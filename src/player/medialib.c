@@ -244,6 +244,24 @@ vlc_player_CompareAssignState(char **target_ptr, char **input_ptr)
     }
 }
 
+/* Same start/end margins as the media library's
+ * Media::computePositionType(), which only applies them when it knows the
+ * media duration. */
+static double
+vlc_player_GetMlProgressMargin(vlc_tick_t length)
+{
+    const vlc_tick_t hour = VLC_TICK_FROM_SEC(3600);
+    if (length < hour)
+        return .05;
+    if (length < 2 * hour)
+        return .04;
+    if (length < 3 * hour)
+        return .03;
+    if (length < 4 * hour)
+        return .02;
+    return .01;
+}
+
 void
 vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
 {
@@ -280,7 +298,23 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
     assert(media->i_type != VLC_ML_MEDIA_TYPE_UNKNOWN);
 
     if ( var_GetBool( input->thread, "save-recentplay" ) )
-        vlc_ml_media_update_progress( ml, media->i_id, input->position );
+    {
+        double position = input->position;
+        /* Directly opened files are added as external media, which the media
+         * library never parses, so it has no duration for them and stores any
+         * position as resumable. A file played to the end would then offer to
+         * resume on its next start, including on every repeat loop. Clear the
+         * progress near either end ourselves, using the length we know.
+         * ponytail: no play count bump for such media, which the media library
+         * only does when it knows the duration. */
+        if (media->i_duration <= 0 && input->length > 0)
+        {
+            const double margin = vlc_player_GetMlProgressMargin(input->length);
+            if (position < margin || position > 1. - margin)
+                position = -1.;
+        }
+        vlc_ml_media_update_progress( ml, media->i_id, position );
+    }
 
     /* If the value changed during the playback, update it in the medialibrary.
      * If not, set each state to their "unset" values, so that they aren't saved
