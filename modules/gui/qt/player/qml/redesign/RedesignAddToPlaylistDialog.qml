@@ -11,6 +11,7 @@ C.Dialog {
     property color accentColor: "#d37918"
     property Component videoBackdropContent
     property var playlistModel
+    property Item scrollFocusItem
     property int itemCount: 0
     property bool busy: false
     property string errorMessage: ""
@@ -22,9 +23,9 @@ C.Dialog {
     signal saveRequested(string key, string name)
     title: qsTr("Add to Playlist")
     anchors.centerIn: parent
-    width: Math.min(theme.dp(714), parent ? parent.width - theme.dp(32) : theme.dp(714))
-    height: Math.min(theme.dp(590), parent ? parent.height - theme.dp(32) : theme.dp(590))
-    padding: 0
+    width: Math.min(theme.dp(713), parent ? parent.width - theme.dp(32) : theme.dp(713))
+    height: Math.min(theme.dp(589), parent ? parent.height - theme.dp(32) : theme.dp(589))
+    padding: 0; spacing: 0
     modal: true; dim: true; focus: true
     closePolicy: busy ? C.Popup.NoAutoClose : C.Popup.CloseOnEscape
     background: RedesignDialogSurface { theme: root.theme; videoBackdropContent: root.videoBackdropContent }
@@ -45,6 +46,47 @@ C.Dialog {
         if (success) accept()
         else errorMessage = message || qsTr("VLC cannot save this selection. Try again.")
     }
+    function revealOnFocus(item) {
+        scrollFocusItem = item
+        revealFocusedItem()
+    }
+    function revealFocusedItem() { Qt.callLater(revealFocusedItemNow) }
+    function revealFocusedItemNow() {
+        const item = scrollFocusItem
+        if (!root.visible || !item || !item.activeFocus) return
+        const viewport = scroll.contentItem
+        const point = item.mapToItem(viewport.contentItem, 0, 0)
+        let target = viewport.contentY
+        if (point.y < target || item.height >= viewport.height) target = point.y - root.theme.dp(8)
+        else if (point.y + item.height > target + viewport.height)
+            target = point.y + item.height + root.theme.dp(8) - viewport.height
+        viewport.contentY = Math.max(0, Math.min(target, viewport.contentHeight - viewport.height))
+    }
+    function moveDestinationFocus(index, direction) {
+        for (let next = index + direction; next >= 0 && next < destinations.count; next += direction) {
+            destinations.positionViewAtIndex(next, ListView.Contain)
+            destinations.forceLayout()
+            const item = destinations.itemAtIndex(next)
+            if (item && item.enabled) {
+                item.forceActiveFocus(Qt.TabFocusReason)
+                return
+            }
+        }
+        destinations.positionViewAtIndex(destinations.currentIndex, ListView.Contain)
+        revealFocusedItem()
+    }
+    component PlaylistField: C.TextField {
+        enabled: !root.busy; selectByMouse: true
+        color: root.theme.settingsHeading; placeholderTextColor: root.lightTheme ? root.theme.foreground : "#404040"
+        selectionColor: root.theme.accent; selectedTextColor: root.theme.field
+        font.pixelSize: root.theme.dp(14); leftPadding: root.theme.dp(14)
+        onActiveFocusChanged: if (activeFocus) root.revealOnFocus(this)
+        background: Rectangle {
+            color: root.theme.field; radius: root.theme.dp(6); border.width: root.theme.dp(2)
+            border.color: parent.activeFocus ? root.theme.accent : root.lightTheme ? root.theme.border : "#191919"
+        }
+        onAccepted: root.submit()
+    }
     onNewNameChanged: { if (newName.length) selectedKey = ""; errorMessage = "" }
     onFilterTextChanged: { selectedKey = ""; errorMessage = "" }
     onOpened: searchField.forceActiveFocus()
@@ -62,7 +104,7 @@ C.Dialog {
         }
         RedesignButton {
             objectName: "addToPlaylistClose"
-            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(8); anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(7); anchors.verticalCenter: parent.verticalCenter
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             iconName: "close"; text: qsTr("Close"); enabled: !root.busy
             onClicked: root.reject()
@@ -72,35 +114,45 @@ C.Dialog {
         id: scroll
         contentWidth: availableWidth; clip: true
         C.ScrollBar.horizontal.policy: C.ScrollBar.AlwaysOff
-        ColumnLayout {
-            width: scroll.availableWidth; spacing: root.theme.dp(12)
-            Item { Layout.preferredHeight: root.theme.dp(8) }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Choose a Playlist"); color: root.theme.bright; font.pixelSize: root.theme.dp(16)
+        onAvailableHeightChanged: if (root.opened) root.revealFocusedItem()
+        onContentHeightChanged: if (root.opened) root.revealFocusedItem()
+        Column {
+            width: scroll.availableWidth
+            Item {
+                width: parent.width
+                height: Math.max(root.theme.dp(100), help.y + help.height + root.theme.dp(23))
+                Text {
+                    id: heading
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: root.theme.dp(42) - baselineOffset
+                    text: qsTr("Choose a Playlist"); color: root.theme.settingsHeading
+                    font.pixelSize: root.theme.dp(16); wrapMode: Text.WordWrap
+                }
+                Text {
+                    id: help
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: Math.max(root.theme.dp(73) - baselineOffset, heading.y + heading.height + root.theme.dp(10))
+                    text: qsTr("Add the selected media to a saved playlist, or create a new playlist.")
+                    color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap
+                }
             }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Add the selected media to a saved playlist, or create a new playlist.")
-                color: root.theme.foreground; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap
-            }
-            C.TextField {
+            PlaylistField {
                 id: searchField
                 objectName: "addToPlaylistSearch"
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.preferredHeight: root.theme.dp(32)
-                enabled: !root.busy; placeholderText: qsTr("Search playlists")
-                color: root.theme.bright; placeholderTextColor: root.theme.foreground
-                selectionColor: root.theme.accent; selectedTextColor: root.theme.field
-                font.pixelSize: root.theme.dp(14); leftPadding: root.theme.dp(12)
-                background: Rectangle { color: root.theme.field; radius: root.theme.dp(4); border.color: searchField.activeFocus ? root.theme.accent : "transparent" }
-                onAccepted: root.submit()
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40); height: root.theme.dp(37)
+                placeholderText: qsTr("Search playlists"); Accessible.name: placeholderText
+                leftPadding: root.theme.dp(42)
+                RedesignIcon {
+                    x: root.theme.dp(8); y: (parent.height - height) / 2
+                    width: root.theme.dp(24); height: width
+                    name: "search"; color: root.theme.foreground
+                }
             }
+            Item { width: 1; height: root.theme.dp(12) }
             ListView {
                 id: destinations
                 objectName: "playlistDestinations"
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.preferredHeight: root.theme.dp(204)
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40); height: root.theme.dp(180)
                 clip: true; model: root.playlistModel
                 C.ScrollBar.vertical: C.ScrollBar { }
                 delegate: C.ItemDelegate {
@@ -110,12 +162,30 @@ C.Dialog {
                     readonly property string key: model.id.toString()
                     objectName: "playlistDestination" + index
                     width: destinations.width; height: root.theme.dp(48)
+                    padding: root.theme.dp(8)
+                    Accessible.name: model.name
+                    Accessible.selected: highlighted
+                    Keys.onDownPressed: root.moveDestinationFocus(index, 1)
+                    Keys.onUpPressed: root.moveDestinationFocus(index, -1)
+                    Keys.onPressed: event => {
+                        if (event.key === Qt.Key_Home) root.moveDestinationFocus(-1, 1)
+                        else if (event.key === Qt.Key_End) root.moveDestinationFocus(destinations.count, -1)
+                        else return
+                        event.accepted = true
+                    }
+                    onActiveFocusChanged: if (activeFocus && root && root.visible && ListView.view) {
+                        const view = ListView.view
+                        const position = index
+                        root.revealOnFocus(destination)
+                        view.currentIndex = position
+                        if (Qt.isQtObject(view)) view.positionViewAtIndex(position, ListView.Contain)
+                    }
                     enabled: !root.busy && model.readOnly !== true
                     highlighted: root.selectedKey === key
                     onClicked: { root.newName = ""; root.selectedKey = key; root.errorMessage = "" }
                     background: Rectangle {
                         radius: root.theme.dp(6)
-                        color: destination.highlighted ? root.theme.selected : destination.hovered ? root.theme.hover : "transparent"
+                        color: destination.highlighted ? root.theme.field : destination.hovered ? root.theme.hover : "transparent"
                         border.color: destination.visualFocus ? root.theme.accent : "transparent"
                     }
                     contentItem: RowLayout {
@@ -127,16 +197,16 @@ C.Dialog {
                         }
                         Text {
                             Layout.fillWidth: true; text: destination.model.name; elide: Text.ElideRight
-                            color: root.theme.foreground; font.pixelSize: root.theme.dp(14)
+                            color: root.theme.playerHeading; font.pixelSize: root.theme.dp(14)
                         }
                         RedesignIcon {
-                            Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20)
-                            sourceSize: Qt.size(root.theme.dp(20) * Screen.devicePixelRatio, root.theme.dp(20) * Screen.devicePixelRatio)
-                            name: "check"; visible: destination.highlighted; color: root.theme.accent
+                            Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24)
+                            sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio)
+                            name: "check-active"; visible: destination.highlighted; color: root.theme.accent
                         }
                         Text {
                             visible: destination.model.readOnly === true
-                            text: qsTr("Read only"); color: root.theme.foreground; font.pixelSize: root.theme.dp(12)
+                            text: qsTr("Read only"); color: root.theme.playerLabel; font.pixelSize: root.theme.dp(12)
                         }
                     }
                 }
@@ -144,35 +214,36 @@ C.Dialog {
                     anchors.fill: parent; anchors.margins: root.theme.dp(20)
                     visible: destinations.count === 0
                     text: root.filterText.length ? qsTr("No playlists match your search.") : qsTr("VLC has no saved playlists.")
-                    color: root.theme.foreground; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap
+                    color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap
                     verticalAlignment: Text.AlignVCenter; horizontalAlignment: Text.AlignHCenter
                 }
             }
+            Item { width: 1; height: root.theme.dp(20) }
             Rectangle {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.preferredHeight: root.theme.dp(1); color: root.theme.border
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                height: root.theme.dp(1); color: root.lightTheme ? root.theme.border : "#222222"
             }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Or create a new playlist"); color: root.theme.bright; font.pixelSize: root.theme.dp(14)
+            Item {
+                width: parent.width; height: Math.max(root.theme.dp(57), createHeading.y + createHeading.height + root.theme.dp(23))
+                Text {
+                    id: createHeading
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: root.theme.dp(27) - baselineOffset
+                    text: qsTr("Or create a new playlist"); color: root.theme.settingsHeading
+                    font.pixelSize: root.theme.dp(16); wrapMode: Text.WordWrap
+                }
             }
-            C.TextField {
+            PlaylistField {
                 id: nameField
                 objectName: "addToPlaylistName"
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.preferredHeight: root.theme.dp(32)
-                enabled: !root.busy; placeholderText: qsTr("Playlist name")
-                color: root.theme.bright; placeholderTextColor: root.theme.foreground
-                selectionColor: root.theme.accent; selectedTextColor: root.theme.field
-                font.pixelSize: root.theme.dp(14); leftPadding: root.theme.dp(12)
-                background: Rectangle { color: root.theme.field; radius: root.theme.dp(4); border.color: nameField.activeFocus ? root.theme.accent : "transparent" }
-                onAccepted: root.submit()
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40); height: root.theme.dp(37)
+                placeholderText: qsTr("Playlist name"); Accessible.name: placeholderText
             }
-            Item { Layout.preferredHeight: root.theme.dp(8) }
+            Item { width: 1; height: root.theme.dp(20) }
         }
     }
     footer: Item {
-        implicitHeight: root.theme.dp(70) + (errorText.visible ? errorText.implicitHeight + root.theme.dp(12) : 0)
+        implicitHeight: root.theme.dp(74) + (errorText.visible ? errorText.implicitHeight + root.theme.dp(12) : 0)
         Text {
             id: errorText
             objectName: "addToPlaylistError"
@@ -180,6 +251,7 @@ C.Dialog {
             anchors.leftMargin: root.theme.dp(20); anchors.rightMargin: root.theme.dp(20); anchors.topMargin: root.theme.dp(8)
             visible: root.errorMessage.length > 0
             text: root.errorMessage; color: root.theme.danger; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap
+            Accessible.role: Accessible.AlertMessage
         }
         RowLayout {
             anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
@@ -189,7 +261,7 @@ C.Dialog {
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitHeight: root.theme.dp(32); implicitWidth: root.theme.dp(100)
                 caption: qsTr("Cancel"); text: caption; enabled: !root.busy
-                background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.panel; radius: root.theme.dp(4) }
+                background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.background; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 onClicked: root.reject()
             }
             Item { Layout.fillWidth: true }
@@ -197,7 +269,9 @@ C.Dialog {
                 objectName: "addToPlaylistSave"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitHeight: root.theme.dp(32); implicitWidth: root.theme.dp(100)
-                caption: root.busy ? qsTr("Saving…") : qsTr("Add"); text: caption; accent: true
+                caption: root.busy ? qsTr("Saving…") : qsTr("Add"); text: caption
+                foreground: root.theme.accent
+                background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.progress; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent"; opacity: parent.enabled ? 1 : .35 }
                 enabled: root.valid && !root.busy
                 onClicked: root.submit()
             }
