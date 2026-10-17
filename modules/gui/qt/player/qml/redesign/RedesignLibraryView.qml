@@ -231,6 +231,7 @@ Item {
         anchors.bottomMargin: root.expanded ? theme.dp(8) : 0
         scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
         expanded: root.expanded; category: root.category
+        atCategoryRoot: root.breadcrumbs.length <= 1
         pins: root.pins; selectedPinId: root.selectedPinId
         onCategoryRequested: category => root.categoryRequested(category)
         onAddRequested: root.addRequested()

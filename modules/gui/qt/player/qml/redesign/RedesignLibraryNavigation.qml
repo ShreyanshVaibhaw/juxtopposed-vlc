@@ -10,6 +10,7 @@ Rectangle {
     property Component videoBackdropContent
     property bool expanded: false
     property int category: 1
+    property bool atCategoryRoot: true
     property var pins: []
     property string selectedPinId: ""
     signal categoryRequested(int category)
@@ -87,10 +88,14 @@ Rectangle {
                 NavigationButton {
                     required property int index
                     required property string modelData
+                    readonly property bool ancestorCategory: root.category === index
+                        && (!root.atCategoryRoot || root.selectedPinId.length > 0)
+                    readonly property string normalIcon: ["home", "videos", "library-songs", "network", "playlist", "history"][index]
+                    readonly property string activeIcon: ["home-active", "videos-active", "library-songs-active", "nav-streaming-active", "playlist-active", "history"][index]
                     objectName: "libraryCategory" + index
-                    iconName: ["home", "videos", "library-songs", "network", "playlist", "history"][index]
-                    selectedIconName: ["home-active", "videos-active", "library-songs-active", "nav-streaming-active", "playlist-active", "history"][index]
-                    text: modelData; selected: !root.selectedPinId && root.category === index
+                    iconName: ancestorCategory ? activeIcon : normalIcon
+                    selectedIconName: activeIcon
+                    text: modelData; selected: !ancestorCategory && root.category === index
                     caption: root.expanded ? [qsTr("Home"), qsTr("Videos"), qsTr("Music"), qsTr("Network"), qsTr("Playlists"), qsTr("Recent")][index] : ""
                     onClicked: root.categoryRequested(index)
                 }

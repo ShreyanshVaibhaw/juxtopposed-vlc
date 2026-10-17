@@ -723,14 +723,29 @@ TestCase {
         return [{tag: "dark-orange", light: false, accent: "#d37918"},
                 {tag: "light-green", light: true, accent: "#0cb37a"}]
     }
+    function verifyNavigationFolderFill(index, color) {
+        if (index !== 1 && index !== 2) return
+        const icon = findChild(findChild(library, "libraryCategory" + index), "redesignButtonIcon")
+        tryCompare(icon, "status", Image.Ready)
+        const point = icon.mapToItem(testCase, index === 1 ? 4.5 : 6.5, index === 1 ? 12.5 : 10.5)
+        const image = grabImage(pixelCaptureBounds), expected = Qt.color(color)
+        const x = Math.floor(point.x * image.width / testCase.width)
+        const y = Math.floor(point.y * image.height / testCase.height)
+        verify(Math.abs(image.red(x, y) - Math.round(expected.r * 255)) <= 1
+            && Math.abs(image.green(x, y) - Math.round(expected.g * 255)) <= 1
+            && Math.abs(image.blue(x, y) - Math.round(expected.b * 255)) <= 1,
+            "The folder must use the filled reference shape and its location color.")
+    }
     function test_navigationIconsFollowTheCategoryAndClearForPins(data) {
         library.lightTheme = data.light
         library.accentColor = data.accent
         library.pins = [{id: "folder:shows", kind: "folder", key: "file:///shows", name: "Shows", icon: "folder"}]
+        mouseMove(testCase, testCase.width - 5, testCase.height - 5)
         const normal = ["home", "videos", "library-songs", "network", "playlist", "history"]
         const active = ["home-active", "videos-active", "library-songs-active", "nav-streaming-active", "playlist-active", "history"]
         for (let category = 0; category < 6; ++category) {
             library.category = category
+            library.breadcrumbs = []
             library.selectedPinId = ""
             for (let i = 0; i < 6; ++i) {
                 const button = findChild(library, "libraryCategory" + i)
@@ -738,24 +753,27 @@ TestCase {
                 compare(button.selected, i === category)
                 compare(icon.name, i === category ? active[i] : normal[i])
                 tryCompare(icon, "status", Image.Ready)
-                if (i === category && (i === 1 || i === 2)) {
-                    const point = icon.mapToItem(testCase, i === 1 ? 4.5 : 6.5, i === 1 ? 12.5 : 10.5)
-                    const image = grabImage(pixelCaptureBounds), color = Qt.color(data.accent)
-                    const x = Math.floor(point.x * image.width / testCase.width)
-                    const y = Math.floor(point.y * image.height / testCase.height)
-                    verify(Math.abs(image.red(x, y) - Math.round(color.r * 255)) <= 1
-                        && Math.abs(image.green(x, y) - Math.round(color.g * 255)) <= 1
-                        && Math.abs(image.blue(x, y) - Math.round(color.b * 255)) <= 1,
-                        "The active folder must use the filled reference shape.")
-                }
             }
+            verifyNavigationFolderFill(category, data.accent)
+            library.breadcrumbs = [{label: "Root", kind: "category"}, {label: "Child", kind: "folder"}]
+            const owner = findChild(library, "libraryCategory" + category)
+            verify(!owner.selected)
+            compare(findChild(owner, "redesignButtonIcon").name, active[category])
+            compare(findChild(owner, "redesignButtonIcon").color, library.theme.foreground)
+            verifyNavigationFolderFill(category, String(library.theme.foreground))
             library.selectedPinId = "folder:shows"
             verify(findChild(library, "libraryPin0").selected)
             for (let i = 0; i < 6; ++i) {
                 const button = findChild(library, "libraryCategory" + i)
                 verify(!button.selected)
-                compare(findChild(button, "redesignButtonIcon").name, normal[i])
+                compare(findChild(button, "redesignButtonIcon").name, i === category ? active[i] : normal[i])
             }
+            library.breadcrumbs = []
+            verify(!owner.selected)
+            compare(findChild(owner, "redesignButtonIcon").name, active[category])
+            library.selectedPinId = ""
+            verify(owner.selected)
+            verifyNavigationFolderFill(category, data.accent)
         }
     }
     function test_expandedGridAndListMatchReferenceAndActivateSameItem() {
