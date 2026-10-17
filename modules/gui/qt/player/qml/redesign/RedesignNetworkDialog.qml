@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls.Basic as C
 
 C.Dialog {
@@ -22,8 +21,8 @@ C.Dialog {
     title: qsTr("Open Network Stream")
     anchors.centerIn: parent
     width: Math.min(theme.dp(1048), parent ? parent.width - theme.dp(32) : theme.dp(1048))
-    height: Math.min(theme.dp(630), parent ? parent.height - theme.dp(32) : theme.dp(630))
-    padding: 0
+    height: Math.min(theme.dp(631), parent ? parent.height - theme.dp(32) : theme.dp(631))
+    padding: 0; spacing: 0
     modal: true; dim: true; focus: true
     closePolicy: busy ? C.Popup.NoAutoClose : C.Popup.CloseOnEscape
     background: RedesignDialogSurface { theme: root.theme; videoBackdropContent: root.videoBackdropContent }
@@ -44,6 +43,18 @@ C.Dialog {
         if (success) accept()
         else { errorMessage = qsTr("VLC cannot save these streams. Check the links and try again."); urlsField.forceActiveFocus() }
     }
+    function revealFocusedField() { Qt.callLater(revealFocusedFieldNow) }
+    function revealFocusedFieldNow() {
+        const field = urlsField.activeFocus ? urlsField : nameField.activeFocus ? nameField : null
+        if (!root.visible || !field) return
+        const viewport = scroll.contentItem
+        const point = field.mapToItem(viewport.contentItem, 0, 0)
+        let target = viewport.contentY
+        if (point.y < target || field.height >= viewport.height) target = point.y - root.theme.dp(8)
+        else if (point.y + field.height > target + viewport.height)
+            target = point.y + field.height + root.theme.dp(8) - viewport.height
+        viewport.contentY = Math.max(0, Math.min(target, viewport.contentHeight - viewport.height))
+    }
     onOpened: urlsField.forceActiveFocus()
     onUrlsTextChanged: errorMessage = ""
     Shortcut { sequence: "Ctrl+Return"; enabled: root.visible && root.valid && !root.busy; onActivated: root.submit() }
@@ -61,7 +72,7 @@ C.Dialog {
         }
         RedesignButton {
             objectName: "networkCloseButton"
-            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(8); anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(7); anchors.verticalCenter: parent.verticalCenter
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             iconName: "close"; text: qsTr("Close"); enabled: !root.busy
             onClicked: root.reject()
@@ -71,85 +82,100 @@ C.Dialog {
         id: scroll
         clip: true
         contentWidth: availableWidth
+        onAvailableHeightChanged: if (root.opened) root.revealFocusedField()
         C.ScrollBar.horizontal.policy: C.ScrollBar.AlwaysOff
-        ColumnLayout {
+        Column {
             width: scroll.availableWidth
-            spacing: root.theme.dp(12)
-            Item { Layout.preferredHeight: root.theme.dp(6) }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Network URL"); color: root.theme.bright; font.pixelSize: root.theme.dp(16)
-            }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Enter one link on each line."); color: root.theme.foreground; font.pixelSize: root.theme.dp(14)
-                wrapMode: Text.WordWrap
+            Item {
+                width: parent.width; height: Math.max(root.theme.dp(100), urlHelp.y + urlHelp.height + root.theme.dp(23))
+                Text {
+                    id: urlHeading
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: root.theme.dp(42) - baselineOffset
+                    text: qsTr("Network URL"); color: root.theme.settingsHeading; font.pixelSize: root.theme.dp(16)
+                    wrapMode: Text.WordWrap
+                }
+                Text {
+                    id: urlHelp
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: Math.max(root.theme.dp(73) - baselineOffset, urlHeading.y + urlHeading.height + root.theme.dp(10))
+                    text: qsTr("Enter one link on each line."); color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14)
+                    wrapMode: Text.WordWrap
+                }
             }
             C.ScrollView {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.topMargin: root.theme.dp(20)
-                Layout.preferredHeight: root.theme.dp(190)
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40); height: root.theme.dp(194)
                 clip: true
+                C.ScrollBar.horizontal.policy: C.ScrollBar.AlwaysOff
                 C.TextArea {
                     id: urlsField
                     objectName: "networkUrlsField"
                     placeholderText: qsTr("e.g., https://www.example.com/stream.avi")
-                    color: root.theme.bright; placeholderTextColor: root.theme.foreground
+                    color: root.theme.settingsHeading; placeholderTextColor: root.lightTheme ? root.theme.foreground : "#404040"
                     selectionColor: root.theme.accent; selectedTextColor: root.theme.field
-                    font.pixelSize: root.theme.dp(14)
-                    padding: root.theme.dp(12)
+                    font.pixelSize: root.theme.dp(14); padding: root.theme.dp(14)
                     wrapMode: TextEdit.Wrap
                     selectByMouse: true; readOnly: root.busy
                     Accessible.name: qsTr("Network URLs")
-                    background: Rectangle { color: root.theme.field; radius: root.theme.dp(4); border.color: urlsField.activeFocus ? root.theme.accent : "transparent" }
+                    onActiveFocusChanged: if (activeFocus) root.revealFocusedField()
+                    background: Rectangle { color: root.theme.field; radius: root.theme.dp(5); border.width: root.theme.dp(2); border.color: urlsField.activeFocus ? root.theme.accent : root.lightTheme ? root.theme.border : "#191919" }
                 }
             }
             Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                topPadding: root.theme.dp(12)
                 visible: root.errorMessage.length > 0
                 text: root.errorMessage; color: root.theme.danger; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap
                 Accessible.role: Accessible.AlertMessage
             }
+            Item { width: 1; height: root.theme.dp(20) }
             Rectangle {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.topMargin: root.theme.dp(8); Layout.bottomMargin: root.theme.dp(8)
-                implicitHeight: root.theme.dp(1); color: root.theme.border
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                height: root.theme.dp(1); color: root.lightTheme ? root.theme.border : "#222222"
             }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Playlist Name (optional)"); color: root.theme.bright; font.pixelSize: root.theme.dp(16)
-            }
-            Text {
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                text: qsTr("Save these links in a playlist with this name."); color: root.theme.foreground; font.pixelSize: root.theme.dp(14)
-                wrapMode: Text.WordWrap
+            Item {
+                width: parent.width; height: Math.max(root.theme.dp(99), nameHelp.y + nameHelp.height + root.theme.dp(23))
+                Text {
+                    id: nameHeading
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: root.theme.dp(39) - baselineOffset
+                    text: qsTr("Playlist Name (optional)"); color: root.theme.settingsHeading; font.pixelSize: root.theme.dp(16)
+                    wrapMode: Text.WordWrap
+                }
+                Text {
+                    id: nameHelp
+                    x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
+                    y: Math.max(root.theme.dp(70) - baselineOffset, nameHeading.y + nameHeading.height + root.theme.dp(10))
+                    text: qsTr("Save these links in a playlist with this name."); color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14)
+                    wrapMode: Text.WordWrap
+                }
             }
             C.TextField {
                 id: nameField
                 objectName: "networkPlaylistNameField"
-                Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(20); Layout.rightMargin: root.theme.dp(20)
-                Layout.topMargin: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(32)
+                x: root.theme.dp(20); width: parent.width - root.theme.dp(40); height: root.theme.dp(37)
                 placeholderText: qsTr("e.g., Favorite TV Channels")
-                color: root.theme.bright; placeholderTextColor: root.theme.foreground
+                color: root.theme.settingsHeading; placeholderTextColor: root.lightTheme ? root.theme.foreground : "#404040"
                 selectionColor: root.theme.accent; selectedTextColor: root.theme.field
-                font.pixelSize: root.theme.dp(14); leftPadding: root.theme.dp(12)
+                font.pixelSize: root.theme.dp(14); leftPadding: root.theme.dp(14)
                 readOnly: root.busy; selectByMouse: true
                 Accessible.name: qsTr("Playlist name")
-                background: Rectangle { color: root.theme.field; radius: root.theme.dp(4); border.color: nameField.activeFocus ? root.theme.accent : "transparent" }
+                onActiveFocusChanged: if (activeFocus) root.revealFocusedField()
+                background: Rectangle { color: root.theme.field; radius: root.theme.dp(5); border.width: root.theme.dp(2); border.color: nameField.activeFocus ? root.theme.accent : root.lightTheme ? root.theme.border : "#191919" }
                 onAccepted: root.submit()
             }
-            Item { Layout.preferredHeight: root.theme.dp(12) }
+            Item { width: 1; height: root.theme.dp(20) }
         }
     }
     footer: Item {
-        implicitHeight: root.theme.dp(70)
+        implicitHeight: root.theme.dp(72)
         RedesignButton {
             objectName: "networkCancelButton"
             x: root.theme.dp(20); anchors.verticalCenter: parent.verticalCenter
             implicitWidth: root.theme.dp(100); implicitHeight: root.theme.dp(32)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             caption: qsTr("Cancel"); text: caption; enabled: !root.busy
-            background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.panel; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
+            background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.background; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
             onClicked: root.reject()
         }
         RedesignButton {

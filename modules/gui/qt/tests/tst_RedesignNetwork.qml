@@ -29,6 +29,46 @@ TestCase {
         }
         compare(saveSpy.count, 0)
     }
+    function test_referenceFieldGeometry() {
+        compare(dialog.width, 1048); compare(dialog.height, 631)
+        for (const spec of [
+            {name: "networkUrlsField", x: 20, y: 150, width: 1008, height: 194},
+            {name: "networkPlaylistNameField", x: 20, y: 464, width: 1008, height: 37},
+            {name: "networkCancelButton", x: 20, y: 579, width: 100, height: 32},
+            {name: "networkSaveButton", x: 928, y: 579, width: 100, height: 32}
+        ]) {
+            const item = findChild(dialog, spec.name)
+            const point = item.mapToItem(dialog.background, 0, 0)
+            fuzzyCompare(point.x, spec.x, 0.1); fuzzyCompare(point.y, spec.y, 0.1)
+            compare(item.width, spec.width); compare(item.height, spec.height)
+        }
+    }
+    function test_smallWindowRevealsTheFocusedField() {
+        width = 640; height = 400
+        wait(20)
+        const name = findChild(dialog, "networkPlaylistNameField")
+        name.forceActiveFocus(); keyClick(Qt.Key_A)
+        compare(dialog.playlistName, "a")
+        tryVerify(() => {
+            const point = name.mapToItem(dialog.background, 0, 0)
+            return point.y >= 50 && point.y + name.height <= dialog.height - 72
+        })
+        height = 800; wait(20)
+        height = 400
+        tryVerify(() => {
+            const point = name.mapToItem(dialog.background, 0, 0)
+            return point.y >= 50 && point.y + name.height <= dialog.height - 72
+        })
+        dialog.urlsText = "https://one.test"
+        dialog.submit(); dialog.finish(false)
+        const urls = findChild(dialog, "networkUrlsField")
+        tryVerify(() => urls.activeFocus)
+        tryVerify(() => {
+            const point = urls.mapToItem(dialog.background, 0, 0)
+            return point.y >= 50 && point.y + urls.height <= dialog.height - 72
+        })
+        verify(findChild(dialog, "networkSaveButton").visible)
+    }
     function test_multipleLinksKeepOrderAndOptionalName() {
         dialog.urlsText = " https://one.test/live.m3u \r\n\n rtsp://two.test/live\nhttps://one.test/live.m3u"
         dialog.playlistName = " TV Channels "
