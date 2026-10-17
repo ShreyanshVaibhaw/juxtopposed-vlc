@@ -14,7 +14,7 @@ TestCase {
     function init() {
         width = 1280; height = 800
         dialog.scaleFactor = 1; dialog.lightTheme = false
-        dialog.busy = false; dialog.close()
+        dialog.busy = false; dialog.canSavePlaylist = true; dialog.close()
         saveSpy.clear(); acceptedSpy.clear()
         dialog.begin(); tryCompare(dialog, "opened", true)
     }
@@ -93,6 +93,23 @@ TestCase {
         compare(dialog.errorMessage, "")
         dialog.submit(); compare(saveSpy.count, 2)
         compare(saveSpy.signalArguments[1][1], "")
+    }
+    function test_withoutLibraryOpensLinksWithoutSavingAPlaylist() {
+        dialog.canSavePlaylist = false
+        const name = findChild(dialog, "networkPlaylistNameField")
+        const open = findChild(dialog, "networkSaveButton")
+        verify(!name.enabled)
+        compare(open.caption, "Open")
+        verify(!open.enabled)
+        dialog.urlsText = "https://one.test/live\nrtsp://two.test/live\nhttps://one.test/live"
+        dialog.playlistName = "Old draft"
+        mouseClick(open)
+        compare(saveSpy.count, 1)
+        compare(saveSpy.signalArguments[0][0], ["https://one.test/live", "rtsp://two.test/live", "https://one.test/live"])
+        compare(saveSpy.signalArguments[0][1], "")
+        compare(open.caption, "Opening…")
+        dialog.finish(true)
+        compare(acceptedSpy.count, 1)
     }
     function test_repeatedOpenKeepsDraftAndNewOpenClearsIt() {
         dialog.urlsText = "https://one.test"; dialog.playlistName = "Draft"

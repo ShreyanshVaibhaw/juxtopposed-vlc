@@ -60,8 +60,7 @@ Item {
     Loader {
         id: networkStreams
         anchors.fill: parent
-        active: MainCtx.mediaLibraryAvailable
-        source: active ? "qrc:///qt/qml/VLC/Player/RedesignNetworkStreams.qml" : ""
+        source: "qrc:///qt/qml/VLC/Player/RedesignNetworkStreams.qml"
         onLoaded: item.videoBackdropContent = dialogBackdrop
     }
     Connections {

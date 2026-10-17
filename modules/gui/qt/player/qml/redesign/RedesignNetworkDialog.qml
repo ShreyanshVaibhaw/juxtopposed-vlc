@@ -10,6 +10,7 @@ C.Dialog {
     property color accentColor: "#d37918"
     property Component videoBackdropContent
     property bool busy: false
+    property bool canSavePlaylist: true
     property string errorMessage: ""
     property alias urlsText: urlsField.text
     property alias playlistName: nameField.text
@@ -36,12 +37,12 @@ C.Dialog {
         if (!valid || busy) return
         errorMessage = ""
         busy = true
-        saveRequested(urls, playlistName.trim())
+        saveRequested(urls, canSavePlaylist ? playlistName.trim() : "")
     }
     function finish(success) {
         busy = false
         if (success) accept()
-        else { errorMessage = qsTr("VLC cannot save these streams. Check the links and try again."); urlsField.forceActiveFocus() }
+        else { errorMessage = qsTr("VLC cannot open these streams. Check the links and try again."); urlsField.forceActiveFocus() }
     }
     function revealFocusedField() { Qt.callLater(revealFocusedFieldNow) }
     function revealFocusedFieldNow() {
@@ -146,7 +147,9 @@ C.Dialog {
                     id: nameHelp
                     x: root.theme.dp(20); width: parent.width - root.theme.dp(40)
                     y: Math.max(root.theme.dp(70) - baselineOffset, nameHeading.y + nameHeading.height + root.theme.dp(10))
-                    text: qsTr("Save these links in a playlist with this name."); color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14)
+                    text: root.canSavePlaylist ? qsTr("Save these links in a playlist with this name.")
+                                              : qsTr("To save a playlist, turn on the media library in Settings. Then restart VLC.")
+                    color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14)
                     wrapMode: Text.WordWrap
                 }
             }
@@ -158,6 +161,8 @@ C.Dialog {
                 color: root.theme.settingsHeading; placeholderTextColor: root.lightTheme ? root.theme.foreground : "#404040"
                 selectionColor: root.theme.accent; selectedTextColor: root.theme.field
                 font.pixelSize: root.theme.dp(14); leftPadding: root.theme.dp(14)
+                enabled: root.canSavePlaylist
+                opacity: enabled ? 1 : .5
                 readOnly: root.busy; selectByMouse: true
                 Accessible.name: qsTr("Playlist name")
                 onActiveFocusChanged: if (activeFocus) root.revealFocusedField()
@@ -183,7 +188,9 @@ C.Dialog {
             anchors.right: parent.right; anchors.rightMargin: root.theme.dp(20); anchors.verticalCenter: parent.verticalCenter
             implicitWidth: root.theme.dp(100); implicitHeight: root.theme.dp(32)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-            caption: root.busy ? qsTr("Saving…") : qsTr("Save"); text: caption
+            caption: root.canSavePlaylist ? (root.busy ? qsTr("Saving…") : qsTr("Save"))
+                                          : (root.busy ? qsTr("Opening…") : qsTr("Open"))
+            text: caption
             enabled: root.valid && !root.busy; foreground: root.theme.accent
             background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.progress; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent"; opacity: parent.enabled ? 1 : .35 }
             onClicked: root.submit()

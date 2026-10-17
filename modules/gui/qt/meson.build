@@ -797,6 +797,7 @@ qml_modules += {
        'player/qml/redesign/RedesignAddToPlaylistDialog.qml',
        'player/qml/redesign/RedesignAddToPlaylist.qml',
        'player/qml/redesign/RedesignNetworkStreams.qml',
+       'player/qml/redesign/RedesignNetworkStreamLibrary.qml',
        'player/qml/redesign/RedesignPreferencesCatalog.qml',
        'player/qml/redesign/RedesignPreferencesWindow.qml',
        'player/qml/redesign/RedesignSettingSlider.qml',

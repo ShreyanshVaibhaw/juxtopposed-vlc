@@ -1246,6 +1246,7 @@ libqml_module_player_a_QML = \
 	player/qml/redesign/RedesignAddToPlaylistDialog.qml \
 	player/qml/redesign/RedesignAddToPlaylist.qml \
 	player/qml/redesign/RedesignNetworkStreams.qml \
+	player/qml/redesign/RedesignNetworkStreamLibrary.qml \
 	player/qml/redesign/RedesignPreferencesWindow.qml \
 	player/qml/redesign/RedesignSettingSlider.qml \
 	player/qml/redesign/RedesignSleepTimer.qml \
