@@ -12,6 +12,10 @@ QtObject {
     readonly property color background: lightTheme ? "#acacac" : "#1b1b1b"
     readonly property color panel: lightTheme ? "#c3c3c3" : "#0f0f0f"
     readonly property color floatingPanel: lightTheme ? Qt.rgba(195 / 255, 195 / 255, 195 / 255, floatingOpacity) : Qt.rgba(14 / 255, 14 / 255, 14 / 255, floatingOpacity)
+    readonly property color libraryPanel: lightTheme ? panel : "#0e0e0e"
+    readonly property color libraryOverlay: lightTheme ? Qt.rgba(231 / 255, 231 / 255, 231 / 255, floatingOpacity) : Qt.rgba(14 / 255, 14 / 255, 14 / 255, floatingOpacity)
+    readonly property color libraryNavigation: lightTheme ? background : "#191919"
+    readonly property color libraryNavigationOverlay: lightTheme ? Qt.rgba(213 / 255, 213 / 255, 213 / 255, transparencyEnabled ? 0.75 : 1) : "#191919"
     readonly property color field: lightTheme ? "#dedede" : "#090909"
     readonly property color border: lightTheme ? "#969696" : "#292929"
     readonly property color foreground: lightTheme ? "#404040" : "#8f8f8f"

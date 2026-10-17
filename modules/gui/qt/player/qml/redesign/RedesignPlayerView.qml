@@ -325,8 +325,16 @@ FocusScope {
         x: (reveal - 1) * width
         anchors.top: parent.top; anchors.bottom: parent.bottom
         anchors.topMargin: header.height; anchors.bottomMargin: root.libraryExpanded ? 0 : toolbar.height
-        color: theme.panel
+        color: root.libraryExpanded ? theme.libraryPanel : "transparent"
         clip: true
+        Rectangle {
+            objectName: "redesignLibraryBody"
+            visible: !root.libraryExpanded
+            x: theme.dp(50)
+            width: Math.max(0, parent.width - x)
+            height: parent.height
+            color: theme.libraryOverlay
+        }
         MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onWheel: wheel => wheel.accepted = true }
         Loader {
             id: libraryLoader

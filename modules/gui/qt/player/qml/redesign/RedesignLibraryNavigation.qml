@@ -20,7 +20,7 @@ Rectangle {
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
     width: theme.dp(expanded ? 201 : 50)
     radius: expanded ? theme.dp(6) : 0
-    color: expanded && !lightTheme ? "#191919" : theme.background
+    color: expanded ? theme.libraryNavigation : theme.libraryNavigationOverlay
     function reveal(button) {
         const y = button.mapToItem(contents, 0, 0).y + contents.y
         if (y < scroll.contentY) scroll.contentY = y
