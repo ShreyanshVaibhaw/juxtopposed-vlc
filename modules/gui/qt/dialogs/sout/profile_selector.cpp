@@ -145,6 +145,12 @@ void VLCProfileSelector::editProfilePrivate( const QString& qs, const QString& v
     QWidget* windowWidget = window();
     QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
     VLCProfileEditor *editor = new VLCProfileEditor( qs, value,  parentWindow );
+    if (windowWidget && windowWidget->property("redesignDialog").toBool())
+    {
+        editor->setPalette(windowWidget->palette());
+        editor->setFont(windowWidget->font());
+        editor->setStyleSheet(windowWidget->styleSheet());
+    }
 
     /* Show it */
     if( QDialog::Accepted == editor->exec() )

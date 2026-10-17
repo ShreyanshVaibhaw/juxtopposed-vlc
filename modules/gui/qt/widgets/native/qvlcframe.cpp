@@ -28,6 +28,7 @@
 
 #include "qvlcframe.hpp"
 #include "maininterface/compositor.hpp"
+#include "util/redesign_widget_theme.hpp"
 
 void QVLCTools::saveWidgetPosition(QSettings *settings, QWidget *widget)
 {
@@ -224,6 +225,9 @@ void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_i
 {
     assert(widget);
     assert(widget->isWindow()); // Do not call this method if widget is not a window.
+
+    if (p_intf)
+        applyRedesignWidgetTheme(widget, p_intf->p_mi);
 
     if (!parent && p_intf && !p_intf->b_isDialogProvider)
     {

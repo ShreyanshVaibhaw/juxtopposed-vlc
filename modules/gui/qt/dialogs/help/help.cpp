@@ -28,8 +28,9 @@
 #include "qt.hpp"
 #include "help.hpp"
 #include "aboutmodel.hpp"
-#include "util/qt_dirs.hpp"
 #include "maininterface/mainctx.hpp"
+#include "util/color_scheme_model.hpp"
+#include "util/qt_dirs.hpp"
 
 
 #include <vlc_intf_strings.h>
@@ -44,6 +45,9 @@
 #include <QEvent>
 #include <QDate>
 #include <QPushButton>
+#include <QRegularExpression>
+#include <QApplication>
+#include <QStyleHints>
 
 #include <cassert>
 
@@ -93,10 +97,10 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
     setWindowModality( Qt::WindowModal );
 
     ui.version->setText(qfu( " " VERSION_MESSAGE ) );
-    ui.title->setText("<html><head/><body><p><span style=\" font-size:26pt; color:#353535;\"> " + qtr( "VLC media player" ) + " </span></p></body></html>");
+    ui.title->setText("<html><head/><body><p><span style=\" font-size:26pt;\"> " + qtr( "VLC media player" ) + " </span></p></body></html>");
 
     ui.MainBlabla->setText("<html><head/><body>" +
-    qtr( "<p>VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the <a href=\"https://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join us!</span></a>" ) +
+    qtr( "<p>VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the <a href=\"https://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join us!</span></a>" ).remove(QStringLiteral("color:#0057ae;")) +
     "</p>" + AboutModel::getDesignAttribution() + "</body> </html>");
 
     const QDate today = QDate::currentDate();
@@ -115,14 +119,29 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
     /* People who wrote the software */
     ui.authorsPage->setText( qfu( psz_authors ) );
 
-    ui.licenseButton->setText( "<html><head/><body><p><span style=\" text-decoration: underline; color:#0057ae;\">"+qtr( "License" )+"</span></p></body></html>");
-    ui.licenseButton->installEventFilter( this );
+    ui.licenseButton->setText(qtr("License"));
+    connect(ui.licenseButton, &QPushButton::clicked, this, &AboutDialog::showLicense);
 
-    ui.authorsButton->setText( "<html><head/><body><p><span style=\" text-decoration: underline; color:#0057ae;\">"+qtr( "Authors" )+"</span></p></body></html>");
-    ui.authorsButton->installEventFilter( this );
+    ui.authorsButton->setText(qtr("Authors"));
+    connect(ui.authorsButton, &QPushButton::clicked, this, &AboutDialog::showAuthors);
 
-    ui.creditsButton->setText( "<html><head/><body><p><span style=\" text-decoration: underline; color:#0057ae;\">"+qtr( "Credits" )+"</span></p></body></html>");
-    ui.creditsButton->installEventFilter( this );
+    ui.creditsButton->setText(qtr("Credits"));
+    connect(ui.creditsButton, &QPushButton::clicked, this, &AboutDialog::showCredit);
+
+    const auto updateLinkColor = [this] {
+        const QColor color = palette().color(QPalette::Link);
+        QString html = ui.MainBlabla->text();
+        html.remove(QRegularExpression(QStringLiteral(" style=\"color:#[0-9a-fA-F]{6};\"")));
+        html.replace(QStringLiteral("<a "), QStringLiteral("<a style=\"color:%1;\" ").arg(color.name()));
+        ui.MainBlabla->setText(html);
+    };
+    updateLinkColor();
+    if (p_intf->p_mi)
+    {
+        connect(p_intf->p_mi, &MainCtx::redesignAccentChanged, this, updateLinkColor);
+        connect(p_intf->p_mi->getColorScheme(), &ColorSchemeModel::currentChanged, this, updateLinkColor);
+        connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this, updateLinkColor);
+    }
 
     ui.version->installEventFilter( this );
 }
@@ -161,13 +180,6 @@ bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
             }
             return true;
         }
-        else if( obj == ui.licenseButton )
-            showLicense();
-        else if( obj == ui.authorsButton )
-            showAuthors();
-        else if( obj == ui.creditsButton )
-            showCredit();
-
         return false;
     }
 

@@ -16,6 +16,7 @@
 
 void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
 {
+    if (!ctx || widget->property("redesignDialog").toBool()) return;
     widget->setProperty("redesignDialog", true);
     widget->setAttribute(Qt::WA_StyledBackground);
     const auto box = qobject_cast<QMessageBox*>(widget);
@@ -43,7 +44,14 @@ void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
         colors.setColor(QPalette::ButtonText, QColor(foreground));
         colors.setColor(QPalette::Highlight, QColor(accent));
         colors.setColor(QPalette::HighlightedText, QColor("#161616"));
-        colors.setColor(QPalette::Link, QColor(accent));
+        const QColor linkColor = light ? ctx->redesignAccent().darker(200) : ctx->redesignAccent();
+        colors.setColor(QPalette::Link, linkColor);
+        colors.setColor(QPalette::LinkVisited, linkColor);
+        colors.setColor(QPalette::Light, QColor(border));
+        colors.setColor(QPalette::Midlight, QColor(border));
+        colors.setColor(QPalette::Mid, QColor(border));
+        colors.setColor(QPalette::Dark, QColor(border));
+        colors.setColor(QPalette::Shadow, QColor(border));
         widget->setPalette(colors);
         if (auto message = qobject_cast<QMessageBox*>(widget)) {
             for (auto button : message->buttons()) button->setIcon({});
@@ -57,12 +65,29 @@ void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
         widget->setStyleSheet(QStringLiteral(
             "QWidget { font-family: Inter; font-size: %1px; color: %2; }"
             "QWidget[redesignDialog=\"true\"], QDialog, QTabWidget::pane { background: %3; border: none; }"
-            "QLineEdit, QTextEdit, QComboBox, QAbstractItemView { background: %4; alternate-background-color: %3; color: %5; border: 1px solid %6; border-radius: 4px; padding: 5px; selection-background-color: %7; selection-color: #161616; }"
-            "QLineEdit:focus, QTextEdit:focus { border-color: %7; }"
+            "QWidget#aboutWidget QFrame#footer { background: %4; }"
+            "QWidget#aboutWidget QLabel#title { color: %5; }"
+            "QLineEdit, QTextEdit, QPlainTextEdit, QComboBox, QAbstractSpinBox, QAbstractItemView { background: %4; alternate-background-color: %3; color: %5; border: 1px solid %6; border-radius: 4px; padding: 5px; selection-background-color: %7; selection-color: #161616; }"
+            "QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QAbstractSpinBox:focus { border-color: %7; }"
+            "QAbstractSpinBox { min-height: %9px; }"
+            "QAbstractSpinBox::up-button, QAbstractSpinBox::down-button { background: transparent; border: none; }"
+            "QAbstractSpinBox QLineEdit { background: transparent; border: none; padding: 0; }"
+            "QComboBox::drop-down { background: transparent; border: none; }"
+            "QComboBox::down-arrow { image: none; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid %2; border-bottom: none; }"
+            "QCheckBox::indicator, QGroupBox::indicator, QRadioButton::indicator { width: 14px; height: 14px; background: %4; border: 1px solid %6; }"
+            "QCheckBox::indicator, QGroupBox::indicator { border-radius: 3px; }"
+            "QRadioButton::indicator { border-radius: 7px; }"
+            "QCheckBox::indicator:checked, QGroupBox::indicator:checked { background: %7; border-color: %7; image: url(:/icons/check.svg); }"
+            "QRadioButton::indicator:checked { background: %7; border-color: %7; }"
+            "QCheckBox::indicator:hover, QGroupBox::indicator:hover, QRadioButton::indicator:hover { border-color: %7; }"
+            "QCheckBox::indicator:disabled, QGroupBox::indicator:disabled, QRadioButton::indicator:disabled { background: %8; border-color: %6; }"
+            "QCheckBox::indicator:checked:disabled, QGroupBox::indicator:checked:disabled, QRadioButton::indicator:checked:disabled { background: %2; border-color: %2; }"
             "QPushButton { background: %4; border: 1px solid transparent; border-radius: 4px; padding: 6px 16px; min-height: 18px; }"
             "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 4px; padding: 4px; }"
             "QToolButton:hover { background: %8; }"
             "QToolButton:focus { border-color: %7; }"
+            "QToolButton::menu-button { background: %4; border: none; }"
+            "QToolButton::menu-button:hover { background: %8; }"
             "QPushButton:hover { background: %8; }"
             "QPushButton:focus { border-color: %7; }"
             "QPushButton:pressed { background: %7; color: #161616; }"
@@ -85,7 +110,7 @@ void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
             "QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }"
             "QScrollBar::add-page, QScrollBar::sub-page { background: transparent; }"
             "QScrollArea, QScrollArea > QWidget > QWidget { background: %3; border: none; }")
-            .arg(dp(14)).arg(foreground, background, field, bright, border, accent, hover));
+            .arg(dp(14)).arg(foreground, background, field, bright, border, accent, hover).arg(dp(18)));
     };
     applyTheme();
     if (ctx) {

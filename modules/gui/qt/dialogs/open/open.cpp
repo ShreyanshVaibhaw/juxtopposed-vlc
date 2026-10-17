@@ -281,6 +281,8 @@ void OpenDialog::signalCurrent( int i_tab )
                               OpenPanel::CONTEXT_INTERACTIVE :
                               OpenPanel::CONTEXT_BATCH );
     }
+    // Capture controls are built lazily. Their styled minimum sizes are ready after polish.
+    QMetaObject::invokeMethod(this, [this] { setMinimumSize(minimumSizeHint()); }, Qt::QueuedConnection);
 }
 
 /***********
