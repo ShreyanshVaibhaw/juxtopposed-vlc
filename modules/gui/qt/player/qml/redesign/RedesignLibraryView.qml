@@ -23,7 +23,7 @@ Item {
     property bool locationPinned: false
     property var menuForItem: (index, section) => null
     property string searchText: ""
-    property bool grid: false
+    property alias grid: viewMode.grid
     property bool expanded: false
     property bool playlistOpen: false
     property bool playlistEditing: false
@@ -74,6 +74,37 @@ Item {
     signal playlistMoveRequested(int from, int to, var id)
     signal playlistRemoveRequested(int row, var id)
     signal playlistFilesDropped(var urls)
+
+    QtObject {
+        id: viewMode
+        property var ctx: root.settingsContext
+        readonly property string mode: root.expanded ? "expanded" : "compact"
+        readonly property string storageKey: "Juxtopposed/library-view"
+        property var saved: ({})
+        property bool grid: false
+        property bool ready: false
+        property bool applying: false
+        function apply() {
+            applying = true
+            grid = typeof saved[mode] === "boolean" ? saved[mode] : root.expanded
+            applying = false
+        }
+        function load() {
+            try {
+                const value = ctx ? JSON.parse(ctx.settingValue(storageKey, "{}")) : {}
+                saved = value && !Array.isArray(value) && typeof value === "object" ? value : {}
+            } catch (error) { saved = {} }
+            apply()
+        }
+        onGridChanged: {
+            if (!ready || applying) return
+            saved = Object.assign({}, saved, {[mode]: grid})
+            if (ctx) ctx.setSettingValue(storageKey, JSON.stringify(saved))
+        }
+        onModeChanged: if (ready) apply()
+        onCtxChanged: if (ready) load()
+        Component.onCompleted: { load(); ready = true }
+    }
 
     function nameFromUrl(url) {
         const value = url.toString()

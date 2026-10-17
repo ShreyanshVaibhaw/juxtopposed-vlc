@@ -42,8 +42,9 @@ TestCase {
     QtObject {
         id: settings
         property string saved: "[]"
+        property int writes: 0
         function settingValue(key, fallback) { return saved }
-        function setSettingValue(key, value) { saved = value }
+        function setSettingValue(key, value) { saved = value; ++writes }
     }
     DropArea {
         id: queueDrop
@@ -57,6 +58,7 @@ TestCase {
     Component { id: visitsComponent; RedesignLibraryVisits { ctx: settings } }
     Component { id: sortComponent; RedesignLibrarySort { ctx: settings } }
     Component { id: pinsComponent; RedesignLibraryPins { ctx: settings } }
+    Component { id: viewComponent; RedesignLibraryView { visible: false; width: 1920; height: 1040; settingsContext: settings } }
     RedesignLibraryPath { id: folderPath }
     SignalSpy { id: homeSpy; target: library; signalName: "homeActivated" }
     SignalSpy { id: homeQueueSpy; target: library; signalName: "homeEnqueueRequested" }
@@ -114,6 +116,10 @@ TestCase {
         wait(20)
         queueDrop.visible = false; queueDrop.drops = 0; queueDrop.sourceItem = null
         settings.saved = "[]"
+        settings.writes = 0
+        library.expanded = false
+        library.settingsContext = null
+        library.settingsContext = undefined
         library.homeSections = []
         homeSpy.clear(); homeQueueSpy.clear(); sectionSpy.clear()
         library.category = 1
@@ -709,6 +715,42 @@ TestCase {
         compare(activateSpy.signalArguments[1][0], 1)
         library.expanded = false
         tryCompare(second, "width", findChild(library, "libraryMediaView").width)
+    }
+    function test_defaultFullLibraryUsesGridAndCompactKeepsList() {
+        compare(library.grid, false)
+        expandLibrary(); compare(library.grid, true)
+        library.expanded = false; compare(library.grid, false)
+    }
+    function test_fullAndCompactViewChoicesAreIndependent() {
+        library.grid = true
+        expandLibrary(); compare(library.grid, true)
+        mouseClick(findChild(library,"libraryViewButton"))
+        tryCompare(findChild(library,"libraryViewMenu"),"opened",true)
+        mouseClick(findChild(library,"libraryAction_list"))
+        compare(library.grid,false)
+        library.expanded=false; compare(library.grid,true)
+        library.expanded=true; compare(library.grid,false)
+    }
+    function test_viewChoicesSurviveReloadWithoutSavingModeSwitches() {
+        settings.saved="{}"
+        let view=createTemporaryObject(viewComponent,testCase)
+        compare(view.grid,false); compare(settings.writes,0)
+        view.grid=true; compare(settings.writes,1)
+        view.expanded=true; compare(view.grid,true); compare(settings.writes,1)
+        view.grid=false; compare(settings.writes,2)
+        view.expanded=false; compare(view.grid,true); compare(settings.writes,2)
+        view=createTemporaryObject(viewComponent,testCase)
+        compare(view.grid,true); compare(settings.writes,2)
+        view.expanded=true; compare(view.grid,false); compare(settings.writes,2)
+    }
+    function test_invalidViewChoicesUseTheDesignDefaults() {
+        for (const value of ["invalid", "[]", "null", "42", "false", '{"compact":"grid","expanded":"list"}']) {
+            settings.saved=value
+            const view=createTemporaryObject(viewComponent,testCase)
+            compare(view.grid,false)
+            view.expanded=true; compare(view.grid,true)
+        }
+        compare(settings.writes,0)
     }
     function test_expandedLibraryKeepsControlsInsideNarrowWindow() {
         testCase.width = 640
