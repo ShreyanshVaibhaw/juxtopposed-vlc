@@ -714,6 +714,7 @@ FocusScope {
                 objectName: "subtitleButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "subtitles"; text: qsTr("Subtitle tracks")
+                selectedIconName: "subtitles-active"
                 selected: !!root.trackPopup && root.trackPopup.visible && root.trackPopup.page === "subtitles"
                 onClicked: { root.toggleTracks(this, "subtitles"); root.subtitleTracksRequested(this) }
             }
@@ -722,6 +723,7 @@ FocusScope {
                 objectName: "playbackSettingsButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "settings"; text: qsTr("Playback settings")
+                selectedIconName: "playback-settings-active"
                 selected: root.settingsPage.length > 0
                 onClicked: root.toggleSettings("playback")
             }

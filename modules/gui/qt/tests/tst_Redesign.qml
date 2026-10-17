@@ -10,6 +10,13 @@ TestCase {
     height: 720
     when: windowShown
     visible: true
+    // A scaled software window grab can contain physical pixels but report DPR 1.
+    Item {
+        id: pixelCaptureBounds
+        width: testCase.width * Screen.devicePixelRatio
+        height: testCase.height * Screen.devicePixelRatio
+        visible: false
+    }
     property var seekEventOrder: []
     property bool consumeVideoHover: false
     property int activeBackdrops: 0
@@ -609,6 +616,34 @@ TestCase {
         tryCompare(trackPicker, "visible", false)
         verify(!subtitles.selected)
         verify(!settings.selected)
+    }
+    function test_selectedToolbarGlyphs_data() {
+        return [{tag: "settings-dark", button: "playbackSettingsButton", x: 7, y: 11, light: false, accent: "#d37918"},
+                {tag: "subtitles-dark", button: "subtitleButton", x: 12, y: 8, light: false, accent: "#d37918"},
+                {tag: "settings-light-green", button: "playbackSettingsButton", x: 7, y: 11, light: true, accent: "#0cb37a"},
+                {tag: "subtitles-light-green", button: "subtitleButton", x: 12, y: 8, light: true, accent: "#0cb37a"}]
+    }
+    function test_selectedToolbarGlyphs(data) {
+        player.lightTheme = data.light
+        player.accentColor = data.accent
+        const button = findChild(player, data.button), icon = findChild(button, "redesignButtonIcon")
+        verify(icon !== null)
+        mouseClick(button)
+        tryCompare(button, "selected", true)
+        tryCompare(icon, "status", Image.Ready)
+        const point = icon.mapToItem(testCase, data.x + 0.5, data.y + 0.5)
+        const image = grabImage(pixelCaptureBounds), expected = Qt.color(data.accent)
+        const x = Math.floor(point.x * image.width / testCase.width)
+        const y = Math.floor(point.y * image.height / testCase.height)
+        verify(Math.abs(image.red(x, y) - Math.round(expected.r * 255)) <= 1
+            && Math.abs(image.green(x, y) - Math.round(expected.g * 255)) <= 1
+            && Math.abs(image.blue(x, y) - Math.round(expected.b * 255)) <= 1,
+            "The active glyph must use the filled shape and the chosen accent.")
+        mouseClick(button)
+        tryCompare(button, "selected", false)
+        tryCompare(icon, "status", Image.Ready)
+        compare(icon.name, button.iconName)
+        player.accentColor = "#d37918"
     }
     function test_headerFolderOpensCurrentMediaFolderWithoutMovingVideo() {
         const button = findChild(player, "mediaFolderButton")
