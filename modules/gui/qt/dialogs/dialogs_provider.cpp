@@ -81,13 +81,13 @@
 #include <QScopeGuard>
 #include <QRegularExpression>
 #include <algorithm>
+#include <utility>
 
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
 
 #define BASE_DIALOG(X) \
     X(prefsDialog) \
-    X(openDialog) \
     X(extendedDialog) \
     X(messagesDialog) \
     X(gotoTimeDialog) \
@@ -118,6 +118,9 @@ DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
 
 DialogsProvider::~DialogsProvider()
 {
+    m_openDialog.reset();
+    m_discOpenDialog.reset();
+    m_captureOpenDialog.reset();
     /* free parentless menus  */
     VLCMenuBar::freeRendererMenu();
 }
@@ -283,6 +286,12 @@ bool DialogsProvider::eventFilter(QObject *watched, QEvent *event) {
     case QEvent::Close:
     case QEvent::Destroy:
     {
+        if (watched == m_openDialog.get() || watched == m_discOpenDialog.get()
+            || watched == m_captureOpenDialog.get())
+        {
+            emit openDialogVisibleChanged();
+            break;
+        }
         ALL_DIALOG(CASE_DIALOG)
         break;
     }
@@ -707,7 +716,8 @@ void DialogsProvider::openFileDialog()
 }
 void DialogsProvider::openDiscDialog()
 {
-    openDialog( OpenDialog::OPEN_DISC_TAB );
+    ensureDialog(m_discOpenDialog, nullptr, OpenDialog::OPEN_DISC_TAB);
+    m_discOpenDialog->showTab(OpenDialog::OPEN_DISC_TAB, OpenDialog::OPEN_AND_PLAY);
 }
 void DialogsProvider::openNetDialog()
 {
@@ -719,7 +729,8 @@ void DialogsProvider::openNetDialog()
 }
 void DialogsProvider::openCaptureDialog()
 {
-    openDialog( OpenDialog::OPEN_CAPTURE_TAB );
+    ensureDialog(m_captureOpenDialog, nullptr, OpenDialog::OPEN_CAPTURE_TAB);
+    m_captureOpenDialog->showTab(OpenDialog::OPEN_CAPTURE_TAB, OpenDialog::OPEN_AND_PLAY);
 }
 
 /* Same as the open one, but force the enqueue */
@@ -1391,11 +1402,11 @@ void DialogsProvider::sendKey( int key )
 }
 
 
-template<typename T>
-void DialogsProvider::ensureDialog(std::unique_ptr<T>& dialog)
+template<typename T, typename... Args>
+void DialogsProvider::ensureDialog(std::unique_ptr<T>& dialog, Args&&... args)
 {
     if (!dialog) {
-        dialog = std::make_unique<T>(p_intf);
+        dialog = std::make_unique<T>(p_intf, std::forward<Args>(args)...);
         //install event filter to track visibility
         dialog->installEventFilter(this);
     }
@@ -1415,6 +1426,13 @@ void DialogsProvider::toggleDialogVisible(std::unique_ptr<T>& dialog) {
     }
 
 ALL_DIALOG(DIALOG_VISIBLE_GETTER)
+
+bool DialogsProvider::openDialogVisible() const
+{
+    return (m_openDialog && m_openDialog->isVisible())
+        || (m_discOpenDialog && m_discOpenDialog->isVisible())
+        || (m_captureOpenDialog && m_captureOpenDialog->isVisible());
+}
 
 void DialogsProvider::dismissFirstRunDialog()
 {

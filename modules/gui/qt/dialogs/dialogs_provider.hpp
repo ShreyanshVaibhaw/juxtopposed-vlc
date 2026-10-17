@@ -176,6 +176,8 @@ private:
     QPointer<PrefsDialog> m_prefsDialog;
 
     std::unique_ptr<OpenDialog> m_openDialog;
+    std::unique_ptr<OpenDialog> m_discOpenDialog;
+    std::unique_ptr<OpenDialog> m_captureOpenDialog;
     bool m_firstRunDialogVisible = false;
     std::unique_ptr<ExtendedDialog> m_extendedDialog;
     std::unique_ptr<MessagesDialog> m_messagesDialog;
@@ -200,8 +202,8 @@ private:
 
     void openDialog( OpenDialog::OpenTab );
 
-    template<typename T>
-    inline void ensureDialog(std::unique_ptr<T>& dialog);
+    template<typename T, typename... Args>
+    inline void ensureDialog(std::unique_ptr<T>& dialog, Args&&... args);
     template<typename T>
     void toggleDialogVisible(std::unique_ptr<T>& dialog);
 

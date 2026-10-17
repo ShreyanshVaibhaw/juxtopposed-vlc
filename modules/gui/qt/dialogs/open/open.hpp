@@ -61,7 +61,7 @@ public:
 
 
 public:
-    OpenDialog(qt_intf_t * , QWindow *parent = nullptr);
+    OpenDialog(qt_intf_t *, QWindow *parent = nullptr, OpenTab source = OPEN_TAB_MAX);
     virtual ~OpenDialog();
 
     void showTab( OpenDialog::OpenTab tab, OpenDialog::ActionFlag action );
@@ -83,17 +83,16 @@ private:
     QString optionsMRL;
     QString storedMethod;
     QStringList itemsMRL;
+    const OpenTab source;
+    const QString settingsGroup;
 
     Ui::Open ui;
-    FileOpenPanel *fileOpenPanel;
-    NetOpenPanel *netOpenPanel;
-    DiscOpenPanel *discOpenPanel;
-    CaptureOpenPanel *captureOpenPanel;
+    OpenPanel *sourcePanels[OPEN_TAB_MAX] = {};
 
     ActionFlag i_action_flag = OPEN_AND_PLAY;
     QStringList SeparateEntries( const QString& );
 
-    QPushButton *cancelButton, *selectButton;
+    QPushButton *cancelButton, *selectButton, *actionButton;
     QToolButton *playButton;
 
 private slots:
