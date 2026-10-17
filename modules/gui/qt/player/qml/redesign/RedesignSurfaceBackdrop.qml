@@ -11,6 +11,17 @@ Item {
     property real cornerRadius: 10 * scaleFactor
     property bool menuShadow: false
     property bool nativeVideo: true
+    Loader {
+        anchors.fill: parent
+        z: -1
+        active: root.visible && root.menuShadow && GraphicsInfo.shaderType !== GraphicsInfo.RhiShader
+        sourceComponent: Component {
+            RedesignSoftwareShadow {
+                scaleFactor: root.scaleFactor
+                cornerRadius: root.cornerRadius
+            }
+        }
+    }
     Widgets.RoundedRectangleShadow {
         anchors.alignWhenCentered: false
         visible: root.menuShadow && GraphicsInfo.shaderType === GraphicsInfo.RhiShader

@@ -826,6 +826,7 @@ qml_modules += {
        'player/qml/redesign/RedesignSvg.qml',
        'player/qml/redesign/RedesignActionMenu.qml',
        'player/qml/redesign/RedesignSurfaceBackdrop.qml',
+       'player/qml/redesign/RedesignSoftwareShadow.qml',
        'player/qml/redesign/RedesignDialogSurface.qml',
        'player/qml/redesign/RedesignSettingsDialog.qml',
        'player/qml/redesign/RedesignLibraryArtwork.qml',
@@ -1566,6 +1567,15 @@ if qt6_dep.found()
             'sources': files('tests/test_redesign_folder_model.cpp', 'util/redesign_folder_model.cpp'),
             'moc_sources': files('tests/test_redesign_folder_model.cpp'),
             'moc_headers': files('util/redesign_folder_model.hpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+        vlc_tests += {
+            'name': 'test_qt_effects_image_provider',
+            'sources': files('tests/test_effects_image_provider.cpp', 'util/effects_image_provider.cpp'),
+            'moc_sources': files('tests/test_effects_image_provider.cpp'),
+            'moc_headers': files('util/effects_image_provider.hpp'),
             'suite': ['qt'],
             'include_directories': qt_include_dir,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],

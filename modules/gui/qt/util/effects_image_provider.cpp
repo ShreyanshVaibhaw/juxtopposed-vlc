@@ -48,6 +48,9 @@ public:
         , m_yOffset(settings["yOffset"].toReal())
         , m_recWidth(settings["rectWidth"].toReal())
         , m_height(settings["rectHeight"].toReal())
+        , m_exclusion(settings["exclusionX"].toReal(), settings["exclusionY"].toReal(),
+                      settings["exclusionWidth"].toReal(), settings["exclusionHeight"].toReal())
+        , m_exclusionRadius(settings["exclusionRadius"].toReal())
     {
     }
 
@@ -112,6 +115,18 @@ public:
             QImage::Format_ARGB32_Premultiplied,
             free, rawDest);
 
+        if (!m_exclusion.isEmpty())
+        {
+            // A translucent surface must not show its own shadow underneath.
+            QPainter painter(&dest);
+            painter.setRenderHint(QPainter::Antialiasing);
+            painter.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+            painter.scale(xscale, yscale);
+            QPainterPath path;
+            path.addRoundedRect(m_exclusion, m_exclusionRadius, m_exclusionRadius);
+            painter.fillPath(path, Qt::black);
+        }
+
         return dest;
     }
 
@@ -125,6 +140,8 @@ protected:
     qreal m_yOffset = 0.0;
     qreal m_recWidth = 0.0;
     qreal m_height = 0.0;
+    QRectF m_exclusion;
+    qreal m_exclusionRadius = 0.0;
 };
 
 class RoundedRectDropShadowEffect : public RectDropShadowEffect

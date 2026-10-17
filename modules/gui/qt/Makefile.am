@@ -1281,6 +1281,7 @@ libqml_module_player_a_QML = \
 	player/qml/redesign/RedesignSvg.qml \
 	player/qml/redesign/RedesignActionMenu.qml \
 	player/qml/redesign/RedesignSurfaceBackdrop.qml \
+	player/qml/redesign/RedesignSoftwareShadow.qml \
 	player/qml/redesign/RedesignDialogSurface.qml \
 	player/qml/redesign/RedesignSettingsDialog.qml \
 	player/qml/redesign/RedesignLibraryArtwork.qml \
@@ -2177,6 +2178,19 @@ test_qt_track_list_model_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_qt_track_list_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_qt_track_list_model
 TESTS += test_qt_track_list_model
+
+test_qt_effects_image_provider_SOURCES = \
+	tests/test_effects_image_provider.cpp util/effects_image_provider.cpp util/effects_image_provider.hpp
+nodist_test_qt_effects_image_provider_SOURCES = \
+	tests/test_effects_image_provider.moc util/effects_image_provider.moc.cpp
+BUILT_SOURCES += tests/test_effects_image_provider.moc
+CLEANFILES += tests/test_effects_image_provider.moc
+test_qt_effects_image_provider_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_qt_effects_image_provider_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_qt_effects_image_provider_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_qt_effects_image_provider_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_qt_effects_image_provider
+TESTS += test_qt_effects_image_provider
 
 test_qt_navigation_model_SOURCES = \
 	tests/vlc_stub_modules.cpp \
