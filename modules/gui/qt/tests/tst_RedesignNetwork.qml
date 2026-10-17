@@ -43,6 +43,21 @@ TestCase {
             compare(item.width, spec.width); compare(item.height, spec.height)
         }
     }
+    function test_widthChangeKeepsFocusedNameVisible() {
+        height = 400
+        const name = findChild(dialog, "networkPlaylistNameField")
+        name.forceActiveFocus(); keyClick(Qt.Key_A)
+        verify(waitForRendering(name))
+        function revealed() {
+            const point = name.mapToItem(dialog.background, 0, 0)
+            return name.activeFocus && point.y >= 50 && point.y + name.height <= dialog.height - 72
+        }
+        tryVerify(revealed)
+        width = 260
+        tryVerify(revealed)
+        keyClick(Qt.Key_B)
+        compare(dialog.playlistName, "ab")
+    }
     function test_smallWindowRevealsTheFocusedField() {
         width = 640; height = 400
         wait(20)

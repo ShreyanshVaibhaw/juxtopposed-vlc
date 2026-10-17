@@ -45,6 +45,36 @@ TestCase {
             fuzzyCompare(item.height, spec.height * data.scale, .1, spec.name)
         }
     }
+    function test_widthChangeKeepsFocusedNameVisible() {
+        height = 300
+        const name = findChild(dialog, "playlistNameField")
+        name.forceActiveFocus(); keyClick(Qt.Key_A)
+        verify(waitForRendering(name))
+        function revealed() {
+            const point = name.mapToItem(dialog.background, 0, 0)
+            return name.activeFocus && point.y >= 50 && point.y + name.height <= dialog.height - 74
+        }
+        tryVerify(revealed)
+        width = 260
+        tryVerify(revealed)
+        keyClick(Qt.Key_B)
+        compare(dialog.playlistName, "ab")
+    }
+    function test_widthChangeKeepsFocusedFileButtonVisible() {
+        height = 400
+        const button = findChild(dialog, "playlistSelectFilesButton")
+        button.forceActiveFocus()
+        verify(waitForRendering(button))
+        function revealed() {
+            const point = button.mapToItem(dialog.background, 0, 0)
+            return button.activeFocus && point.y >= 50 && point.y + button.height <= dialog.height - 74
+        }
+        tryVerify(revealed)
+        width = 400
+        tryVerify(revealed)
+        keyClick(Qt.Key_Space)
+        compare(filesSpy.count, 1)
+    }
     function test_smallWindowRevealsFocusedControls() {
         width = 500; height = 400
         wait(20)

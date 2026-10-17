@@ -109,6 +109,7 @@ C.Dialog {
         clip: true; contentWidth: availableWidth
         C.ScrollBar.horizontal.policy: C.ScrollBar.AlwaysOff
         onAvailableHeightChanged: if (root.opened) root.revealFocusedItem()
+        onContentHeightChanged: if (root.opened) root.revealFocusedItem()
         Column {
             width: scroll.availableWidth
             Item {
