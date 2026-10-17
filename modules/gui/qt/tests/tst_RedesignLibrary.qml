@@ -10,6 +10,12 @@ TestCase {
     visible: true
     when: windowShown
     property int activeBackdrops: 0
+    Item {
+        id: pixelCaptureBounds
+        width: testCase.width * Screen.devicePixelRatio
+        height: testCase.height * Screen.devicePixelRatio
+        visible: false
+    }
     Component {
         id: backdropProbe
         Item {
@@ -123,6 +129,8 @@ TestCase {
         library.homeSections = []
         homeSpy.clear(); homeQueueSpy.clear(); sectionSpy.clear()
         library.category = 1
+        library.lightTheme = false
+        library.accentColor = "#d37918"
         library.playlistOpen = false; library.playlistEditing = false; library.playlistBusy = false
         library.playlistEditMessage = ""; library.playlistKey = ""; library.dragDestination = -1
         library.mediaModel = folderItems
@@ -710,6 +718,45 @@ TestCase {
         tryVerify(() => compactSearch.visible)
         compare(compactSearch.text, "s")
         compare(findChild(library, "libraryCategory2").caption, "")
+    }
+    function test_navigationIconsFollowTheCategoryAndClearForPins_data() {
+        return [{tag: "dark-orange", light: false, accent: "#d37918"},
+                {tag: "light-green", light: true, accent: "#0cb37a"}]
+    }
+    function test_navigationIconsFollowTheCategoryAndClearForPins(data) {
+        library.lightTheme = data.light
+        library.accentColor = data.accent
+        library.pins = [{id: "folder:shows", kind: "folder", key: "file:///shows", name: "Shows", icon: "folder"}]
+        const normal = ["home", "videos", "library-songs", "network", "playlist", "history"]
+        const active = ["home-active", "videos-active", "library-songs-active", "nav-streaming-active", "playlist-active", "history"]
+        for (let category = 0; category < 6; ++category) {
+            library.category = category
+            library.selectedPinId = ""
+            for (let i = 0; i < 6; ++i) {
+                const button = findChild(library, "libraryCategory" + i)
+                const icon = findChild(button, "redesignButtonIcon")
+                compare(button.selected, i === category)
+                compare(icon.name, i === category ? active[i] : normal[i])
+                tryCompare(icon, "status", Image.Ready)
+                if (i === category && (i === 1 || i === 2)) {
+                    const point = icon.mapToItem(testCase, i === 1 ? 4.5 : 6.5, i === 1 ? 12.5 : 10.5)
+                    const image = grabImage(pixelCaptureBounds), color = Qt.color(data.accent)
+                    const x = Math.floor(point.x * image.width / testCase.width)
+                    const y = Math.floor(point.y * image.height / testCase.height)
+                    verify(Math.abs(image.red(x, y) - Math.round(color.r * 255)) <= 1
+                        && Math.abs(image.green(x, y) - Math.round(color.g * 255)) <= 1
+                        && Math.abs(image.blue(x, y) - Math.round(color.b * 255)) <= 1,
+                        "The active folder must use the filled reference shape.")
+                }
+            }
+            library.selectedPinId = "folder:shows"
+            verify(findChild(library, "libraryPin0").selected)
+            for (let i = 0; i < 6; ++i) {
+                const button = findChild(library, "libraryCategory" + i)
+                verify(!button.selected)
+                compare(findChild(button, "redesignButtonIcon").name, normal[i])
+            }
+        }
     }
     function test_expandedGridAndListMatchReferenceAndActivateSameItem() {
         expandLibrary()

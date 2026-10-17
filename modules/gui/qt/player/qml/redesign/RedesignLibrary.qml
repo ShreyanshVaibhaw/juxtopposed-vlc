@@ -483,7 +483,7 @@ RedesignLibraryView {
     }
     ListModel {
         id: musicCategories
-        ListElement { title: QT_TR_NOOP("Songs"); iconName: "library-songs" }
+        ListElement { title: QT_TR_NOOP("Songs"); iconName: "music" }
         ListElement { title: QT_TR_NOOP("Albums"); iconName: "library-album" }
         ListElement { title: QT_TR_NOOP("Artists"); iconName: "library-artist" }
         ListElement { title: QT_TR_NOOP("Genres"); iconName: "library-genre" }

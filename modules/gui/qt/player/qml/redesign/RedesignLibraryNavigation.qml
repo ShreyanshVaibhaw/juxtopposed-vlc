@@ -88,7 +88,8 @@ Rectangle {
                     required property int index
                     required property string modelData
                     objectName: "libraryCategory" + index
-                    iconName: [root.category === 0 && !root.selectedPinId ? "home-active" : "home", "videos", "music", "network", "playlist", "history"][index]
+                    iconName: ["home", "videos", "library-songs", "network", "playlist", "history"][index]
+                    selectedIconName: ["home-active", "videos-active", "library-songs-active", "nav-streaming-active", "playlist-active", "history"][index]
                     text: modelData; selected: !root.selectedPinId && root.category === index
                     caption: root.expanded ? [qsTr("Home"), qsTr("Videos"), qsTr("Music"), qsTr("Network"), qsTr("Playlists"), qsTr("Recent")][index] : ""
                     onClicked: root.categoryRequested(index)
