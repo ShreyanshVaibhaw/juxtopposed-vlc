@@ -14,7 +14,7 @@ RedesignSvg {
     property color color: "#8f8f8f"
     property color detailColor: color
     property real sidebarReveal: 0
-    readonly property bool hasDetail: (paths[name] || "").includes("DETAIL")
+    readonly property bool hasDetail: name === "sort-active" || (paths[name] || "").includes("DETAIL")
     sourceSize: Qt.size(width * Screen.devicePixelRatio, height * Screen.devicePixelRatio)
     fillMode: Image.PreserveAspectFit
     readonly property var paths: {
@@ -141,7 +141,7 @@ RedesignSvg {
     "music": "<g xmlns=\"http://www.w3.org/2000/svg\" id=\"name=music, direction=default, state=default, value=default, EQ=default, two-tone=no\">\n<g id=\"Frame\">\n<path id=\"Vector 25\" d=\"M18 6H13.6676V13.5M13.6676 13.5C13.6676 13.5 13.668 18 9.16772 18C6.75246 18 5.41767 15.75 6.2462 14.0932C7.88438 10.8173 13.6676 13.5 13.6676 13.5Z\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n</g>\n</g>\n",
     "network": "<g xmlns=\"http://www.w3.org/2000/svg\" id=\"name=streaming, direction=default, state=default, value=default, EQ=default, two-tone=no\">\n<g id=\"Frame\">\n<circle id=\"Ellipse 1\" cx=\"12\" cy=\"12\" r=\"2\" fill=\"COLOR\" />\n<path id=\"Ellipse 2\" d=\"M7.75736 7.75732C6.67157 8.84311 6 10.3431 6 12C6 13.6568 6.67157 15.1568 7.75736 16.2426\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n<path id=\"Ellipse 4\" d=\"M16.2426 16.2427C17.3284 15.1569 18 13.6569 18 12C18 10.3432 17.3284 8.84318 16.2426 7.75739\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n<path id=\"Ellipse 3\" d=\"M19.0711 4.92871C20.8807 6.73835 22 9.23835 22 11.9998C22 14.7612 20.8807 17.2612 19.0711 19.0708M4.92893 19.0708C3.11929 17.2612 2 14.7612 2 11.9998C2 9.23835 3.11929 6.73835 4.92893 4.92871\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n</g>\n</g>\n",
     "history": "<g xmlns=\"http://www.w3.org/2000/svg\" id=\"name=recent, direction=default, state=default, value=default, EQ=default, two-tone=no\">\n<g id=\"Frame\">\n<path id=\"Ellipse 12\" d=\"M13.1428 5C16.9299 5 19.9999 8.13401 19.9999 12C19.9999 15.866 16.9299 19 13.1428 19C9.35569 19 6.28564 15.866 6.28564 12V10.4444M3.57143 13.1587L6.28564 10.4444L8.99993 13.1587\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n<path id=\"Vector 101\" d=\"M13 8V11.1429C13 11.6162 13.3838 12 13.8571 12H15.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n</g>\n</g>\n",
-    "sort-active": "<g transform=\"scale(0.9230769)\"><path d=\"M17.5 19L17.5 6M14 9.5L17.5 6L21 9.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M6.5 7L6.5 20M10 16.5L6.5 20L3 16.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"24\" cy=\"2\" r=\"2\" fill=\"DETAIL\"/></g>",
+    "sort-active": "<path d=\"M17.5 18L17.5 5M14 8.5L17.5 5L21 8.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M6.5 6L6.5 19M10 15.5L6.5 19L3 15.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
     "sort": "<path d=\"M17.5 18L17.5 5M14 8.5L17.5 5L21 8.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M6.5 6L6.5 19M10 15.5L6.5 19L3 15.5\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
     "check-active": "<path d=\"M5 11.5L9.66667 17L19 6\" stroke=\"COLOR\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>",
     "check": "<path d=\"m5 12 4 4L19 6\" fill=\"none\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
@@ -161,6 +161,15 @@ RedesignSvg {
     svg:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">'
         + (paths[name] || "").split("COLOR").join(color.toString()).split("DETAIL").join(detailColor.toString()) + "</svg>"
+    // The active dot extends outside the standard icon frame in the mockup.
+    // Keep its SVG frame aligned with the base icon at fractional scales.
+    RedesignSvg {
+        visible: root.name === "sort-active"
+        x: -root.width * 2 / 24; y: -root.height * 2 / 24
+        width: root.width * 28 / 24; height: root.height * 28 / 24
+        svg: visible ? '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="-2 -2 28 28"><circle cx="24" cy="1" r="2" fill="'
+            + root.detailColor.toString() + '"/></svg>' : ""
+    }
     // The icon fill follows the exact same reveal value as the sidebar.
     Rectangle {
         visible: root.name === "sidebar"
