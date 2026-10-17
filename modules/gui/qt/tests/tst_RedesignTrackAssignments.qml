@@ -39,6 +39,70 @@ TestCase {
         tryCompare(dialog,"opened",true); load([rows()[0]])
     }
     function cleanup() { dialog.saving=false; dialog.close(); tryCompare(dialog,"visible",false) }
+    function test_referenceLayout_data() {
+        const cases = []
+        for (const mode of ["file", "folder", "online"])
+            for (const style of [{tag: "dark", scale: 1}, {tag: "light", scale: 1, light: true}, {tag: "scaled", scale: 1.5}])
+                cases.push({tag: mode + "-" + style.tag, mode: mode, scale: style.scale, light: style.light})
+        return cases
+    }
+    function test_referenceLayout(data) {
+        width=1800; height=1400; dialog.scaleFactor=data.scale; dialog.lightTheme=!!data.light
+        if (data.mode === "folder") { dialog.selectScope(1); load(rows()) }
+        else if (data.mode === "online") {
+            dialog.providerConfigured=true; dialog.sourceIndex=1
+            dialog.onlineSources=[{url: "opensubtitles:1", name: "English.srt"}]
+        }
+        wait(20)
+        function geometry(item, x, y, w, h) {
+            const point=item.mapToItem(dialog.background, 0, 0)
+            fuzzyCompare(point.x, x * data.scale, .6, item.objectName)
+            fuzzyCompare(point.y, y * data.scale, .6, item.objectName)
+            fuzzyCompare(item.width, w * data.scale, .6, item.objectName)
+            fuzzyCompare(item.height, h * data.scale, .6, item.objectName)
+        }
+        geometry(findChild(dialog,"trackAssignmentClose"),1005,7,36,36)
+        geometry(findChild(dialog,"trackAssignmentScope"),9,53,200,34)
+        geometry(findChild(dialog,"trackAssignmentFiles"),219,53,200,34)
+        geometry(findChild(dialog,"trackAssignmentScope").indicator,177,58,24,24)
+        geometry(findChild(dialog,"trackAssignmentFiles").indicator,387,58,24,24)
+        if (data.mode === "online") {
+            geometry(findChild(dialog,"trackAssignmentSearch"),429,53,400,34)
+            geometry(findChild(dialog,"trackAssignmentLanguage"),839,53,200,34)
+            geometry(findChild(dialog,"trackAssignmentLanguage").indicator,1007,58,24,24)
+            geometry(findChild(dialog,"trackAssignmentSearchButton"),429,53,40,34)
+        } else {
+            geometry(findChild(dialog,"trackAssignmentFolder"),429,53,610,34)
+            geometry(findChild(dialog,"trackAssignmentFolderIcon"),437,58,24,24)
+        }
+        geometry(findChild(dialog,"trackAssignmentCancel"),20,748,100,32)
+        geometry(findChild(dialog,"trackAssignmentSave"),928,748,100,32)
+        function pixel(item, x, y, color) {
+            const point=item.mapToItem(testCase,x * data.scale,y * data.scale)
+            const image=grabImage(testCase), expected=Qt.color(color)
+            x=Math.round(point.x); y=Math.round(point.y)
+            compare(image.red(x,y),Math.round(expected.r*255))
+            compare(image.green(x,y),Math.round(expected.g*255))
+            compare(image.blue(x,y),Math.round(expected.b*255))
+        }
+        const scope=findChild(dialog,"trackAssignmentScope")
+        pixel(scope.background,20,4,data.light ? "#c3c3c3" : "#151515")
+        const list=findChild(dialog,"trackAssignmentList")
+        tryVerify(() => !!list.itemAtIndex(0))
+        geometry(list.itemAtIndex(0),20,118,1008,36)
+        const label=findChild(list.itemAtIndex(0),"trackAssignmentName_0")
+        const labelPoint=label.mapToItem(dialog.background,0,0)
+        fuzzyCompare(labelPoint.x, (data.mode === "folder" ? 68 : 66) * data.scale, .1)
+        if (data.mode === "folder") {
+            geometry(findChild(list.itemAtIndex(0),"trackAssignmentConnector_0"),239,137.5,280,1)
+            geometry(findChild(list.itemAtIndex(0),"trackAssignmentChoose_0"),547,120,471,32)
+            geometry(list.itemAtIndex(1),20,158,1008,36)
+        } else {
+            dialog.setTracks(first,[dialog.visibleSources[0].url]); wait(10)
+            pixel(list.itemAtIndex(0).background,80,3,data.light ? "#dedede" : "#090909")
+            fuzzyCompare(label.mapToItem(dialog.background,0,0).x,66 * data.scale,.1)
+        }
+    }
     function test_selectAndCancelDoesNotSave() {
         compare(dialog.changedRows.length,0)
         const list=findChild(dialog,"trackAssignmentList")

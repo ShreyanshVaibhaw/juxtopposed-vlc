@@ -74,7 +74,7 @@ C.Dialog {
     readonly property bool fileMode: scopeIndex === 0
     readonly property var scopes: [
         {text: qsTr("To This File"), enabled: anchorFile.length > 0},
-        {text: qsTr("To Folder"), enabled: targetFolder.length > 0},
+        {text: qsTr("To This Folder"), enabled: targetFolder.length > 0},
         {text: qsTr("To Playlist"), enabled: !!context.key || (context.urls || []).length > 0}
     ]
     readonly property var changedRows: Object.keys(drafts).map(url => drafts[url]).filter(row => !same(row.initialTracks, row.tracks) || (row.inheritedRule && row.manual))
@@ -105,7 +105,7 @@ C.Dialog {
     anchors.centerIn: parent
     width: Math.min(theme.dp(1048), parent ? parent.width - theme.dp(32) : theme.dp(1048))
     height: Math.min(theme.dp(800), parent ? parent.height - theme.dp(32) : theme.dp(800))
-    padding: 0; modal: true; dim: true; focus: true
+    padding: 0; spacing: 0; modal: true; dim: true; focus: true
     closePolicy: saving && !cancelableSave ? C.Popup.NoAutoClose : C.Popup.CloseOnEscape
     background: RedesignDialogSurface {
         theme: root.theme
@@ -360,6 +360,19 @@ C.Dialog {
     Shortcut { sequence: "Ctrl+O"; enabled: root.visible && !root.saving; onActivated: { root.selectSource(0); root.filesRequested("") } }
     Shortcut { sequences: ["Ctrl+Return", "Ctrl+Enter"]; enabled: root.visible && !root.saving; onActivated: root.submit() }
 
+    component HeaderComboBox: RedesignComboBox {
+        scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+        background: Rectangle {
+            color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6)
+            border.color: parent.visualFocus ? root.theme.accent : "transparent"
+        }
+        indicator: RedesignIcon {
+            width: root.theme.dp(24); height: width
+            x: parent.width - width - root.theme.dp(8); y: (parent.height - height) / 2
+            name: "chevron-down"; color: root.theme.foreground
+        }
+    }
+
     header: Item {
         implicitHeight: root.theme.dp(96)
         Rectangle {
@@ -367,12 +380,12 @@ C.Dialog {
             Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: parent.height / 2; color: parent.color }
         }
         Text {
-            x: root.theme.dp(20); y: root.theme.dp(16)
+            x: root.theme.dp(20); y: (root.theme.dp(50) - height) / 2
             text: root.title; color: root.theme.foreground; font.pixelSize: root.theme.dp(14)
         }
         RedesignButton {
             objectName: "trackAssignmentClose"
-            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(8); y: root.theme.dp(6)
+            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(7); y: root.theme.dp(7)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             iconName: "close"; text: qsTr("Close"); enabled: !root.saving || root.cancelableSave; onClicked: root.reject()
         }
@@ -380,25 +393,21 @@ C.Dialog {
             anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
             anchors.leftMargin: root.theme.dp(9); anchors.rightMargin: root.theme.dp(9); anchors.bottomMargin: root.theme.dp(9)
             spacing: root.theme.dp(10)
-            RedesignComboBox {
+            HeaderComboBox {
                 id: scopeChoice
                 objectName: "trackAssignmentScope"
                 Layout.preferredWidth: Math.min(root.theme.dp(200), root.width * 0.23); Layout.preferredHeight: root.theme.dp(34)
-                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 model: root.scopes; textRole: "text"; restrictChoices: true
                 currentIndex: root.scopeIndex; enabled: !root.loading && !root.loadingDrop && !root.saving
                 onModelChanged: Qt.callLater(() => scopeChoice.currentIndex = root.scopeIndex)
-                background: Rectangle { color: root.theme.panel; radius: root.theme.dp(4); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 onActivated: index => root.selectScope(index)
             }
-            RedesignComboBox {
+            HeaderComboBox {
                 id: sourceChoice
                 objectName: "trackAssignmentFiles"
                 Layout.preferredWidth: Math.min(root.theme.dp(200), root.width * 0.23); Layout.preferredHeight: root.theme.dp(34)
-                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 model: root.sourceChoices; currentIndex: root.sourceIndex
                 enabled: !root.loading && !root.loadingDrop && !root.saving
-                background: Rectangle { color: root.theme.panel; radius: root.theme.dp(4); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 onModelChanged: Qt.callLater(() => sourceChoice.currentIndex = root.sourceIndex)
                 onActivated: index => root.selectSource(index)
             }
@@ -409,10 +418,10 @@ C.Dialog {
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "folder"; text: root.sourceFolder || qsTr("Select track folder"); leftAligned: true
                 enabled: !root.saving && !root.loadingDrop
-                background: Rectangle { color: root.theme.panel; radius: root.theme.dp(4); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
+                background: Rectangle { color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 contentItem: RowLayout {
-                    spacing: root.theme.dp(12)
-                    RedesignIcon { sourceSize: Qt.size(root.theme.dp(40), root.theme.dp(40)); Layout.leftMargin: root.theme.dp(10); Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20); name: "folder"; color: root.theme.foreground }
+                    spacing: root.theme.dp(10)
+                    RedesignIcon { objectName: "trackAssignmentFolderIcon"; sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio); Layout.leftMargin: root.theme.dp(8); Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24); name: "folder"; color: root.theme.foreground }
                     Text { Layout.fillWidth: true; Layout.rightMargin: root.theme.dp(12); text: root.sourceFolder ? decodeURIComponent(root.sourceFolder.replace(/^file:\/\//, "")) : qsTr("Select track folder"); elide: Text.ElideMiddle; font.pixelSize: root.theme.dp(14); color: root.theme.foreground }
                 }
                 onClicked: root.folderRequested()
@@ -423,27 +432,27 @@ C.Dialog {
                 Layout.fillWidth: true; Layout.preferredHeight: root.theme.dp(34)
                 enabled: root.providerConfigured && !root.saving
                 text: root.searchTitle; placeholderText: qsTr("Search subtitles")
-                leftPadding: root.theme.dp(40); rightPadding: root.theme.dp(10)
+                leftPadding: root.theme.dp(42); rightPadding: root.theme.dp(10)
                 color: root.theme.foreground; placeholderTextColor: root.theme.foreground
                 font.pixelSize: root.theme.dp(14); selectByMouse: true
                 Accessible.name: qsTr("Search subtitles")
-                background: Rectangle { color: root.theme.panel; radius: root.theme.dp(4); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
+                background: Rectangle { color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 RedesignButton {
+                    objectName: "trackAssignmentSearchButton"
                     anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                    implicitWidth: root.theme.dp(34); implicitHeight: root.theme.dp(34)
+                    implicitWidth: root.theme.dp(40); implicitHeight: root.theme.dp(34)
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                    iconName: "search"; iconSize: root.theme.dp(20); text: qsTr("Search subtitles")
+                    iconName: "search"; iconSize: root.theme.dp(24); text: qsTr("Search subtitles")
                     onClicked: root.requestSearch()
                 }
                 onTextEdited: { root.searchTitle = text; searchDebounce.restart() }
                 onAccepted: root.requestSearch()
             }
-            RedesignComboBox {
+            HeaderComboBox {
                 id: languageChoice
                 objectName: "trackAssignmentLanguage"
                 visible: root.onlineMode
                 Layout.preferredWidth: Math.min(root.theme.dp(200), root.width * 0.20); Layout.preferredHeight: root.theme.dp(34)
-                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 model: root.searchLanguageChoices; textRole: "text"
                 enabled: root.providerConfigured && !root.saving
                 function syncLanguage() { currentIndex = root.searchLanguageChoices.findIndex(item => item.code === root.searchLanguage) }
@@ -451,7 +460,7 @@ C.Dialog {
                 onModelChanged: Qt.callLater(syncLanguage)
                 Component.onCompleted: syncLanguage()
                 onActivated: index => { root.manualSearchLanguage = true; root.searchLanguage = root.searchLanguageChoices[index].code; root.requestSearch() }
-                background: Rectangle { color: root.theme.panel; radius: root.theme.dp(4); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
+                background: Rectangle { color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
             }
             C.TextField {
                 objectName: "trackAssignmentLink"
@@ -463,7 +472,7 @@ C.Dialog {
                 color: root.theme.foreground; placeholderTextColor: root.theme.foreground
                 font.pixelSize: root.theme.dp(14); selectByMouse: true
                 Accessible.name: placeholderText
-                background: Rectangle { color: root.theme.panel; radius: root.theme.dp(4); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
+                background: Rectangle { color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 RedesignIcon { anchors.left: parent.left; anchors.leftMargin: root.theme.dp(10); anchors.verticalCenter: parent.verticalCenter; width: root.theme.dp(20); height: width; name: "link"; color: root.theme.foreground }
                 onTextEdited: root.linkText = text
                 onAccepted: root.addLink()
@@ -504,7 +513,7 @@ C.Dialog {
             }
         }
         C.ScrollView {
-            anchors.fill: parent; anchors.topMargin: root.theme.dp(20); anchors.leftMargin: root.theme.dp(20); anchors.rightMargin: root.theme.dp(20)
+            anchors.fill: parent; anchors.topMargin: root.theme.dp(22); anchors.leftMargin: root.theme.dp(20); anchors.rightMargin: root.theme.dp(20)
             clip: true; contentWidth: availableWidth
             C.ScrollBar.horizontal.policy: C.ScrollBar.AlwaysOff
             ListView {
@@ -518,10 +527,11 @@ C.Dialog {
                     required property int index
                     objectName: "trackAssignmentRow_" + index
                     width: ListView.view.width; height: root.theme.dp(36)
-                    enabled: !root.saving; padding: root.theme.dp(10)
+                    enabled: !root.saving; padding: 0
+                    leftPadding: root.theme.dp(root.fileMode ? 8 : 10); rightPadding: leftPadding
                     highlighted: root.fileMode && root.tracks(root.anchorFile).includes(modelData.url)
                     Accessible.name: modelData.name
-                    background: Rectangle { radius: root.theme.dp(5); color: entry.highlighted ? root.theme.field : entry.hovered ? root.theme.hover : "transparent"; border.color: entry.visualFocus || rowDrop.containsDrag ? root.theme.accent : "transparent" }
+                    background: Rectangle { radius: root.theme.dp(6); color: entry.highlighted ? root.theme.field : entry.hovered ? root.theme.hover : "transparent"; border.color: entry.visualFocus || rowDrop.containsDrag ? root.theme.accent : "transparent" }
                     DropArea {
                         id: rowDrop
                         objectName: "trackAssignmentRowDrop_" + entry.index
@@ -535,44 +545,51 @@ C.Dialog {
                     }
                     onClicked: root.fileMode ? root.toggle(root.anchorFile, modelData.url) : root.chooseRow(modelData.url)
                     contentItem: RowLayout {
-                        spacing: root.theme.dp(18)
+                        spacing: root.theme.dp(root.fileMode ? 14 : 18)
                         C.CheckBox {
                             visible: !root.fileMode
                             Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(24)
+                            Layout.topMargin: root.theme.dp(4)
                             checked: !!root.selectedRows[entry.modelData.url]
                             Accessible.name: qsTr("Select %1").arg(entry.modelData.name)
                             onToggled: root.selectedRows = Object.assign({}, root.selectedRows, {[entry.modelData.url]: checked})
-                            indicator: Rectangle { x: root.theme.dp(2); y: (parent.height - height) / 2; width: root.theme.dp(16); height: width; radius: root.theme.dp(2); color: "transparent"; border.color: parent.visualFocus ? root.theme.accent : root.theme.foreground
+                            indicator: Rectangle { x: root.theme.dp(3); y: (parent.height - height) / 2; width: root.theme.dp(18); height: root.theme.dp(16); radius: root.theme.dp(3); color: "transparent"; border.width: root.theme.dp(1.5); border.color: parent.visualFocus ? root.theme.accent : root.theme.playerLabel
                                 RedesignIcon { sourceSize: Qt.size(root.theme.dp(40), root.theme.dp(40)); anchors.fill: parent; anchors.margins: root.theme.dp(1); name: "check"; color: root.theme.accent; visible: parent.parent.checked }
                             }
                             contentItem: Item {}
                         }
-                        RedesignIcon { sourceSize: Qt.size(root.theme.dp(40), root.theme.dp(40)); visible: root.fileMode; Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20); name: root.subtitles ? "subtitle-file" : "audio-file"; color: root.theme.foreground }
+                        RedesignIcon { sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio); visible: root.fileMode; Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24); name: root.subtitles ? "subtitle-file" : "audio-file"; color: root.theme.playerLabel }
                         Text {
-                            Layout.fillWidth: root.fileMode; Layout.preferredWidth: root.fileMode ? -1 : root.theme.dp(160)
-                            text: entry.modelData.name; font.pixelSize: root.theme.dp(14); color: root.theme.foreground; elide: Text.ElideMiddle
+                            objectName: "trackAssignmentName_" + entry.index
+                            Layout.fillWidth: root.fileMode; Layout.preferredWidth: root.fileMode ? -1 : root.theme.dp(156)
+                            Layout.minimumWidth: 0; Layout.topMargin: root.fileMode ? 0 : root.theme.dp(4)
+                            text: entry.modelData.name; font.pixelSize: root.theme.dp(14); color: root.theme.playerHeading; elide: Text.ElideMiddle
                         }
                         Item {
-                            visible: !root.fileMode; Layout.fillWidth: true; Layout.preferredWidth: root.theme.dp(280); Layout.preferredHeight: root.theme.dp(1)
+                            objectName: "trackAssignmentConnector_" + entry.index
+                            visible: !root.fileMode; Layout.preferredWidth: root.theme.dp(280); Layout.maximumWidth: root.theme.dp(280)
+                            Layout.minimumWidth: 0; Layout.preferredHeight: root.theme.dp(1)
+                            Layout.leftMargin: -root.theme.dp(3); Layout.topMargin: root.theme.dp(4)
                             Row { anchors.fill: parent; spacing: root.theme.dp(8); clip: true
-                                Repeater { model: Math.ceil(parent.width / root.theme.dp(16)); Rectangle { width: root.theme.dp(8); height: root.theme.dp(1); color: root.theme.border } }
+                                Repeater { model: Math.ceil(parent.width / root.theme.dp(16)); Rectangle { width: root.theme.dp(8); height: root.theme.dp(1); color: root.lightTheme ? root.theme.border : "#373737" } }
                             }
                         }
                         RedesignButton {
                             visible: !root.fileMode
                             objectName: "trackAssignmentChoose_" + entry.index
                             Layout.fillWidth: true; Layout.preferredWidth: root.theme.dp(460); Layout.preferredHeight: root.theme.dp(32)
+                            Layout.minimumWidth: 0; Layout.leftMargin: root.theme.dp(10)
                             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                             iconName: root.subtitles ? "subtitle-file" : "audio-file"; leftAligned: true
                             text: qsTr("Select tracks for %1").arg(entry.modelData.name)
                             contentItem: RowLayout {
-                                spacing: root.theme.dp(12)
-                                RedesignIcon { sourceSize: Qt.size(root.theme.dp(40), root.theme.dp(40)); Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20); name: root.subtitles ? "subtitle-file" : "audio-file"; color: root.theme.foreground }
-                                Text { Layout.fillWidth: true; text: root.tracks(entry.modelData.url).length ? root.tracks(entry.modelData.url).map(url => root.fileName(url)).join(", ") : qsTr("Select tracks"); elide: Text.ElideMiddle; color: root.theme.foreground; font.pixelSize: root.theme.dp(14) }
+                                spacing: root.theme.dp(14)
+                                RedesignIcon { sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio); Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24); name: root.subtitles ? "subtitle-file" : "audio-file"; color: root.theme.playerLabel }
+                                Text { Layout.fillWidth: true; text: root.tracks(entry.modelData.url).length ? root.tracks(entry.modelData.url).map(url => root.fileName(url)).join(", ") : qsTr("Select tracks"); elide: Text.ElideMiddle; color: root.theme.playerHeading; font.pixelSize: root.theme.dp(14) }
                             }
                             onClicked: root.chooseRow(entry.modelData.url)
                         }
-                        RedesignIcon { sourceSize: Qt.size(root.theme.dp(40), root.theme.dp(40)); visible: entry.highlighted; Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20); name: "check"; color: root.theme.accent }
+                        RedesignIcon { sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio); visible: entry.highlighted; Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24); name: "check-active"; color: root.theme.accent }
                     }
                 }
             }
@@ -622,7 +639,7 @@ C.Dialog {
             implicitWidth: root.theme.dp(100); implicitHeight: root.theme.dp(32)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             caption: qsTr("Cancel"); text: caption; enabled: !root.saving || root.cancelableSave; onClicked: root.reject()
-            background: Rectangle { radius: root.theme.dp(5); color: parent.hovered ? root.theme.hover : root.theme.background; border.color: parent.visualFocus ? root.theme.accent : "transparent" }
+            background: Rectangle { radius: root.theme.dp(6); color: parent.hovered ? root.theme.hover : root.theme.background; border.color: parent.visualFocus ? root.theme.accent : "transparent" }
         }
         RedesignButton {
             objectName: "trackAssignmentProviderSettings"
@@ -659,7 +676,7 @@ C.Dialog {
             caption: root.saving ? qsTr("Saving…") : qsTr("Save"); text: caption
             enabled: !root.saving && !root.loading && !root.loadingSources && !root.loadingDrop && !root.matching && (root.changedRows.length > 0 || root.folderRuleChanged)
             foreground: root.theme.accent
-            background: Rectangle { radius: root.theme.dp(5); color: root.theme.progress; border.color: parent.visualFocus ? root.theme.accent : "transparent"; opacity: parent.enabled ? 1 : 0.4 }
+            background: Rectangle { radius: root.theme.dp(6); color: root.theme.progress; border.color: parent.visualFocus ? root.theme.accent : "transparent"; opacity: parent.enabled ? 1 : 0.4 }
             onClicked: root.submit()
         }
     }
