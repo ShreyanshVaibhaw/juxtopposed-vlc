@@ -19,6 +19,61 @@ TestCase {
         dialog.begin(); tryCompare(dialog, "opened", true)
     }
     function cleanup() { dialog.busy = false; dialog.close(); tryCompare(dialog, "visible", false) }
+    function test_referenceGeometry_data() {
+        return [{tag: "dark", scale: 1}, {tag: "light", scale: 1, light: true}, {tag: "scaled", scale: 1.5}]
+    }
+    function test_referenceGeometry(data) {
+        width = 1600; height = 1200
+        dialog.scaleFactor = data.scale; dialog.lightTheme = !!data.light
+        wait(20)
+        fuzzyCompare(dialog.width, 713 * data.scale, .1)
+        fuzzyCompare(dialog.height, 589 * data.scale, .1)
+        for (const spec of [
+            {name: "playlistNameField", x: 20, y: 152, width: 541, height: 37},
+            {name: "playlistCoverBox", x: 581, y: 79, width: 112, height: 112},
+            {name: "playlistCoverButton", x: 622, y: 120, width: 30, height: 30},
+            {name: "playlistDropBox", x: 20, y: 309, width: 673, height: 186},
+            {name: "playlistSelectFilesButton", x: 311.5, y: 405.5, width: 84, height: 30},
+            {name: "playlistCancelButton", x: 20, y: 537, width: 100, height: 32},
+            {name: "playlistSaveButton", x: 593, y: 537, width: 100, height: 32}
+        ]) {
+            const item = findChild(dialog, spec.name)
+            const point = item.mapToItem(dialog.background, 0, 0)
+            fuzzyCompare(point.x, spec.x * data.scale, .1, spec.name)
+            fuzzyCompare(point.y, spec.y * data.scale, .1, spec.name)
+            fuzzyCompare(item.width, spec.width * data.scale, .1, spec.name)
+            fuzzyCompare(item.height, spec.height * data.scale, .1, spec.name)
+        }
+    }
+    function test_smallWindowRevealsFocusedControls() {
+        width = 500; height = 400
+        wait(20)
+        function checkRevealed(item) {
+            item.forceActiveFocus()
+            tryVerify(() => {
+                const point = item.mapToItem(dialog.background, 0, 0)
+                return point.y >= 50 && point.y + item.height <= dialog.height - 74
+            })
+        }
+        const select = findChild(dialog, "playlistSelectFilesButton")
+        checkRevealed(select); keyClick(Qt.Key_Space)
+        compare(filesSpy.count, 1)
+        checkRevealed(findChild(dialog, "playlistCoverButton"))
+        checkRevealed(findChild(dialog, "playlistNameField"))
+        keyClick(Qt.Key_A); compare(dialog.playlistName, "a")
+        dialog.addFiles(["file:///video.mkv"])
+        const listing = findChild(dialog, "playlistSelectedFiles")
+        tryVerify(() => listing.itemAtIndex(0) !== null)
+        const remove = findChild(listing.itemAtIndex(0), "playlistRemoveFile0")
+        checkRevealed(remove); keyClick(Qt.Key_Space)
+        compare(dialog.fileCount, 0)
+        checkRevealed(select)
+        height = 800; wait(20); height = 400
+        tryVerify(() => {
+            const point = select.mapToItem(dialog.background, 0, 0)
+            return point.y >= 50 && point.y + select.height <= dialog.height - 74
+        })
+    }
     function test_nameRequiredButEmptyPlaylistAllowed() {
         const save = findChild(dialog, "playlistSaveButton")
         verify(!save.enabled)
