@@ -95,17 +95,28 @@ const char *ppsz_mir_arrow_sign[ARROW_LINES] =
 /*****************************************************************************
  * fill target image (clean memory)
  *****************************************************************************/
+static bool puzzle_is_planar_rgb(const picture_t *picture)
+{
+    return picture->format.i_chroma == VLC_CODEC_GBR_PLANAR
+        || picture->format.i_chroma == VLC_CODEC_GBRA_PLANAR;
+}
+
+static uint8_t puzzle_plane_color(const picture_t *picture, unsigned plane,
+                                  uint8_t Y, uint8_t U, uint8_t V)
+{
+    if (plane == A_PLANE)
+        return 255;
+    // The desk and markers use neutral colors. RGB needs the brightness in
+    // all three color planes, rather than YUV's neutral chroma values.
+    if (puzzle_is_planar_rgb(picture) || plane == Y_PLANE)
+        return Y;
+    return plane == U_PLANE ? U : V;
+}
+
 void puzzle_preset_desk_background( picture_t *p_pic_out, uint8_t Y, uint8_t U, uint8_t V)
 {
-    uint8_t i_c;
-
     for( uint8_t i_plane = 0; i_plane < p_pic_out->i_planes; i_plane++ ) {
-        if (i_plane == Y_PLANE)
-            i_c = Y;
-        else if (i_plane == U_PLANE)
-            i_c = U;
-        else if (i_plane == V_PLANE)
-            i_c = V;
+        const uint8_t i_c = puzzle_plane_color(p_pic_out, i_plane, Y, U, V);
 
         const int32_t i_dst_pitch = p_pic_out->p[i_plane].i_pitch;
         const int32_t i_dst_lines = p_pic_out->p[i_plane].i_lines;
@@ -202,26 +213,34 @@ void puzzle_draw_preview( filter_t *p_filter, picture_t *p_pic_in, picture_t *p_
  *****************************************************************************/
 void puzzle_draw_sign(picture_t *p_pic_out, int32_t i_x, int32_t i_y, int32_t i_width, int32_t i_lines, const char **ppsz_sign, bool b_reverse)
 {
-    plane_t *p_out = &p_pic_out->p[Y_PLANE];
-    int32_t i_pixel_pitch    = p_pic_out->p[Y_PLANE].i_pixel_pitch;
+    const plane_t *first = &p_pic_out->p[Y_PLANE];
+    const int32_t width = first->i_visible_pitch / first->i_pixel_pitch;
+    if (i_width <= 0 || i_lines <= 0 || i_x >= width || i_y >= first->i_visible_lines
+        || i_x <= -i_width || i_y <= -i_lines)
+        return;
 
-    uint8_t i_Y;
-
-    i_Y = ( p_out->p_pixels[ i_y * p_out->i_pitch + i_x ] >= 0x7F ) ? 0x00 : 0xFF;
-
-    for( int32_t y = 0; y < i_lines ; y++ )
-        for( int32_t x = 0; x < i_width; x++ ) {
-            int32_t i_dst_x = ( x + i_x ) * i_pixel_pitch;
-            int32_t i_dst_y = y + i_y;
-            if ( ppsz_sign[y][b_reverse?i_width-1-x:x] == 'o' ) {
-                if ((i_dst_x < p_out->i_visible_pitch) && (i_dst_y < p_out->i_visible_lines) && (i_dst_x >= 0 ) && (i_dst_y >= 0))
-                    memset( &p_out->p_pixels[ i_dst_y * p_out->i_pitch + i_dst_x ],   i_Y,  p_out->i_pixel_pitch );
+    // A pointer symbol can start outside the picture at a video edge.
+    const int32_t sample_x = __MAX(i_x, 0) * first->i_pixel_pitch;
+    const int32_t sample_y = __MAX(i_y, 0);
+    const uint8_t contrast = first->p_pixels[sample_y * first->i_pitch + sample_x] >= 0x7F ? 0x00 : 0xFF;
+    const unsigned planes = puzzle_is_planar_rgb(p_pic_out) ? p_pic_out->i_planes : 1;
+    for (unsigned plane = 0; plane < planes; ++plane) {
+        plane_t *p_out = &p_pic_out->p[plane];
+        const uint8_t color = plane == A_PLANE ? 255 : contrast;
+        for (int32_t y = 0; y < i_lines; ++y)
+            for (int32_t x = 0; x < i_width; ++x) {
+                const int32_t dx = (x + i_x) * p_out->i_pixel_pitch;
+                const int32_t dy = y + i_y;
+                if (dx < 0 || dx >= p_out->i_visible_pitch || dy < 0 || dy >= p_out->i_visible_lines)
+                    continue;
+                uint8_t *pixel = &p_out->p_pixels[dy * p_out->i_pitch + dx];
+                const char mark = ppsz_sign[y][b_reverse ? i_width - 1 - x : x];
+                if (mark == 'o')
+                    memset(pixel, color, p_out->i_pixel_pitch);
+                else if (mark == '.')
+                    *pixel = (*pixel + color) / 2;
             }
-            else if ( ppsz_sign[y][b_reverse?i_width-1-x:x] == '.' ) {
-                if ((i_dst_x < p_out->i_visible_pitch) && (i_dst_y < p_out->i_visible_lines) && (i_dst_x >= 0 ) && (i_dst_y >= 0))
-                    p_out->p_pixels[ i_dst_y * p_out->i_pitch + i_dst_x ] = p_out->p_pixels[ i_dst_y * p_out->i_pitch + i_dst_x ] / 2 + i_Y / 2;
-            }
-        }
+    }
 }
 
 /*****************************************************************************
@@ -229,18 +248,11 @@ void puzzle_draw_sign(picture_t *p_pic_out, int32_t i_x, int32_t i_y, int32_t i_
  *****************************************************************************/
 void puzzle_draw_rectangle(picture_t *p_pic_out, int32_t i_x, int32_t i_y, int32_t i_w, int32_t i_h, uint8_t i_Y, uint8_t i_U, uint8_t i_V )
 {
-    uint8_t i_c;
-
     for( uint8_t i_plane = 0; i_plane < p_pic_out->i_planes; i_plane++ ) {
         plane_t *p_oyp = &p_pic_out->p[i_plane];
         int32_t i_pixel_pitch    = p_pic_out->p[i_plane].i_pixel_pitch;
 
-        if (i_plane == Y_PLANE)
-            i_c = i_Y;
-        else if (i_plane == U_PLANE)
-            i_c = i_U;
-        else if (i_plane == V_PLANE)
-            i_c = i_V;
+        const uint8_t i_c = puzzle_plane_color(p_pic_out, i_plane, i_Y, i_U, i_V);
 
         int32_t i_x_min = (      i_x    * p_oyp->i_visible_pitch / p_pic_out->p[0].i_visible_pitch ) * i_pixel_pitch;
         int32_t i_x_max = ( (i_x + i_w) * p_oyp->i_visible_pitch / p_pic_out->p[0].i_visible_pitch ) * i_pixel_pitch;
@@ -266,18 +278,11 @@ void puzzle_draw_rectangle(picture_t *p_pic_out, int32_t i_x, int32_t i_y, int32
  *****************************************************************************/
 void puzzle_fill_rectangle(picture_t *p_pic_out, int32_t i_x, int32_t i_y, int32_t i_w, int32_t i_h, uint8_t i_Y, uint8_t i_U, uint8_t i_V )
 {
-    uint8_t i_c;
-
     for( uint8_t i_plane = 0; i_plane < p_pic_out->i_planes; i_plane++ ) {
         plane_t *p_oyp = &p_pic_out->p[i_plane];
         int32_t i_pixel_pitch    = p_pic_out->p[i_plane].i_pixel_pitch;
 
-        if (i_plane == Y_PLANE)
-            i_c = i_Y;
-        else if (i_plane == U_PLANE)
-            i_c = i_U;
-        else if (i_plane == V_PLANE)
-            i_c = i_V;
+        const uint8_t i_c = puzzle_plane_color(p_pic_out, i_plane, i_Y, i_U, i_V);
 
         int32_t i_x_min = (     i_x     * p_oyp->i_visible_pitch / p_pic_out->p[0].i_visible_pitch ) * i_pixel_pitch;
         int32_t i_x_max = ( (i_x + i_w) * p_oyp->i_visible_pitch / p_pic_out->p[0].i_visible_pitch ) * i_pixel_pitch;

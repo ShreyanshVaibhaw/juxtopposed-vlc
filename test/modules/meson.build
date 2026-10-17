@@ -1,4 +1,11 @@
 vlc_tests += {
+    'name': 'test_modules_video_filter_puzzle',
+    'sources': files('video_filter/puzzle.c', '../../modules/video_filter/puzzle/puzzle_lib.c'),
+    'suite': ['modules', 'test_modules'],
+    'link_with': [libvlccore],
+}
+
+vlc_tests += {
     'name': 'test_modules_visualization_resize',
     'sources': files('visualization/resize.c'),
     'suite': ['modules', 'test_modules'],
