@@ -855,6 +855,114 @@ private slots:
         QCOMPARE(writes, 0); // Opening, scanning and cancelling do not create media records.
     }
 
+    void testTrackAssignmentUrlIdentity_data()
+    {
+        QTest::addColumn<bool>("subtitles");
+        QTest::addColumn<QString>("origin");
+        for (const auto subtitles : {true, false})
+            for (const auto& origin : {"runtime", "saved", "folder"})
+                QTest::newRow(qPrintable(QString(subtitles ? "subtitle-" : "audio-") + origin)) << subtitles << QString(origin);
+    }
+
+    void testTrackAssignmentUrlIdentity()
+    {
+        QFETCH(bool, subtitles);
+        QFETCH(QString, origin);
+        QQmlEngine engine;
+        QQmlEngine::setObjectOwnership(m_medialib.get(), QQmlEngine::CppOwnership);
+        QQmlEngine::setContextForObject(m_medialib.get(), engine.rootContext());
+        engine.newQObject(m_medialib.get());
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+        const auto mediaUrl = QUrl::fromLocalFile(directory.filePath("show.mkv"));
+        const auto track = QUrl::fromLocalFile(directory.filePath(QStringLiteral("captions & +;= français 100%.") + (subtitles ? "srt" : "wav")));
+        QFile trackFile(track.toLocalFile()); QVERIFY(trackFile.open(QIODevice::WriteOnly)); trackFile.write("track"); trackFile.close();
+        const auto encoded = track.toString(QUrl::FullyEncoded);
+        auto escaped = encoded;
+        escaped.replace("&", "%26").replace("+", "%2B").replace(";", "%3B").replace("=", "%3D");
+        QVERIFY(escaped != encoded);
+        QCOMPARE(QUrl(escaped).toLocalFile(), track.toLocalFile());
+        const auto type = subtitles ? VLC_ML_FILE_TYPE_SUBTITLE : VLC_ML_FILE_TYPE_SOUNDTRACK;
+        auto files = [&] {
+            auto* list = static_cast<vlc_ml_file_list_t*>(calloc(1, sizeof(vlc_ml_file_list_t) + sizeof(vlc_ml_file_t)));
+            list->i_nb_items = 1;
+            list->p_items[0].i_type = type;
+            list->p_items[0].psz_mrl = strdup(qtu(escaped));
+            return list;
+        };
+        m_env->mediaGet = [&](int query, va_list) -> void* {
+            if (query != VLC_ML_GET_MEDIA_BY_MRL) return nullptr;
+            auto* media = static_cast<vlc_ml_media_t*>(calloc(1, sizeof(vlc_ml_media_t)));
+            media->i_id = 1;
+            if (origin == "saved") {
+                media->b_subtitle_track_selection = subtitles;
+                media->b_soundtrack_track_selection = !subtitles;
+                media->p_files = files();
+            }
+            return media;
+        };
+        int writes = 0;
+        m_env->mediaControl = [&](int query, va_list args) {
+            if (query == VLC_ML_MEDIA_GET_FOLDER_TRACKS) {
+                va_arg(args, const char*); va_arg(args, int);
+                *va_arg(args, bool*) = origin == "folder";
+                *va_arg(args, vlc_ml_file_list_t**) = origin == "folder" ? files() : nullptr;
+                return VLC_SUCCESS;
+            }
+            ++writes; return VLC_EGENERIC;
+        };
+        const auto callback = engine.evaluate("(function(value) { answer=value; })");
+        auto waitForAnswer = [&] {
+            if (!QTest::qWaitFor([&] { return !engine.globalObject().property("answer").isNull(); }))
+                qFatal("Track URL request did not finish");
+            return engine.globalObject().property("answer");
+        };
+        engine.globalObject().setProperty("answer", QJSValue(QJSValue::NullValue));
+        m_medialib->trackAssignmentSources(QUrl::fromLocalFile(directory.path()), subtitles, callback);
+        auto result = waitForAnswer(); QVERIFY(result.property("success").toBool());
+        QCOMPARE(result.property("sources").property("length").toInt(), 1);
+        const auto discovered = result.property("sources").property(0).property("url").toString();
+        engine.globalObject().setProperty("answer", QJSValue(QJSValue::NullValue));
+        QVariantMap target{{"scope", "file"}, {"url", mediaUrl}};
+        if (origin == "runtime") {
+            target.insert("runtimeUrl", mediaUrl);
+            target.insert("runtimeTracks", QVariantList{encoded, escaped});
+        }
+        m_medialib->trackAssignmentRows(target, subtitles, callback);
+        result = waitForAnswer(); QVERIFY(result.property("success").toBool());
+        const auto row = result.property("rows").property(0);
+        QCOMPARE(row.property("initialTracks").property("length").toInt(), 1);
+        QCOMPARE(row.property("initialTracks").property(0).toString(), discovered);
+        QCOMPARE(row.property("baseline").property("length").toInt(), origin == "saved" ? 1 : 0);
+        if (origin == "saved") {
+            auto unchanged = row.toVariant().toMap(); unchanged.insert("tracks", QStringList{encoded, escaped});
+            engine.globalObject().setProperty("answer", QJSValue(QJSValue::NullValue));
+            m_medialib->saveTrackAssignments({unchanged}, subtitles, callback);
+            result = waitForAnswer(); QVERIFY(result.property("success").toBool());
+            QCOMPARE(result.property("saved").property("length").toInt(), 0);
+        }
+        if (origin == "runtime") {
+            // Decode local filenames once. Preserve query separators and stream selectors.
+            const QStringList distinct{
+                QUrl::fromLocalFile(directory.filePath("captions %26.srt")).toString(QUrl::FullyEncoded),
+                QStringLiteral("https://example.test/captions?name=A%26B&language=en"),
+                QStringLiteral("https://example.test/captions?name=A&B&language=en"),
+                encoded + QStringLiteral("?track=A%26B"),
+                encoded + QStringLiteral("#track=A%26B")};
+            QVariantList loaded{encoded, escaped};
+            for (const auto& url : distinct) loaded.append(url);
+            target.insert("runtimeTracks", loaded);
+            engine.globalObject().setProperty("answer", QJSValue(QJSValue::NullValue));
+            m_medialib->trackAssignmentRows(target, subtitles, callback);
+            result = waitForAnswer(); QVERIFY(result.property("success").toBool());
+            const auto initial = result.property("rows").property(0).property("initialTracks");
+            QCOMPARE(initial.property("length").toInt(), distinct.size() + 1);
+            QCOMPARE(initial.property(0).toString(), discovered);
+            for (int i = 0; i < distinct.size(); ++i) QCOMPARE(initial.property(i + 1).toString(), distinct[i]);
+        }
+        QCOMPARE(writes, 0);
+    }
+
     void testTrackDropSources()
     {
         QQmlEngine engine;

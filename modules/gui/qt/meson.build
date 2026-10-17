@@ -480,6 +480,7 @@ qt_plugin_sources = files(
     'util/redesign_widget_theme.hpp',
     'util/playlist_cover_store.hpp',
     'util/track_matching.hpp',
+    'util/local_file_url.hpp',
     'util/ui_notifier.cpp',
     'util/ui_notifier.hpp',
     'util/color_svg_image_provider.cpp',

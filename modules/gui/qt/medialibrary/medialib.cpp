@@ -22,6 +22,7 @@
 #include "util/shared_input_item.hpp"
 #include "util/playlist_cover_store.hpp"
 #include "util/track_matching.hpp"
+#include "util/local_file_url.hpp"
 #include "../../../misc/medialibrary/track_rules.hpp"
 #include <QScopeGuard>
 
@@ -342,13 +343,18 @@ void MediaLib::playlistTrackTargets(const MLItemId& id, QJSValue callback)
 }
 
 namespace {
+QString trackString(const QUrl& url)
+{
+    return vlc::qt::normalizeLocalFileUrl(url).toString(QUrl::FullyEncoded);
+}
+
 QStringList selectedTracks(const vlc_ml_media_t* media, vlc_ml_file_type_t type)
 {
     QStringList tracks;
     if (media && media->p_files) {
         for (const auto& file : ml_range_iterate<vlc_ml_file_t>(media->p_files))
             if (file.i_type == type && !file.b_unselected)
-                tracks.append(QUrl(qfu(file.psz_mrl)).toString(QUrl::FullyEncoded));
+                tracks.append(trackString(QUrl(qfu(file.psz_mrl))));
     }
     tracks.removeDuplicates();
     return tracks;
@@ -364,7 +370,7 @@ bool sameTracks(QStringList left, QStringList right)
 QStringList trackStrings(const QVariant& value)
 {
     QStringList result;
-    for (const auto& item : value.toList()) result.append(item.toUrl().toString(QUrl::FullyEncoded));
+    for (const auto& item : value.toList()) result.append(trackString(item.toUrl()));
     return result;
 }
 
@@ -506,7 +512,7 @@ void MediaLib::trackAssignmentRows(const QVariantMap& target, bool subtitles, QJ
                     const int status = vlc_ml_media_get_folder_tracks(ml, uri.constData(), type, &inherited, &files);
                     if (status != VLC_SUCCESS) inherited = false;
                     if (inherited) initial.clear();
-                    if (status == VLC_SUCCESS && files) for (const auto& file : ml_range_iterate<vlc_ml_file_t>(files)) initial.append(qfu(file.psz_mrl));
+                    if (status == VLC_SUCCESS && files) for (const auto& file : ml_range_iterate<vlc_ml_file_t>(files)) initial.append(trackString(QUrl(qfu(file.psz_mrl))));
                     if (files) vlc_ml_file_list_release(files);
                     initial.removeDuplicates();
                 }
@@ -716,12 +722,12 @@ void MediaLib::saveTrackAssignmentsImpl(const QVariantList& rows, bool subtitles
                 }
                 for (const auto& text : after) {
                     const QUrl track(text);
-                    if (!track.isValid() || track.scheme().isEmpty() || track == url) {
+                    if (!track.isValid() || track.scheme().isEmpty() || text == trackString(url)) {
                         result["error"] = qtr("VLC cannot use this track: %1").arg(text); return;
                     }
                     if (media && media->p_files) {
                         for (const auto& file : ml_range_iterate<vlc_ml_file_t>(media->p_files)) {
-                            if (QUrl(qfu(file.psz_mrl)) == track && file.i_type != type) {
+                            if (trackString(QUrl(qfu(file.psz_mrl))) == text && file.i_type != type) {
                                 result["error"] = qtr("VLC already uses this file for another track: %1").arg(track.fileName()); return;
                             }
                         }

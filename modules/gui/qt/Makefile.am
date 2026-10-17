@@ -336,6 +336,7 @@ libqt_plugin_la_SOURCES = \
 	util/redesign_widget_theme.cpp util/redesign_widget_theme.hpp \
 	util/playlist_cover_store.hpp \
 	util/track_matching.hpp \
+	util/local_file_url.hpp \
 	util/ui_notifier.cpp util/ui_notifier.hpp \
 	util/color_svg_image_provider.cpp util/color_svg_image_provider.hpp \
 	util/vlcaccess_image_provider.cpp util/vlcaccess_image_provider.hpp \

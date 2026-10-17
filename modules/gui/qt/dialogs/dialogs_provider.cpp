@@ -36,6 +36,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "menus/menus.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/local_file_url.hpp"
 #include "util/vlchotkeyconverter.hpp"
 #include "maininterface/mainctx.hpp"
 
@@ -1262,7 +1263,7 @@ void DialogsProvider::showTrackAssignments(const QVariantMap& target, bool subti
                 const auto* track = vlc_player_GetTrackAt(p_intf->p_player, category, i);
                 const char* source = vlc_es_id_GetSourceUri(track->es_id);
                 if (!source) continue;
-                const QUrl url(qfu(source));
+                const auto url = vlc::qt::normalizeLocalFileUrl(QUrl(qfu(source)));
                 if (!seen.contains(url)) { seen.insert(url); tracks.append(url.toString(QUrl::FullyEncoded)); }
             }
             context.insert("runtimeTracks", tracks);
@@ -1285,7 +1286,7 @@ QStringList DialogsProvider::selectTrackFiles(bool subtitles, const QUrl& folder
 {
     auto files = showSimpleOpen(subtitles ? qtr("Select subtitle files") : qtr("Select audio files"),
         subtitles ? EXT_FILTER_SUBTITLE : EXT_FILTER_AUDIO, folder);
-    for (auto& file : files) file = QUrl(file).toString(QUrl::FullyEncoded);
+    for (auto& file : files) file = vlc::qt::normalizeLocalFileUrl(QUrl(file)).toString(QUrl::FullyEncoded);
     return files;
 }
 
@@ -1303,11 +1304,11 @@ bool DialogsProvider::applySavedTrackAssignments(const QVariantList& saved, bool
         const auto row = value.toMap();
         QSet<QUrl> before, after;
         const auto initial = row.value("initialTracks", row.value("baseline"));
-        for (const auto& track : initial.toList()) before.insert(track.toUrl());
-        for (const auto& track : row.value("tracks").toList()) after.insert(track.toUrl());
+        for (const auto& track : initial.toList()) before.insert(vlc::qt::normalizeLocalFileUrl(track.toUrl()));
+        for (const auto& track : row.value("tracks").toList()) after.insert(vlc::qt::normalizeLocalFileUrl(track.toUrl()));
         Change change {before - after, {}};
         for (const auto& value : row.value("tracks").toList()) {
-            const auto track = value.toUrl();
+            const auto track = vlc::qt::normalizeLocalFileUrl(value.toUrl());
             if (!before.contains(track) && !change.added.contains(track)) change.added.append(track);
         }
         changes.insert(row.value("url").toUrl(), change);
@@ -1320,7 +1321,7 @@ bool DialogsProvider::applySavedTrackAssignments(const QVariantList& saved, bool
         int count = 0;
         for (int i = 0; i < item->i_slaves; ++i) {
             auto* slave = item->pp_slaves[i];
-            if (change->removed.contains(QUrl(qfu(slave->psz_uri))))
+            if (change->removed.contains(vlc::qt::normalizeLocalFileUrl(QUrl(qfu(slave->psz_uri)))))
                 input_item_slave_Delete(slave);
             else item->pp_slaves[count++] = slave;
         }
