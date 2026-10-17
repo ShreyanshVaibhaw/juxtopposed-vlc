@@ -199,6 +199,50 @@ TestCase {
         mouseClick(findChild(player, "playButton"))
         tryCompare(toggled, "count", 1)
     }
+    function test_smallPaletteRevealsKeyboardFocus() {
+        testCase.width = 800; testCase.height = 600
+        editor.begin()
+        const palette = item("customizationPalette")
+        tryVerify(() => palette.itemAtIndex(palette.count - 1) !== null)
+        const last = palette.itemAtIndex(palette.count - 1)
+        last.forceActiveFocus()
+        tryVerify(() => last.mapToItem(palette, 0, 0).y >= -1
+                  && last.mapToItem(palette, 0, last.height).y <= palette.height + 1)
+        const first = palette.itemAtIndex(0)
+        first.forceActiveFocus()
+        tryVerify(() => Math.abs(palette.contentY) < 1)
+    }
+    function test_smallPaletteArrowKeysReachLastRow() {
+        testCase.width = 800; testCase.height = 600
+        editor.begin()
+        const palette = item("customizationPalette")
+        tryVerify(() => palette.itemAtIndex(0) !== null)
+        palette.itemAtIndex(0).forceActiveFocus()
+        for (let n = 0; n < 5; ++n) keyClick(Qt.Key_Down)
+        compare(palette.currentIndex, 30)
+        const last = palette.itemAtIndex(30)
+        verify(last !== null && last.activeFocus)
+        verify(last.mapToItem(palette, 0, last.height).y <= palette.height + 1)
+        keyClick(Qt.Key_Return)
+        tryCompare(item("customizationPlacement"), "currentIndex", 0)
+        for (let n = 0; n < 3; ++n) keyClick(Qt.Key_Down)
+        keyClick(Qt.Key_Return)
+        tryVerify(() => player.layoutModel.location("playlists") !== null)
+    }
+    function test_paletteKeepsFocusVisibleAfterResize() {
+        editor.begin()
+        const palette = item("customizationPalette")
+        tryVerify(() => palette.itemAtIndex(30) !== null)
+        palette.itemAtIndex(30).forceActiveFocus()
+        testCase.width = 800; testCase.height = 600
+        tryVerify(() => palette.currentItem && palette.currentItem.activeFocus
+                  && palette.currentItem.mapToItem(palette, 0, palette.currentItem.height).y <= palette.height + 1)
+        player.scaleFactor = 1.5
+        // A tall row cannot fit here. Keep its focus outline at the top.
+        tryVerify(() => palette.currentItem && palette.currentItem.activeFocus
+                  && palette.currentItem.mapToItem(palette, 0, 0).y >= -1
+                  && palette.currentItem.mapToItem(palette, 0, 46 * player.scaleFactor).y <= palette.height + 1)
+    }
     function test_overlayFollowsResizeWhileClosedAndOpen() {
         testCase.width = 1528; testCase.height = 894
         tryCompare(editor, "width", 1528); tryCompare(editor, "height", 894)

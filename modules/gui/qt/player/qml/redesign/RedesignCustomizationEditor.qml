@@ -51,7 +51,6 @@ Item {
         previousFocus = Window.window ? Window.window.activeFocusItem : null
         ++generation; errorMessage = ""; saving = false; editPresetId = presetId
         active = true; model.begin(); panel.open()
-
     }
     function cancel() { if (!saving) { ++generation; endDrag(); model.cancel(); panel.close() } }
     function save() {
@@ -176,7 +175,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         enabled: !root.saving
         cursorShape: root.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-        onPressed: mouse => { anchorItem.forceActiveFocus(); root.startPointer(controlId, pointerArea, mouse) }
+        onPressed: mouse => { root.startPointer(controlId, pointerArea, mouse); anchorItem.forceActiveFocus() }
         onPositionChanged: mouse => { if (pressed && pressedButtons === Qt.LeftButton) root.movePointer(pointerArea, mouse) }
         onReleased: root.releasePointer(controlId, anchorItem)
         onCanceled: root.endDrag()
@@ -322,11 +321,27 @@ Item {
                 cellWidth: Math.min(width, root.theme.dp(110))
                 cellHeight: root.theme.dp(120)
                 model: root.available
+                function revealFocusedCell() { Qt.callLater(revealFocusedCellNow) }
+                function revealFocusedCellNow() {
+                    if (!root.opened || !currentItem || !currentItem.activeFocus) return
+                    forceLayout()
+                    positionViewAtIndex(currentIndex, cellHeight > height ? GridView.Beginning : GridView.Contain)
+                }
+                onWidthChanged: revealFocusedCell()
+                onHeightChanged: revealFocusedCell()
+                onCellWidthChanged: revealFocusedCell()
+                onCellHeightChanged: revealFocusedCell()
                 C.ScrollBar.vertical: C.ScrollBar { }
                 delegate: FocusScope {
                     id: cell
                     required property var modelData
+                    required property int index
+                    focus: GridView.isCurrentItem
                     activeFocusOnTab: true
+                    onActiveFocusChanged: if (activeFocus) {
+                        controlPalette.currentIndex = index
+                        controlPalette.revealFocusedCell()
+                    }
                     objectName: "customizePalette_" + modelData.id
                     width: controlPalette.cellWidth; height: controlPalette.cellHeight
                     Accessible.role: Accessible.Button
