@@ -64,6 +64,14 @@ TestCase {
         compare(layout.stored, layout.defaults())
         compare(layout.layout.zones.above, ["timeline"])
     }
+    function test_equivalentSavedLayoutHasNoPendingChanges() {
+        const value = layout.defaults(), reversed = {zones: {}, version: 1}
+        for (const zone of layout.zones.slice().reverse()) reversed.zones[zone] = value.zones[zone]
+        layout.savedLayout = JSON.stringify(reversed, null, 2)
+        layout.begin(); verify(!layout.dirty)
+        layout.reset(); verify(!layout.dirty)
+        compare(layout.layout, layout.defaults())
+    }
     function test_saveRoundTripAndRestart() {
         layout.begin(); layout.move("timeline", "above", 0); layout.remove("audio")
         const text = layout.serialize()

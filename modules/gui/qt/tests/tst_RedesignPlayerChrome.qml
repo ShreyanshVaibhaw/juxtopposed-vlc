@@ -1,0 +1,143 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+import QtQuick
+import QtTest
+import "../player/qml/redesign"
+
+TestCase {
+    id: testCase
+    name: "JuxtopposedPlayerChrome"
+    width: 1920; height: 1080
+    visible: true; when: windowShown
+    RedesignPlayerView {
+        id: player
+        anchors.fill: parent
+        started: true; hasVideo: true; seekable: true
+        hasPrevious: true; hasNext: true
+        timeText: "00:02:10"; lengthText: "00:25:40"
+        mediaTitle: "The Wand S01E11"; mediaFolderTitle: "S01"
+        videoContent: Rectangle { color: "#2d2b29" }
+    }
+    SignalSpy { id: playSpy; target: player; signalName: "togglePlayback" }
+    SignalSpy { id: volumeSpy; target: player; signalName: "volumeRequested" }
+    SignalSpy { id: fullscreenSpy; target: player; signalName: "fullscreenRequested" }
+    function item(name) { return findChild(player, name) }
+    function point(name) { return item(name).mapToItem(player, 0, 0) }
+    function settledDefault() {
+        tryVerify(() => Math.abs(point("seekBar").x - 254) < 1
+                  && Math.abs(item("seekBar").width - 1238) < 1
+                  && item("mainMenuButton").parent.objectName !== "customHeaderLeft")
+    }
+    function init() {
+        player.playerLayout = ""; player.layoutModel.reload()
+        player.scaleFactor = 1; player.lightTheme = false
+        player.libraryOpen = false; player.libraryExpanded = false
+        player.fullscreen = false; player.controlsHideTimeout = 1800
+        testCase.width = 1920; testCase.height = 1080
+        player.mediaTitle = "The Wand S01E11"; player.mediaFolderTitle = "S01"
+        playSpy.clear(); volumeSpy.clear(); fullscreenSpy.clear()
+        settledDefault()
+    }
+    function alternate() {
+        const model = player.layoutModel
+        model.begin(); model.move("timeline", "above", 0)
+        for (const id of ["previous", "play", "next"]) model.move(id, "footerCenter", model.layout.zones.footerCenter.length)
+        for (const id of ["menu", "library", "divider:1", "folder", "title"]) model.move(id, "footerLeft", model.layout.zones.footerLeft.length)
+        model.move("fullscreen", "footerRight", model.layout.zones.footerRight.length)
+        tryVerify(() => item("mainMenuButton").parent.objectName === "customFooterLeft")
+        tryVerify(() => Math.abs(point("seekBar").x - 104) < 1 && Math.abs(point("seekBar").y - 986) < 1)
+    }
+    function test_referenceAlternateMovesRealControls_data() {
+        return [{tag: "dark"}, {tag: "light", light: true}]
+    }
+    function test_referenceAlternateMovesRealControls(data) {
+        player.lightTheme = !!data.light
+        const seek = item("seekBar"), play = item("playButton"), volume = item("volumeSlider")
+        const video = item("redesignViewport")
+        const originalHeight = video.height
+        alternate()
+        compare(item("seekBar"), seek); compare(item("playButton"), play); compare(item("volumeSlider"), volume)
+        compare(player.controlsHeight, 108)
+        compare(item("seekBar").width, 1712)
+        compare(point("playButton").x + play.width / 2, width / 2)
+        compare(item("fullscreenButton").parent.objectName, "customFooterRight")
+        compare(item("mediaTitleControl").parent.objectName, "customFooterLeft")
+        compare(video.height, originalHeight - 54)
+        compare(player.positionSliderY, point("seekBar").y)
+        mouseClick(play); compare(playSpy.count, 1)
+        mouseClick(item("fullscreenButton")); compare(fullscreenSpy.count, 1)
+        mouseClick(volume, volume.width / 2, volume.height / 2); verify(volumeSpy.count > 0)
+    }
+    function test_cancelRestoresOriginalParentsAndGeometry() {
+        const menuParent = item("mainMenuButton").parent
+        const playParent = item("playButton").parent
+        const timelineParent = item("timelineControl").parent
+        alternate(); player.layoutModel.cancel()
+        settledDefault()
+        compare(item("mainMenuButton").parent, menuParent)
+        compare(item("playButton").parent, playParent)
+        compare(item("timelineControl").parent, timelineParent)
+        compare(player.controlsHeight, 54)
+        compare(point("playButton").x, 58)
+        compare(player.positionSliderY, point("seekBar").y)
+    }
+    function test_removedControlAndRestoredControl() {
+        player.layoutModel.begin(); player.layoutModel.remove("subtitles")
+        tryVerify(() => !item("subtitleButton").visible)
+        player.layoutModel.move("subtitles", "headerLeft", 0)
+        tryVerify(() => item("subtitleButton").visible && item("subtitleButton").parent.objectName === "customHeaderLeft")
+        mouseClick(item("subtitleButton"))
+        player.layoutModel.cancel(); settledDefault()
+        verify(item("subtitleButton").visible)
+    }
+    function test_editingKeepsFullscreenControlsVisible() {
+        player.controlsHideTimeout = 30; player.fullscreen = true
+        player.layoutModel.begin()
+        mouseMove(player, width / 2, height / 2)
+        wait(60)
+        verify(player.topVisible); verify(player.bottomVisible)
+        player.layoutModel.cancel()
+        tryCompare(player, "topVisible", false)
+        tryCompare(player, "bottomVisible", false)
+    }
+    function test_savedLayoutAppliesWithoutEditor() {
+        alternate()
+        const saved = player.layoutModel.serialize()
+        player.playerLayout = saved
+        verify(!player.layoutModel.editing)
+        tryVerify(() => Math.abs(point("seekBar").y - 986) < 1)
+        compare(player.controlsHeight, 108)
+        player.playerLayout = ""; settledDefault()
+        compare(player.controlsHeight, 54)
+    }
+    function test_panelsDoNotMoveVideoWithAlternateLayout() {
+        alternate()
+        const video = item("redesignViewport"), bounds = video.mapToItem(player, 0, 0), size = Qt.size(video.width, video.height)
+        player.libraryOpen = true; player.settingsPage = "video"
+        wait(170)
+        compare(video.mapToItem(player, 0, 0), bounds); compare(Qt.size(video.width, video.height), size)
+        player.settingsPage = ""; player.queueOpen = true
+        compare(video.mapToItem(player, 0, 0), bounds); compare(Qt.size(video.width, video.height), size)
+        player.queueOpen = false
+    }
+    function test_alternateLayoutAtSmallSizesAndScale_data() {
+        return [{tag: "small", w: 640, h: 360, scale: 1},
+                {tag: "medium", w: 900, h: 600, scale: 1},
+                {tag: "wide", w: 1280, h: 720, scale: 1},
+                {tag: "scaled", w: 1920, h: 1080, scale: 1.5}]
+    }
+    function test_alternateLayoutAtSmallSizesAndScale(data) {
+        alternate()
+        player.mediaTitle = "A long media title that must not cover the playback controls"
+        player.mediaFolderTitle = "A long folder name that must not cover the playback controls"
+        testCase.width = data.w; testCase.height = data.h; player.scaleFactor = data.scale
+        const left = item("customFooterLeft"), center = item("customFooterCenter"), right = item("customFooterRight")
+        tryVerify(() => {
+            const l = left.mapToItem(player, 0, 0), c = center.mapToItem(player, 0, 0), r = right.mapToItem(player, 0, 0)
+            return l.x + left.width + 10 * data.scale <= c.x && c.x + center.width + 10 * data.scale <= r.x
+        })
+        compare(item("mediaTitleControl").visible, data.w > 1200 * data.scale)
+        tryVerify(() => Math.abs(point("seekBar").y - (data.h - 94 * data.scale)) <= 1)
+        compare(player.positionSliderY, point("seekBar").y)
+        mouseClick(item("playButton")); compare(playSpy.count, 1)
+    }
+}

@@ -104,6 +104,7 @@ FocusScope {
         scaleFactor: VLCStyle.scale
         lightTheme: !VLCStyle.palette.isDark
         accentColor: MainCtx.redesignAccent
+        playerLayout: MainCtx.redesignPlayerPreferences.layout
         playing: Player.playingState === Player.PLAYING_STATE_PLAYING
         started: Player.isStarted
         hasVideo: MainCtx.hasEmbededVideo
@@ -387,9 +388,9 @@ FocusScope {
     Dialogs {
         z: 10
         bgContent: rootPlayer
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right; bottomMargin: view.theme.dp(54) }
+        anchors { bottom: parent.bottom; left: parent.left; right: parent.right; bottomMargin: view.controlsHeight }
     }
     Widgets.FloatingNotification {
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: view.theme.dp(20); bottomMargin: view.theme.dp(74) }
+        anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: view.theme.dp(20); bottomMargin: view.controlsHeight + view.theme.dp(20) }
     }
 }

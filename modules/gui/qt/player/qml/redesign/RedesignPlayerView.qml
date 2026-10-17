@@ -9,6 +9,9 @@ FocusScope {
     property color accentColor: "#d37918"
     property bool lightTheme: false
     property bool presentationOnly: false
+    property string playerLayout: ""
+    readonly property alias layoutModel: chromeLayout
+    readonly property real controlsHeight: chrome.controlsHeight
     property bool playing: false
     property bool started: false
     property bool hasVideo: false
@@ -83,8 +86,13 @@ FocusScope {
     readonly property alias libraryItem: libraryLoader.item
     readonly property alias settingsItem: settingsLoader.item
     readonly property alias queueItem: queueLoader.item
-    readonly property real positionSliderY: libraryExpanded ? miniPlayer.y + miniPlayer.seekY : bottomEdge.y + toolbar.y + seek.y
-    readonly property bool controlsLocked: queueOpen || libraryOpen || settingsPage.length > 0 || resumeAvailable || !!trackPopup && trackPopup.visible
+    readonly property real positionSliderY: {
+        if (libraryExpanded) return miniPlayer.y + miniPlayer.seekY
+        let y = 0
+        for (let item = seek; item && item !== root; item = item.parent) y += item.y
+        return y
+    }
+    readonly property bool controlsLocked: chromeLayout.editing || queueOpen || libraryOpen || settingsPage.length > 0 || resumeAvailable || !!trackPopup && trackPopup.visible
     readonly property bool topVisible: !minimalView && (!fullscreen || headerHover.hovered || header.activeFocus || revealTimer.running || controlsLocked)
     readonly property bool bottomVisible: !minimalView && !libraryExpanded && (!fullscreen || showFullscreenControls) && (!autoHideActive || bottomHover.hovered || toolbar.activeFocus || revealTimer.running || controlsLocked)
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
@@ -185,7 +193,7 @@ FocusScope {
             left: parent.left
             right: parent.right
             topMargin: root.minimalView || root.libraryExpanded || root.fullscreen ? 0 : theme.dp(40)
-            bottomMargin: root.minimalView || root.libraryExpanded || root.fullscreen ? 0 : theme.dp(54)
+            bottomMargin: root.minimalView || root.libraryExpanded || root.fullscreen ? 0 : root.controlsHeight
             leftMargin: root.minimalView || root.libraryExpanded || root.fullscreen ? 0 : theme.dp(10)
             rightMargin: root.minimalView || root.libraryExpanded || root.fullscreen ? 0 : theme.dp(10)
         }
@@ -443,7 +451,7 @@ FocusScope {
         id: bottomEdge
         parent: backdropScene
         z: 4
-        anchors.bottom: parent.bottom; width: parent.width; height: theme.dp(64)
+        anchors.bottom: parent.bottom; width: parent.width; height: root.controlsHeight + theme.dp(10)
         HoverHandler { id: bottomHover; blocking: false }
     }
 
@@ -468,6 +476,7 @@ FocusScope {
             }
             ChromeButton {
                 implicitWidth: theme.dp(30)
+                id: mainMenuButton
                 objectName: "mainMenuButton"
                 visible: !root.presentationOnly
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
@@ -475,7 +484,11 @@ FocusScope {
                 onClicked: root.menuRequested(this)
             }
             ChromeButton {
-                implicitWidth: theme.dp(46)
+                implicitWidth: {
+                    const slot = chromeLayout.location("library")
+                    return theme.dp(!slot || slot.zone.startsWith("header") ? 46 : 30)
+                }
+                id: libraryToggleButton
                 objectName: "libraryToggleButton"
                 visible: !root.presentationOnly && !root.libraryExpanded
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
@@ -484,15 +497,19 @@ FocusScope {
                 Accessible.checkable: true; Accessible.checked: root.libraryOpen
                 onClicked: root.libraryOpen = !root.libraryOpen
             }
-            Rectangle { visible: !root.presentationOnly && !root.libraryExpanded; Layout.leftMargin: theme.dp(2); Layout.rightMargin: theme.dp(6); width: theme.dp(1); height: theme.dp(18); color: theme.border }
+            Rectangle { id: headerDivider; visible: !root.presentationOnly && !root.libraryExpanded; Layout.leftMargin: theme.dp(2); Layout.rightMargin: theme.dp(6); width: theme.dp(1); height: theme.dp(18); color: theme.border }
             ChromeButton {
+                id: mediaFolderButton
                 objectName: "mediaFolderButton"
                 property bool hasMediaFolder: root.started && root.canBrowseMedia && root.mediaFolderTitle.length > 0
                 visible: !root.presentationOnly && !root.libraryExpanded && root.width > theme.dp(700)
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "folder"
                 caption: hasMediaFolder ? root.mediaFolderTitle : root.locationTitle
-                captionMaximumWidth: theme.dp(220)
+                captionMaximumWidth: {
+                    const slot = chromeLayout.location("folder")
+                    return theme.dp(!slot || slot.zone.startsWith("header") ? 220 : 100)
+                }
                 text: hasMediaFolder ? qsTr("Open media folder") : qsTr("Browse library")
                 onClicked: {
                     if (hasMediaFolder) {
@@ -502,37 +519,52 @@ FocusScope {
                 }
             }
         }
-        Text {
-            anchors.centerIn: parent
-            width: Math.max(0, parent.width - Math.max(headerLeft.width, windowControls.width) * 2 - theme.dp(32))
-            horizontalAlignment: Text.AlignHCenter
-            text: root.mediaTitle
-            font.pixelSize: theme.dp(14)
-            elide: Text.ElideRight; color: theme.foreground
+        Item {
+            id: titleControl
+            objectName: "mediaTitleControl"
+            readonly property bool inHeader: parent === header || !!parent && parent.objectName.startsWith("customHeader")
+            visible: inHeader || root.width > theme.dp(1200)
+            anchors.centerIn: parent === header ? header : undefined
+            width: parent === header ? Math.max(0, header.width - Math.max(headerLeft.width, windowControls.width) * 2 - theme.dp(32)) : implicitWidth
+            implicitWidth: Math.min(theme.dp(220), titleLabel.implicitWidth)
+            implicitHeight: theme.dp(36)
+            Layout.fillWidth: true
+            Text {
+                id: titleLabel
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                text: root.mediaTitle
+                font.pixelSize: theme.dp(14)
+                elide: Text.ElideRight; color: theme.foreground
+            }
         }
         Row {
             id: windowControls
             anchors.right: parent.right; anchors.rightMargin: theme.dp(6)
             anchors.verticalCenter: parent.verticalCenter
             ChromeButton {
+                id: minimizeButton
                 visible: root.showWindowButtons
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "minimize"; text: qsTr("Minimize")
                 onClicked: root.minimizeRequested()
             }
             ChromeButton {
+                id: maximizeButton
                 visible: root.showWindowButtons
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "maximize"; text: root.maximized ? qsTr("Restore window") : qsTr("Maximize")
                 onClicked: root.maximizeRequested()
             }
             ChromeButton {
+                id: fullscreenButton
                 objectName: "fullscreenButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "fullscreen"; text: root.fullscreen ? qsTr("Exit fullscreen") : qsTr("Fullscreen")
                 onClicked: root.fullscreenRequested()
             }
             ChromeButton {
+                id: closeButton
                 visible: root.showWindowButtons
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "close"; text: qsTr("Close")
@@ -545,14 +577,18 @@ FocusScope {
         id: toolbar
         parent: bottomEdge
         objectName: "redesignToolbar"
-        anchors.bottom: parent.bottom; width: parent.width; height: theme.dp(54)
+        anchors.bottom: parent.bottom; width: parent.width; height: root.controlsHeight
         color: theme.background
         visible: root.bottomVisible
         RowLayout {
+            id: originalToolbar
+            visible: !chrome.custom && !chrome.applying
             anchors.fill: parent
+            anchors.topMargin: root.controlsHeight - theme.dp(54)
             anchors.leftMargin: theme.dp(18); anchors.rightMargin: theme.dp(18)
             spacing: theme.dp(10)
             ChromeButton {
+                id: previousButton
                 objectName: "previousButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitWidth: theme.dp(30); implicitHeight: theme.dp(28)
@@ -560,6 +596,7 @@ FocusScope {
                 onClicked: root.previous()
             }
             ChromeButton {
+                id: playButton
                 objectName: "playButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitWidth: theme.dp(54); implicitHeight: theme.dp(28)
@@ -569,59 +606,67 @@ FocusScope {
                 onClicked: root.togglePlayback()
             }
             ChromeButton {
+                id: nextButton
                 objectName: "nextButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitWidth: theme.dp(30); implicitHeight: theme.dp(28)
                 iconName: "next"; text: qsTr("Next"); enabled: root.hasNext
                 onClicked: root.next()
             }
-            Text {
-                objectName: "elapsedTimeLabel"
-                visible: root.width > theme.dp(650)
-                Layout.preferredWidth: Math.max(theme.dp(82), implicitWidth)
-                leftPadding: theme.dp(8)
-                horizontalAlignment: Text.AlignHCenter
-                text: root.timeText
-                color: theme.foreground; font.pixelSize: theme.dp(14)
-            }
-            RedesignPlayerSeekBar {
-                focusPolicy: root.presentationOnly ? Qt.NoFocus : Qt.StrongFocus
-                id: seek
-                objectName: "seekBar"
-                mediaStarted: root.started
-                playerPosition: root.position
-                onDragStarted: root.seekDragStarted()
-                onDragFinished: (position, commit) => root.seekDragFinished(position, commit)
-                onSeekRequested: position => root.seekRequested(position)
+            RowLayout {
+                id: timelineControl
+                objectName: "timelineControl"
                 Layout.fillWidth: true
-                Layout.minimumWidth: theme.dp(40)
-                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                enabled: root.seekable
-                timeForPosition: root.timeForPosition
-                previewEnabled: root.showSeekPreview && root.started && root.hasVideo && !root.presentationOnly
-                thumbnailContent: root.seekThumbnailContent
-                videoBackdropContent: root.videoBackdropContent
-                previewImage: root.seekPreviewImage
-                previewImagePosition: root.seekPreviewImagePosition
-                timelineEnabled: root.showSubtitleTimeline
-                timelineCues: root.subtitleTimelineCues
-                timelineState: root.subtitleTimelineState
-                durationSeconds: root.durationSeconds
-                subtitleDelayMS: root.subtitleDelayMS
-                onSubtitleDelayRequested: milliseconds => root.subtitleDelayRequested(milliseconds)
-                onPreviewRequested: position => root.seekPreviewRequested(position)
-                onPreviewEnded: root.seekPreviewEnded()
-            }
-            Text {
-                objectName: "durationTimeLabel"
-                visible: root.width > theme.dp(800)
-                Layout.preferredWidth: Math.max(theme.dp(78), implicitWidth)
-                rightPadding: theme.dp(6)
-                horizontalAlignment: Text.AlignHCenter
-                text: root.lengthText
-                color: theme.foreground; font.pixelSize: theme.dp(14)
+                spacing: theme.dp(10)
+                Text {
+                    objectName: "elapsedTimeLabel"
+                    visible: root.width > theme.dp(650)
+                    Layout.preferredWidth: Math.max(theme.dp(chrome.hasTimeline("above") ? 74 : 82), implicitWidth)
+                    leftPadding: chrome.hasTimeline("above") ? 0 : theme.dp(8)
+                    horizontalAlignment: Text.AlignHCenter
+                    text: root.timeText
+                    color: theme.foreground; font.pixelSize: theme.dp(14)
+                }
+                RedesignPlayerSeekBar {
+                    focusPolicy: root.presentationOnly ? Qt.NoFocus : Qt.StrongFocus
+                    id: seek
+                    objectName: "seekBar"
+                    mediaStarted: root.started
+                    playerPosition: root.position
+                    onDragStarted: root.seekDragStarted()
+                    onDragFinished: (position, commit) => root.seekDragFinished(position, commit)
+                    onSeekRequested: position => root.seekRequested(position)
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: theme.dp(40)
+                    scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    enabled: root.seekable
+                    timeForPosition: root.timeForPosition
+                    previewEnabled: root.showSeekPreview && root.started && root.hasVideo && !root.presentationOnly
+                    thumbnailContent: root.seekThumbnailContent
+                    videoBackdropContent: root.videoBackdropContent
+                    previewImage: root.seekPreviewImage
+                    previewImagePosition: root.seekPreviewImagePosition
+                    timelineEnabled: root.showSubtitleTimeline
+                    timelineCues: root.subtitleTimelineCues
+                    timelineState: root.subtitleTimelineState
+                    durationSeconds: root.durationSeconds
+                    subtitleDelayMS: root.subtitleDelayMS
+                    onSubtitleDelayRequested: milliseconds => root.subtitleDelayRequested(milliseconds)
+                    onPreviewRequested: position => root.seekPreviewRequested(position)
+                    onPreviewEnded: root.seekPreviewEnded()
+                }
+                Text {
+                    objectName: "durationTimeLabel"
+                    visible: root.width > theme.dp(800)
+                    Layout.preferredWidth: Math.max(theme.dp(chrome.hasTimeline("above") ? 74 : 78), implicitWidth)
+                    rightPadding: chrome.hasTimeline("above") ? 0 : theme.dp(6)
+                    horizontalAlignment: Text.AlignHCenter
+                    text: root.lengthText
+                    color: theme.foreground; font.pixelSize: theme.dp(14)
+                }
             }
             ChromeButton {
+                id: muteButton
                 objectName: "muteButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitWidth: theme.dp(28)
@@ -650,6 +695,7 @@ FocusScope {
                 onMoved: root.volumeRequested(value)
             }
             ChromeButton {
+                id: audioButton
                 objectName: "audioButton"
                 visible: root.width > theme.dp(900)
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
@@ -658,6 +704,7 @@ FocusScope {
                 onClicked: { root.toggleTracks(this, "audio"); root.audioTracksRequested(this) }
             }
             ChromeButton {
+                id: subtitleButton
                 objectName: "subtitleButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "subtitles"; text: qsTr("Subtitle tracks")
@@ -665,6 +712,7 @@ FocusScope {
                 onClicked: { root.toggleTracks(this, "subtitles"); root.subtitleTracksRequested(this) }
             }
             ChromeButton {
+                id: playbackSettingsButton
                 objectName: "playbackSettingsButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "settings"; text: qsTr("Playback settings")
@@ -672,11 +720,24 @@ FocusScope {
                 onClicked: root.toggleSettings("playback")
             }
             ChromeButton {
+                id: queueButton
                 objectName: "queueButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "queue"; text: qsTr("Play queue"); selected: root.queueOpen
                 onClicked: { root.settingsPage = ""; root.queueOpen = !root.queueOpen }
             }
         }
+    }
+    RedesignPlayerLayout { id: chromeLayout; savedLayout: root.playerLayout }
+    RedesignPlayerChrome {
+        id: chrome
+        theme: root.theme; model: chromeLayout
+        headerHost: header; footerHost: toolbar
+        headerVisible: root.topVisible; footerVisible: root.bottomVisible
+        controls: ({menu: mainMenuButton, library: libraryToggleButton, "divider:1": headerDivider, folder: mediaFolderButton,
+            title: titleControl, minimize: minimizeButton, maximize: maximizeButton, fullscreen: fullscreenButton, close: closeButton,
+            previous: previousButton, play: playButton, next: nextButton, timeline: timelineControl,
+            mute: muteButton, volume: volumeSlider, audio: audioButton, subtitles: subtitleButton,
+            settings: playbackSettingsButton, queue: queueButton})
     }
 }

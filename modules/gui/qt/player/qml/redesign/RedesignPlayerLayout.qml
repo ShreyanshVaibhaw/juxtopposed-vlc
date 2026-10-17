@@ -47,7 +47,10 @@ QtObject {
         if (typeof text !== "string" || text.length > 65536) return null
         try {
             const value = JSON.parse(text)
-            return valid(value) ? value : null
+            if (!valid(value)) return null
+            const normalized = {version: 1, zones: {}}
+            for (const zone of zones) normalized.zones[zone] = value.zones[zone].slice()
+            return normalized
         } catch (error) { return null }
     }
     function reload() {
