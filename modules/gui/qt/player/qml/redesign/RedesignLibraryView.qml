@@ -508,6 +508,7 @@ Item {
                             cornerRadius: root.grid && root.expanded ? 12 : 2
                             iconName: model.fileIsDir || root.showingFolders ? "folder" : model.iconName || root.defaultItemIcon
                             iconSize: root.grid && root.expanded ? 48 : 24
+                            showPlaceholderBackground: root.grid
                             source: delegate.itemArtwork
                             progress: root.grid ? Number(model.progress || 0) : 0
                             surroundColor: mediaButton.down || mediaButton.selected ? theme.selected : mediaButton.hovered ? theme.hover : theme.panel

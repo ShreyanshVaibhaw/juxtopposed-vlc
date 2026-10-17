@@ -64,6 +64,17 @@ TestCase {
     Component { id: visitsComponent; RedesignLibraryVisits { ctx: settings } }
     Component { id: sortComponent; RedesignLibrarySort { ctx: settings } }
     Component { id: pinsComponent; RedesignLibraryPins { ctx: settings } }
+    Component {
+        id: artworkFixture
+        Rectangle {
+            x: 100; y: 400; width: 40; height: 40; z: 30; color: "#236cb0"
+            RedesignLibraryArtwork {
+                objectName: "artworkProbe"
+                anchors.centerIn: parent; width: 32; height: 32
+                iconName: "folder"; cornerRadius: 0; showPlaceholderBackground: false
+            }
+        }
+    }
     Component { id: viewComponent; RedesignLibraryView { visible: false; width: 1920; height: 1040; settingsContext: settings } }
     RedesignLibraryPath { id: folderPath }
     SignalSpy { id: homeSpy; target: library; signalName: "homeActivated" }
@@ -735,6 +746,32 @@ TestCase {
             && Math.abs(image.green(x, y) - Math.round(expected.g * 255)) <= 1
             && Math.abs(image.blue(x, y) - Math.round(expected.b * 255)) <= 1,
             "The folder must use the filled reference shape and its location color.")
+    }
+    function verifyArtworkPixel(artwork, x, y, color) {
+        const point = artwork.mapToItem(testCase, x + .5, y + .5)
+        const image = grabImage(pixelCaptureBounds), expected = Qt.color(color)
+        x = Math.floor(point.x * image.width / testCase.width)
+        y = Math.floor(point.y * image.height / testCase.height)
+        verify(Math.abs(image.red(x, y) - Math.round(expected.r * 255)) <= 1
+            && Math.abs(image.green(x, y) - Math.round(expected.g * 255)) <= 1
+            && Math.abs(image.blue(x, y) - Math.round(expected.b * 255)) <= 1,
+            "Artwork pixels must match the cover or the row background.")
+    }
+    function test_bareArtworkFallbackPreservesCoversAndHandlesLoadFailure() {
+        const fixture = createTemporaryObject(artworkFixture, testCase)
+        const artwork = findChild(fixture, "artworkProbe"), image = findChild(artwork, "libraryArtworkImage")
+        verifyArtworkPixel(artwork, 1, 1, "#236cb0")
+        artwork.showPlaceholderBackground = true
+        verifyArtworkPixel(artwork, 1, 1, "#222222")
+        artwork.showPlaceholderBackground = false
+        artwork.source = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="4" height="8" fill="#ff0000"/></svg>')
+        tryCompare(image, "status", Image.Ready)
+        verifyArtworkPixel(artwork, 8, 16, "#ff0000")
+        verifyArtworkPixel(artwork, 25, 16, "#222222")
+        ignoreWarning(/QML (?:Image|QQuickImage): Cannot open: .*missing-library-cover-test.png/)
+        artwork.source = Qt.resolvedUrl("missing-library-cover-test.png")
+        tryCompare(image, "status", Image.Error)
+        verifyArtworkPixel(artwork, 1, 1, "#236cb0")
     }
     function test_navigationIconsFollowTheCategoryAndClearForPins(data) {
         library.lightTheme = data.light

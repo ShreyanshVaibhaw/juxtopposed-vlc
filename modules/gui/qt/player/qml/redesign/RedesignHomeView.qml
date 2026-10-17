@@ -113,6 +113,7 @@ Flickable {
                                             source: entry.artwork
                                             iconName: section.modelData.icon
                                             iconSize: root.expanded ? 48 : 24
+                                            showPlaceholderBackground: root.expanded
                                             cornerRadius: root.expanded ? 12 : 2
                                             progress: root.expanded && section.modelData.key === "watching" ? Number(entry.model.progress || 0) : 0
                                             surroundColor: button.down || button.selected ? root.theme.selected : button.hovered ? root.theme.hover : root.theme.panel
