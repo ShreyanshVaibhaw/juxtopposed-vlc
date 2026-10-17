@@ -158,6 +158,7 @@ Item {
         const context = menuForItem(index, section || "")
         function show(context) {
             if (request !== menuRequest || !anchor || !root.visible || !context || !context.target || !context.entries.length) return
+            itemMenu.focusOrigin = anchor.activeFocus ? anchor : null
             itemMenu.target = context.target
             itemMenu.entries = context.entries
             itemMenu.popup(anchor, point)
@@ -170,7 +171,15 @@ Item {
         videoBackdropContent: root.videoBackdropContent
         objectName: "libraryItemMenu"
         property var target
+        property Item focusOrigin
         scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+        onClosed: {
+            const origin = focusOrigin
+            focusOrigin = null
+            const window = root.Window.window
+            if (origin && origin.visible && root.visible && window && window.activeFocusItem === window.contentItem)
+                origin.forceActiveFocus(Qt.TabFocusReason)
+        }
         onActionRequested: action => { itemMenu.close(); root.itemActionRequested(target, action) }
     }
     RedesignActionMenu {
@@ -429,6 +438,15 @@ Item {
             cellHeight: root.grid ? root.expanded ? (cellWidth - theme.dp(20)) * (root.squareCards ? 1 : 9 / 16) + theme.dp(root.category === 2 ? 88 : 78) : theme.dp(142) : theme.dp(42)
             keyNavigationEnabled: true
             currentIndex: -1
+            function moveFocus(key) {
+                if (key === Qt.Key_Left) moveCurrentIndexLeft()
+                else if (key === Qt.Key_Right) moveCurrentIndexRight()
+                else if (key === Qt.Key_Up) moveCurrentIndexUp()
+                else if (key === Qt.Key_Down) moveCurrentIndexDown()
+                else return false
+                if (currentItem) currentItem.focusMediaItem()
+                return true
+            }
             C.ScrollBar.vertical: C.ScrollBar { policy: C.ScrollBar.AsNeeded }
             delegate: Item {
                 id: delegate
@@ -440,6 +458,7 @@ Item {
                 readonly property string itemArtist: model.main_artist || ""
                 readonly property string displayTitle: itemTitle + ((!root.expanded || !root.grid) && itemArtist ? " - " + itemArtist : "")
                 readonly property string itemArtwork: model.thumbnail || model.small_cover || model.cover || ""
+                function focusMediaItem() { mediaButton.forceActiveFocus(Qt.TabFocusReason) }
                 RedesignButton {
                     id: grip
                     objectName: "playlistGrip" + delegate.index
@@ -481,7 +500,8 @@ Item {
                     anchors.leftMargin: root.playlistEditing && !root.grid ? theme.dp(28) : 0
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                     text: delegate.displayTitle
-                    selected: mediaView.currentIndex === delegate.index
+                    selected: mediaView.currentIndex === delegate.index && (root.playlistEditing || mediaView.activeFocus)
+                    onActiveFocusChanged: if (activeFocus) mediaView.currentIndex = delegate.index
                     onClicked: { mediaView.currentIndex = delegate.index; if (root.playlistEditing) forceActiveFocus(); else root.activated(delegate.index) }
                     Keys.onMenuPressed: root.openItemMenu(this, delegate.index, Qt.point(0, height), "")
                     Keys.onPressed: event => {
@@ -493,6 +513,10 @@ Item {
                             event.accepted = true
                         } else if (event.key === Qt.Key_F10 && event.modifiers & Qt.ShiftModifier) {
                             root.openItemMenu(this, delegate.index, Qt.point(0, height), ""); event.accepted = true
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                            click(); event.accepted = true
+                        } else if (mediaView.moveFocus(event.key)) {
+                            event.accepted = true
                         } else event.accepted = false
                     }
                     TapHandler { acceptedButtons: Qt.RightButton; onTapped: event => root.openItemMenu(mediaButton, delegate.index, event.position, "") }

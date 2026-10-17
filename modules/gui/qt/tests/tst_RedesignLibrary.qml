@@ -579,6 +579,84 @@ TestCase {
         tryVerify(() => view.itemAtIndex(0) !== null)
         return view
     }
+    function test_libraryFocusSelection_data() {
+        return [{tag: "list", grid: false}, {tag: "grid", grid: true}]
+    }
+    function test_libraryFocusSelection(data) {
+        findChild(library, "libraryAddRow").forceActiveFocus(Qt.MouseFocusReason)
+        library.mediaModel = homeItems
+        library.grid = data.grid
+        const view = findChild(library, "libraryMediaView")
+        tryCompare(view, "count", 4)
+        const first = findChild(view.itemAtIndex(0), "libraryMediaItem0")
+        const second = findChild(view.itemAtIndex(1), "libraryMediaItem1")
+        verify(!first.selected, "An automatic current index must not select a row on arrival.")
+        first.forceActiveFocus(Qt.TabFocusReason)
+        tryCompare(first, "visualFocus", true)
+        verify(first.selected)
+        keyClick(data.grid ? Qt.Key_Right : Qt.Key_Down)
+        compare(view.currentIndex, 1)
+        tryCompare(second, "visualFocus", true)
+        verify(second.selected)
+        verify(!first.selected)
+        keyClick(data.grid ? Qt.Key_Left : Qt.Key_Up)
+        compare(view.currentIndex, 0)
+        verify(first.visualFocus)
+        keyClick(data.grid ? Qt.Key_Right : Qt.Key_Down)
+        verify(second.visualFocus)
+        keyClick(Qt.Key_Return)
+        compare(activateSpy.count, 1)
+        compare(activateSpy.signalArguments[0][0], 1)
+        findChild(library, "libraryAddRow").forceActiveFocus(Qt.TabFocusReason)
+        verify(!second.selected, "Browse selection must clear when focus leaves the items.")
+    }
+    function test_libraryKeyboardScrollsAndOpensTheFocusedItemMenu() {
+        for (let i = playlistItems.count; i < 35; ++i)
+            playlistItems.append({id: "item-" + i, title: "Item " + i})
+        library.mediaModel = playlistItems
+        library.menuForItem = (index, section) => ({target: {index: index}, entries: [{action: "properties", label: "Properties"}]})
+        const view = findChild(library, "libraryMediaView")
+        tryCompare(view, "count", 35)
+        findChild(view.itemAtIndex(0), "libraryMediaItem0").forceActiveFocus(Qt.TabFocusReason)
+        for (let i = 1; i < 35; ++i) keyClick(Qt.Key_Down)
+        compare(view.currentIndex, 34)
+        const last = findChild(view.currentItem, "libraryMediaItem34")
+        verify(last.visualFocus)
+        tryVerify(() => {
+            const y = last.mapToItem(view, 0, 0).y
+            return y >= 0 && y + last.height <= view.height
+        })
+        keyClick(Qt.Key_F10, Qt.ShiftModifier)
+        const menu = findChild(library, "libraryItemMenu")
+        tryCompare(menu, "opened", true)
+        compare(menu.target.index, 34)
+        keyClick(Qt.Key_Escape)
+        tryCompare(menu, "visible", false)
+        tryCompare(last, "activeFocus", true)
+        keyClick(Qt.Key_Return)
+        compare(activateSpy.signalArguments[0][0], 34)
+        keyClick(Qt.Key_F10, Qt.ShiftModifier)
+        tryCompare(menu, "opened", true)
+        const add = findChild(library, "libraryAddRow")
+        mouseClick(add)
+        tryCompare(menu, "visible", false)
+        verify(add.activeFocus)
+        compare(addSpy.count, 1)
+    }
+    function test_playlistArrowFocusKeepsEditActionsOnTheSelectedRow() {
+        const view = beginPlaylistEditing()
+        findChild(view.itemAtIndex(0), "libraryMediaItem0").forceActiveFocus(Qt.TabFocusReason)
+        keyClick(Qt.Key_Down)
+        compare(view.currentIndex, 1)
+        verify(findChild(view.currentItem, "libraryMediaItem1").visualFocus)
+        keyClick(Qt.Key_Up, Qt.AltModifier)
+        compare(Array.from(playlistMoveSpy.signalArguments[0]), [1, 0, "second"])
+        keyClick(Qt.Key_Delete)
+        compare(Array.from(playlistRemoveSpy.signalArguments[0]), [1, "second"])
+        findChild(library, "libraryAddRow").forceActiveFocus(Qt.TabFocusReason)
+        verify(findChild(view.currentItem, "libraryMediaItem1").selected)
+        compare(activateSpy.count, 0)
+    }
     function test_openPlaylistAddAppendsInsteadOfCreatingAnotherPlaylist() {
         library.category = 4; library.playlistOpen = true
         const add = findChild(library, "libraryAddRow")
