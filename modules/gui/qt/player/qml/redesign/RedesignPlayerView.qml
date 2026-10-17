@@ -576,8 +576,10 @@ FocusScope {
                 onClicked: root.next()
             }
             Text {
+                objectName: "elapsedTimeLabel"
                 visible: root.width > theme.dp(650)
-                Layout.preferredWidth: theme.dp(88)
+                Layout.preferredWidth: Math.max(theme.dp(82), implicitWidth)
+                leftPadding: theme.dp(8)
                 horizontalAlignment: Text.AlignHCenter
                 text: root.timeText
                 color: theme.foreground; font.pixelSize: theme.dp(14)
@@ -611,8 +613,10 @@ FocusScope {
                 onPreviewEnded: root.seekPreviewEnded()
             }
             Text {
+                objectName: "durationTimeLabel"
                 visible: root.width > theme.dp(800)
-                Layout.preferredWidth: theme.dp(84)
+                Layout.preferredWidth: Math.max(theme.dp(78), implicitWidth)
+                rightPadding: theme.dp(6)
                 horizontalAlignment: Text.AlignHCenter
                 text: root.lengthText
                 color: theme.foreground; font.pixelSize: theme.dp(14)

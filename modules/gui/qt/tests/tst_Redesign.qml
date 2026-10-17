@@ -224,6 +224,8 @@ TestCase {
         player.autoHideMode = 1
         player.lightTheme = false
         player.scaleFactor = 1
+        player.timeText = "00:02:10"
+        player.lengthText = "00:25:40"
         player.seekPreviewImage = ""
         player.seekPreviewImagePosition = -1
         player.forceActiveFocus()
@@ -240,6 +242,46 @@ TestCase {
         subtitleSpy.clear()
         tryCompare(findChild(player, "redesignLibraryPanel"), "reveal", 0)
         wait(20)
+    }
+    function test_toolbarTimelineGeometry_data() {
+        return [{tag: "dark", width: 1920, height: 1080, scale: 1},
+                {tag: "light", width: 1920, height: 1080, scale: 1, light: true},
+                {tag: "scaled", width: 1920, height: 1080, scale: 1.5},
+                {tag: "small", width: 640, height: 360, scale: 1, compact: true},
+                {tag: "elapsed-only", width: 700, height: 400, scale: 1, elapsedOnly: true}]
+    }
+    function test_toolbarTimelineGeometry(data) {
+        testCase.width = data.width; testCase.height = data.height
+        player.scaleFactor = data.scale; player.lightTheme = !!data.light
+        const seek = findChild(player, "seekBar")
+        const elapsed = findChild(player, "elapsedTimeLabel")
+        const duration = findChild(player, "durationTimeLabel")
+        const s = data.scale
+        const left = data.compact ? 162 : 254 * s
+        const right = data.compact || data.elapsedOnly ? 194 : 428 * s
+        tryVerify(() => Math.abs(seek.mapToItem(player, 0, 0).x - left) <= 1
+                  && Math.abs(seek.width - (data.width - left - right)) <= 1)
+        fuzzyCompare(seek.mapToItem(player, 0, 0).y, data.height - 41 * s, 1)
+        compare(elapsed.visible, !data.compact)
+        compare(duration.visible, !data.compact && !data.elapsedOnly)
+        for (const label of [elapsed, duration]) {
+            if (!label.visible) continue
+            verify(label.width >= label.implicitWidth)
+            const point = label.mapToItem(player, 0, 0)
+            const seekPoint = seek.mapToItem(player, 0, 0)
+            verify(point.x + label.width <= seekPoint.x || point.x >= seekPoint.x + seek.width)
+        }
+    }
+    function test_toolbarLongTimesRemainReadable() {
+        const elapsed = findChild(player, "elapsedTimeLabel")
+        const duration = findChild(player, "durationTimeLabel")
+        const seek = findChild(player, "seekBar")
+        player.timeText = "9999:59:59"; player.lengthText = "9999:59:59"
+        tryVerify(() => elapsed.width >= elapsed.implicitWidth && duration.width >= duration.implicitWidth)
+        const seekPoint = seek.mapToItem(player, 0, 0)
+        verify(elapsed.mapToItem(player, 0, 0).x + elapsed.width <= seekPoint.x)
+        verify(duration.mapToItem(player, 0, 0).x >= seekPoint.x + seek.width)
+        verify(seek.width >= 40)
     }
     function test_statisticsSwitchUsesMouseAndKeyboard() {
         statisticsSwitch.visible = true
