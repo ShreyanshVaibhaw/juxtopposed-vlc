@@ -12,6 +12,7 @@ FocusScope {
     property string playerLayout: ""
     readonly property alias layoutModel: chromeLayout
     readonly property real controlsHeight: chrome.controlsHeight
+    readonly property bool layoutReady: !chrome.applying && JSON.stringify(chrome.renderedLayout) === JSON.stringify(chromeLayout.layout)
     readonly property var chromeItems: chrome.allControls
     property var customControlStates: ({})
     property bool customMenuOpen: false
@@ -466,7 +467,7 @@ FocusScope {
         anchors.top: parent.top; width: parent.width; height: theme.dp(40)
         color: theme.background
         visible: !root.minimalView && (!root.fullscreen || headerHover.hovered || header.activeFocus || revealTimer.running || root.controlsLocked)
-        Loader { anchors.fill: parent; sourceComponent: root.titleBarDragContent }
+        Loader { anchors.fill: parent; active: !chromeLayout.editing; sourceComponent: root.titleBarDragContent }
         RowLayout {
             id: headerLeft
             anchors.left: parent.left
@@ -583,7 +584,7 @@ FocusScope {
         objectName: "redesignToolbar"
         anchors.bottom: parent.bottom; width: parent.width; height: root.controlsHeight
         color: theme.background
-        visible: !root.minimalView && !root.libraryExpanded && (!root.fullscreen || root.showFullscreenControls)
+        visible: !root.minimalView && !root.libraryExpanded && (!root.fullscreen || root.showFullscreenControls || chromeLayout.editing)
             && (!root.autoHideActive || bottomHover.hovered || toolbar.activeFocus || revealTimer.running || root.controlsLocked)
         RowLayout {
             id: originalToolbar

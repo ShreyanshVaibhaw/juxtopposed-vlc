@@ -603,6 +603,10 @@ Item {
             target: DialogsProvider
 
             function onShowToolbarEditorDialog() {
+                if (root.bgContent && typeof root.bgContent.beginCustomization === "function") {
+                    root.bgContent.beginCustomization()
+                    return
+                }
                 toolbarEditorDialogLoader.active = true
                 toolbarEditorDialogLoader.item.open()
             }

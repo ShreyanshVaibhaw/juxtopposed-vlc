@@ -1,0 +1,224 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+import QtQuick
+import QtTest
+import "../player/qml/redesign"
+
+TestCase {
+    id: testCase
+    name: "JuxtopposedCustomizationEditor"
+    width: 1920; height: 1080; visible: true; when: windowShown
+    RedesignPlayerView { id: player; anchors.fill: parent; started: true; hasVideo: true }
+    RedesignCustomizationEditor { id: editor; player: player }
+    SignalSpy { id: toggled; target: player; signalName: "togglePlayback" }
+    SignalSpy { id: saved; target: editor; signalName: "saveRequested" }
+    function item(name) {
+        const found = findChild(editor, name)
+        if (found) return found
+        const p = findChild(editor, "customizationPalette")
+        if (p) for (let n = 0; n < p.count; ++n) {
+            const cell = p.itemAtIndex(n)
+            if (cell && cell.objectName === name) return cell
+        }
+        return null
+    }
+    function init() {
+        editor.saving = false; editor.cancel(); editor.presetId = ""
+        player.playerLayout = ""; player.layoutModel.reload()
+        player.scaleFactor = 1; player.lightTheme = false; player.fullscreen = false; player.showFullscreenControls = true
+        testCase.width = 1920; testCase.height = 1080
+        player.customControlStates = ({})
+        saved.clear()
+    }
+    function cleanup() { editor.saving = false; editor.cancel() }
+    function test_initialGeometryAndPalette() {
+        editor.begin(); tryCompare(editor, "opened", true)
+        const panel = item("customizationPanel")
+        compare(panel.width, 1048); compare(panel.height, 655)
+        compare(panel.x, 436); compare(panel.y, 189.5)
+        compare(editor.available.length, 31)
+        verify(!item("customizationSave").enabled)
+        const cancel = item("customizationCancel"), save = item("customizationSave")
+        compare(cancel.x, 20); compare(cancel.y, 603); compare(cancel.width, 100); compare(cancel.height, 32)
+        compare(save.x, 928); compare(save.y, 603)
+        const palette = item("customizationPalette")
+        compare(Math.round(palette.width / palette.cellWidth), 9)
+        tryVerify(() => item("customizeHandle_timeline") !== null)
+    }
+    function test_cancelCloseAndEscapeRestore() {
+        for (const method of ["cancel", "close", "escape"]) {
+            editor.begin(); player.layoutModel.move("favorite", "footerLeft", 3)
+            tryVerify(() => item("customizeHandle_favorite") !== null)
+            verify(item("customizationSave").enabled)
+            if (method === "cancel") mouseClick(item("customizationCancel"))
+            else if (method === "close") mouseClick(item("customizationClose"))
+            else keyClick(Qt.Key_Escape)
+            tryCompare(editor, "opened", false)
+            compare(player.layoutModel.location("favorite"), null)
+            compare(player.controlsHeight, 54)
+        }
+    }
+    function test_saveFailureKeepsDraftAndSuccessfulEchoCloses() {
+        editor.begin(); player.layoutModel.move("timeline", "above", 0)
+        tryCompare(player, "controlsHeight", 108)
+        mouseClick(item("customizationSave")); compare(saved.count, 1); verify(editor.saving)
+        verify(!item("customizationCancel").enabled)
+        editor.completeSave(false, "Cannot save this file.")
+        verify(editor.opened); verify(player.layoutModel.editing); compare(editor.errorMessage, "Cannot save this file.")
+        compare(player.layoutModel.location("timeline").zone, "above")
+        mouseClick(item("customizationSave")); compare(saved.count, 2)
+        // MainCtx echoes persisted preferences before the save callback returns.
+        player.playerLayout = saved.signalArguments[1][0]
+        verify(editor.opened)
+        editor.completeSave(true, "")
+        tryCompare(editor, "opened", false)
+        compare(player.layoutModel.location("timeline").zone, "above")
+    }
+    function test_externalProfileChangeCancelsDraft() {
+        editor.begin(); player.layoutModel.move("favorite", "footerLeft", 3)
+        const other = player.layoutModel.defaults(); other.zones.above = ["timeline"]; other.zones.footerCenter = []
+        player.playerLayout = JSON.stringify(other)
+        tryCompare(editor, "opened", false)
+        compare(player.layoutModel.location("favorite"), null)
+        compare(player.layoutModel.location("timeline").zone, "above")
+    }
+    function dragFromTo(source, targetX, targetY) {
+        tryCompare(player, "layoutReady", true)
+        tryVerify(() => source.visible && source.width > 0 && source.height > 0)
+        verify(waitForRendering(source))
+        const start = source.mapToItem(editor, source.width / 2, source.height / 2)
+        mousePress(editor, start.x, start.y)
+        mouseMove(editor, start.x + 10, start.y + 10, 20)
+        for (let n = 1; n <= 12; ++n)
+            mouseMove(editor, start.x + (targetX - start.x) * n / 12, start.y + (targetY - start.y) * n / 12, 10)
+        wait(20)
+        mouseRelease(editor, targetX, targetY)
+        wait(20)
+    }
+    function test_realPointerAddRemoveAndMoveTimeline() {
+        editor.begin(); tryVerify(() => item("customizePalette_favorite") !== null)
+        dragFromTo(item("customizePalette_favorite"), 180, height - 25)
+        tryVerify(() => !!player.layoutModel.location("favorite"))
+        verify(!editor.available.some(row => row.id === "favorite"))
+        const panel = item("customizationPanel")
+        dragFromTo(item("customizeHandle_favorite"), panel.x + 80, panel.y + 150)
+        tryCompare(player.layoutModel, "dirty", false)
+        tryVerify(() => item("customizeHandle_timeline") !== null)
+        dragFromTo(item("customizeHandle_timeline"), width / 2, height - 80)
+        tryCompare(player, "controlsHeight", 108)
+        compare(player.layoutModel.location("timeline").zone, "above")
+    }
+    function test_referenceSequenceAndReorder() {
+        editor.begin()
+        tryVerify(() => item("customizeHandle_timeline") !== null)
+        dragFromTo(item("customizeHandle_timeline"), width / 2, height - 80)
+        tryCompare(player, "controlsHeight", 108)
+        for (const id of ["previous", "play", "next"])
+            dragFromTo(item("customizeHandle_" + id), width / 2 + 100, height - 25)
+        tryCompare(player.layoutModel, "draft", player.layoutModel.layout)
+        compare(player.layoutModel.layout.zones.footerCenter, ["previous", "play", "next"])
+        dragFromTo(item("customizeHandle_title"), 20, height - 25)
+        tryVerify(() => player.layoutModel.location("title").zone === "footerLeft")
+        for (const id of ["menu", "library", "folder"])
+            dragFromTo(item("customizeHandle_" + id), 1, height - 25)
+        tryVerify(() => player.layoutModel.location("folder").zone === "footerLeft")
+        dragFromTo(item("customizeHandle_fullscreen"), width - 20, height - 25)
+        tryVerify(() => player.layoutModel.location("fullscreen").zone === "footerRight")
+        dragFromTo(item("customizePalette_favorite"), 20, height - 25)
+        tryVerify(() => player.layoutModel.location("favorite") !== null)
+        const before = player.layoutModel.layout.zones.footerLeft.slice()
+        const moved = before[before.length - 1]
+        dragFromTo(item("customizeHandle_" + moved), 0, height - 25)
+        tryVerify(() => player.layoutModel.layout.zones.footerLeft[0] === moved)
+        mouseClick(item("customizationSave"))
+        editor.completeSave(true, "")
+        tryCompare(editor, "opened", false)
+        verify(player.layoutModel.location("favorite") !== null)
+        compare(player.controlsHeight, 108)
+    }
+    Component { id: titlebarProbe; Item { objectName: "windowDragProbe" } }
+    function test_editingStopsNativeWindowDrag() {
+        player.titleBarDragContent = titlebarProbe
+        tryVerify(() => findChild(player, "windowDragProbe") !== null)
+        editor.begin(); tryVerify(() => findChild(player, "windowDragProbe") === null)
+        editor.cancel(); tryVerify(() => findChild(player, "windowDragProbe") !== null)
+        player.titleBarDragContent = null
+    }
+    function test_editingRevealsControlsInFullscreen() {
+        player.fullscreen = true; player.showFullscreenControls = false
+        verify(!player.bottomVisible)
+        editor.begin(); verify(player.topVisible); verify(player.bottomVisible)
+        editor.cancel(); verify(!player.bottomVisible)
+    }
+    function test_profileSwitchWithSameLayoutCancelsDraft() {
+        editor.presetId = "first"; editor.begin()
+        player.layoutModel.move("favorite", "footerLeft", 0)
+        editor.presetId = "second"
+        tryCompare(editor, "opened", false)
+        compare(player.layoutModel.location("favorite"), null)
+    }
+    function test_staleDropDoesNotModifyAnotherDraft() {
+        editor.begin()
+        editor.queueMove("favorite", "footerLeft", 0)
+        editor.cancel(); editor.begin(); wait(20)
+        compare(player.layoutModel.location("favorite"), null)
+        verify(!player.layoutModel.dirty)
+    }
+    function test_thinDividerHasUsableDragArea() {
+        editor.begin(); tryVerify(() => item("customizeHandle_divider:1") !== null)
+        const handle = item("customizeHandle_divider:1")
+        verify(handle.width >= 12); verify(handle.height >= 28)
+        dragFromTo(handle, 20, height - 25)
+        tryVerify(() => player.layoutModel.location("divider:1").zone === "footerLeft")
+    }
+    function test_disabledControlsStillHaveActiveDragHandles() {
+        player.customControlStates = ({snapshot: {enabled: false}})
+        editor.begin(); player.layoutModel.move("snapshot", "headerLeft", 4)
+        tryVerify(() => item("customizeHandle_snapshot") !== null)
+        verify(item("customizeHandle_snapshot").enabled)
+        verify(!findChild(player, "customButton_snapshot").enabled)
+        dragFromTo(item("customizeHandle_snapshot"), width / 2, height - 25)
+        tryVerify(() => player.layoutModel.location("snapshot").zone === "footerCenter")
+        player.customControlStates = ({})
+    }
+    function test_keyboardCanPlaceAndRemoveControls() {
+        editor.begin(); tryVerify(() => item("customizePalette_favorite") !== null)
+        item("customizePalette_favorite").forceActiveFocus(); keyClick(Qt.Key_Return)
+        // The first menu row is Top left.
+        tryCompare(item("customizationPlacement"), "currentIndex", 0); keyClick(Qt.Key_Return)
+        tryVerify(() => player.layoutModel.location("favorite") !== null)
+        tryVerify(() => item("customizeHandle_favorite") !== null)
+        item("customizeHandle_favorite").forceActiveFocus(); keyClick(Qt.Key_Return)
+        tryCompare(item("customizationPlacement"), "currentIndex", 0)
+        for (let n = 0; n < 7; ++n) keyClick(Qt.Key_Down)
+        compare(item("customizationPlacement").currentIndex, 7); keyClick(Qt.Key_Return)
+        tryCompare(player.layoutModel, "dirty", false)
+    }
+    function test_closingEditorRestoresPlayerPointerInput() {
+        editor.begin(); editor.cancel(); toggled.clear()
+        verify(waitForRendering(player))
+        mouseClick(findChild(player, "playButton"))
+        tryCompare(toggled, "count", 1)
+    }
+    function test_overlayFollowsResizeWhileClosedAndOpen() {
+        testCase.width = 1528; testCase.height = 894
+        tryCompare(editor, "width", 1528); tryCompare(editor, "height", 894)
+        testCase.width = 1920; testCase.height = 1080
+        tryCompare(editor, "width", 1920); tryCompare(editor, "height", 1080)
+        editor.begin()
+        testCase.width = 800; testCase.height = 600
+        tryCompare(editor, "width", 800); tryCompare(editor, "height", 600)
+        editor.cancel()
+    }
+    function test_smallWindowAndScale_data() {
+        return [{tag: "small", w: 800, h: 600, scale: 1}, {tag: "dpi", w: 1600, h: 1000, scale: 1.5}, {tag: "light", w: 1920, h: 1080, scale: 1}]
+    }
+    function test_smallWindowAndScale(data) {
+        testCase.width = data.w; testCase.height = data.h; player.scaleFactor = data.scale; player.lightTheme = data.tag === "light"
+        editor.begin(); tryCompare(editor, "opened", true)
+        const panel = item("customizationPanel")
+        verify(panel.x >= 0 && panel.y >= 40 * data.scale); verify(panel.x + panel.width <= width); verify(panel.y + panel.height <= height - player.controlsHeight)
+        const palette = item("customizationPalette")
+        verify(palette.height > 0); verify(palette.cellWidth > 0)
+        if (data.tag === "small") verify(palette.contentHeight > palette.height)
+    }
+}

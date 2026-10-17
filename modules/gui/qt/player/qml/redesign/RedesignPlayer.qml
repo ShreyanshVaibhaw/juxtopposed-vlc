@@ -17,6 +17,14 @@ FocusScope {
     property bool resumeAvailable: false
     property int queueTab: 0
     property int requestedLibraryCategory: -1
+    function beginCustomization() {
+        if (MainCtx.minimalView) MainCtx.minimalView = false
+        mediaMenu.dismiss(); tracksPopup.close(); customChoice.close()
+        view.settingsPage = ""; view.queueOpen = false
+        view.libraryOpen = false; view.libraryExpanded = false
+        customizationPreferences.discard()
+        customizationEditor.begin()
+    }
     function openLibraryCategory(category) {
         requestedLibraryCategory = category
         view.libraryOpen = true
@@ -451,6 +459,25 @@ FocusScope {
         active: MainCtx.mediaLibraryAvailable && mediaMenu.recentFilesEnabled
         source: active ? "qrc:///qt/qml/VLC/Player/RedesignRecentMenuModel.qml" : ""
     }
+    RedesignPreferences { id: customizationPreferences; ctx: MainCtx; editPlayerPreset: true }
+    RedesignCustomizationEditor {
+        id: customizationEditor
+        presetId: { playerPreferences.revision; return playerPreferences.selectedPlayerPreset }
+        z: 50
+        player: view
+        videoBackdropContent: rootPlayer.menuBackdropContent
+        onSaveRequested: layout => {
+            const staged = customizationPreferences.stage("qt-player-layout", layout)
+            const saved = staged && customizationPreferences.save()
+            completeSave(saved, customizationPreferences.errorMessage)
+        }
+        onFinished: customizationPreferences.discard()
+    }
+    Binding {
+        target: MainCtx; property: "useGlobalShortcuts"; value: false
+        when: customizationEditor.opened
+        restoreMode: Binding.RestoreBindingOrValue
+    }
     RedesignShortcuts {
         id: shortcutEditor
         videoBackdropContent: rootPlayer.menuBackdropContent
@@ -479,7 +506,7 @@ FocusScope {
             case "network": DialogsProvider.openNetDialog(); break
             case "capture": DialogsProvider.openCaptureDialog(); break
             case "convert": DialogsProvider.openAndTranscodingDialogs(); break
-            case "customize": DialogsProvider.showToolbarEditorDialog(); break
+            case "customize": rootPlayer.beginCustomization(); break
             case "shortcuts": shortcutEditor.open(); break
             case "settings": DialogsProvider.prefsDialog(); break
             case "about": DialogsProvider.aboutDialog(); break

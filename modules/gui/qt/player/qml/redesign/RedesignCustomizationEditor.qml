@@ -1,0 +1,397 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls.Basic as C
+
+Item {
+    id: root
+    required property RedesignPlayerView player
+    property Component videoBackdropContent
+    property string errorMessage: ""
+    property string presetId: ""
+    property string editPresetId: ""
+    onPresetIdChanged: if (opened && !saving && presetId !== editPresetId) cancel()
+    property bool saving: false
+    readonly property alias opened: panel.visible
+    readonly property RedesignPlayerLayout model: player.layoutModel
+    readonly property RedesignTheme theme: player.theme
+    readonly property var available: catalog.available(model.layout)
+    readonly property var paletteLabels: ({
+        speed: qsTr("Playback\nSpeed"), forward10: qsTr("Forward\n10s"), backward10: qsTr("Backward\n10s"),
+        forward15: qsTr("Forward\n15s"), backward15: qsTr("Backward\n15s"), pip: qsTr("Picture in\nPicture"),
+        rightSidebar: qsTr("Right\nSidebar"), playlistName: qsTr("Playlist\nName")
+    })
+    property int generation: 0
+    property string dragId: ""
+    property bool dragging: false
+    property point pressPosition
+    property var dropLocation: null
+    property var previousFocus: null
+    signal saveRequested(string layout)
+    signal finished()
+    parent: root.active ? root.player.C.Overlay.overlay : root.player
+    width: player.width; height: player.height
+    readonly property point playerOrigin: {
+        // The view can change windows at startup. Refresh each edit session.
+        root.active
+        const playerWindow = root.player.Window.window
+        const overlayWindow = parent ? parent.Window.window : null
+        if (playerWindow) { playerWindow.x; playerWindow.y; playerWindow.width; playerWindow.height }
+        if (overlayWindow) { overlayWindow.x; overlayWindow.y; overlayWindow.width; overlayWindow.height }
+        if (!parent || parent === player) return Qt.point(0, 0)
+        for (let ancestor = player; ancestor; ancestor = ancestor.parent) { ancestor.x; ancestor.y }
+        return player.mapToItem(parent, 0, 0)
+    }
+    x: playerOrigin.x; y: playerOrigin.y
+    property bool active: false
+    visible: active
+
+    function begin() {
+        if (opened) return
+        previousFocus = Window.window ? Window.window.activeFocusItem : null
+        ++generation; errorMessage = ""; saving = false; editPresetId = presetId
+        active = true; model.begin(); panel.open()
+
+    }
+    function cancel() { if (!saving) { ++generation; endDrag(); model.cancel(); panel.close() } }
+    function save() {
+        if (!model.dirty || saving) return
+        saving = true; errorMessage = ""
+        root.saveRequested(model.serialize())
+    }
+    function completeSave(success, error) {
+        saving = false
+        if (success) { model.finish(true); panel.close() }
+        else errorMessage = error || qsTr("VLC cannot save this layout. Try again.")
+    }
+    function bounds(item) {
+        root.x; root.y
+        if (!item) return Qt.rect(0, 0, 0, 0)
+        // mapToItem alone does not observe changes in reparented ancestors.
+        for (let ancestor = item; ancestor && ancestor !== root.parent; ancestor = ancestor.parent) {
+            ancestor.x; ancestor.y; ancestor.width; ancestor.height; ancestor.scale; ancestor.visible
+        }
+        const point = item.mapToItem(root, 0, 0)
+        return Qt.rect(point.x, point.y, item.width, item.height)
+    }
+    function locationFor(bar, x) {
+        const zones = bar === "header" ? ["headerLeft", "headerCenter", "headerRight"] : ["footerLeft", "footerCenter", "footerRight"]
+        let best = zones[1], distance = Infinity
+        for (let column = 0; column < zones.length; ++column) {
+            const zone = zones[column], ids = model.layout.zones[zone]
+            let left = root.width * column / 3, right = root.width * (column + 1) / 3
+            if (ids.length) {
+                const rects = ids.map(id => bounds(player.chromeItems[id]))
+                left = Math.min(...rects.map(r => r.x)); right = Math.max(...rects.map(r => r.x + r.width))
+            }
+            const delta = x < left ? left - x : x > right ? x - right : 0
+            if (delta < distance) { best = zone; distance = delta }
+        }
+        return {zone: best, index: insertionIndex(best, x)}
+    }
+    function insertionIndex(zone, x) {
+        const ids = model.layout.zones[zone]
+        for (let n = 0; n < ids.length; ++n) {
+            const rect = bounds(player.chromeItems[ids[n]])
+            if (x < rect.x + rect.width / 2) return n
+        }
+        return ids.length
+    }
+    function queueMove(id, zone, index) {
+        const owner = root, token = generation
+        // A move can replace the delegate that owns the current pointer grab.
+        Qt.callLater(() => { if (Qt.isQtObject(owner) && owner.opened && owner.model.editing && !owner.saving && token === owner.generation) owner.model.move(id, zone, index) })
+    }
+    function queueRemove(id) {
+        const owner = root, token = generation
+        Qt.callLater(() => { if (Qt.isQtObject(owner) && owner.opened && owner.model.editing && !owner.saving && token === owner.generation) owner.model.remove(id) })
+    }
+    function startPointer(id, area, mouse) {
+        if (saving) return
+        placement.close()
+        dragId = id; pressPosition = area.mapToItem(root, mouse.x, mouse.y)
+    }
+    function movePointer(area, mouse) {
+        if (!dragId || saving) return
+        const point = area.mapToItem(root, mouse.x, mouse.y)
+        if (!dragging && Math.hypot(point.x - pressPosition.x, point.y - pressPosition.y) < theme.dp(6)) return
+        const mapped = root.mapToItem(ghost.parent, point.x, point.y)
+        ghost.x = mapped.x - ghost.width / 2; ghost.y = mapped.y - ghost.height / 2
+        dragging = true
+    }
+    function releasePointer(id, anchor) {
+        if (dragging) ghost.Drag.drop()
+        else if (id && !saving) showPlacement(id, anchor)
+        endDrag()
+    }
+    function endDrag() { dragging = false; dragId = ""; dropLocation = null }
+    function showPlacement(id, anchor) {
+        placement.controlId = id
+        const labels = [qsTr("Top left"), qsTr("Top center"), qsTr("Top right"), qsTr("Bottom left"), qsTr("Bottom center"), qsTr("Bottom right"), qsTr("Above controls")]
+        placement.entries = model.zones.map((zone, n) => ({action: zone, label: labels[n]}))
+            .concat(model.location(id) ? [{action: "remove", label: qsTr("Remove from player"), separatorBefore: true}] : [])
+        const rect = bounds(anchor)
+        placementAnchor.x = rect.x; placementAnchor.y = rect.y
+        placementAnchor.width = rect.width; placementAnchor.height = rect.height
+        placement.toggleFrom(placementAnchor)
+    }
+    RedesignCustomizationCatalog { id: catalog }
+    Connections {
+        target: root.model
+        function onEditingChanged() { if (root.opened && !root.model.editing && !root.saving) panel.close() }
+    }
+    Rectangle { anchors.fill: parent; color: "#66000000"; visible: root.opened; z: -1 }
+    Keys.onEscapePressed: root.cancel()
+
+    component Outline: Item {
+        id: outline
+        property color stroke: root.theme.playerLabel
+        readonly property real unit: root.theme.dp(1)
+        Repeater {
+            model: Math.max(0, Math.ceil(outline.width / (outline.unit * 8)))
+            delegate: Item {
+                required property int index
+                x: index * outline.unit * 8
+                width: Math.max(0, Math.min(outline.unit * 4, outline.width - x)); height: outline.height
+                Rectangle { width: parent.width; height: outline.unit; color: outline.stroke }
+                Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: outline.unit; color: outline.stroke }
+            }
+        }
+        Repeater {
+            model: Math.max(0, Math.ceil(outline.height / (outline.unit * 8)))
+            delegate: Item {
+                required property int index
+                y: index * outline.unit * 8
+                width: outline.width; height: Math.max(0, Math.min(outline.unit * 4, outline.height - y))
+                Rectangle { width: outline.unit; height: parent.height; color: outline.stroke }
+                Rectangle { anchors.right: parent.right; width: outline.unit; height: parent.height; color: outline.stroke }
+            }
+        }
+    }
+    component PointerArea: MouseArea {
+        id: pointerArea
+        preventStealing: true
+        required property string controlId
+        required property Item anchorItem
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        enabled: !root.saving
+        cursorShape: root.dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+        onPressed: mouse => { anchorItem.forceActiveFocus(); root.startPointer(controlId, pointerArea, mouse) }
+        onPositionChanged: mouse => { if (pressed && pressedButtons === Qt.LeftButton) root.movePointer(pointerArea, mouse) }
+        onReleased: root.releasePointer(controlId, anchorItem)
+        onCanceled: root.endDrag()
+    }
+    Repeater {
+        model: root.opened ? Object.keys(root.player.chromeItems).filter(id => !!root.model.location(id)) : []
+        delegate: FocusScope {
+            id: handle
+            required property string modelData
+            readonly property Item control: root.player.chromeItems[modelData]
+            readonly property rect rect: {
+                const actual = root.bounds(control)
+                if (modelData.startsWith("divider:") && control) {
+                    const width = Math.max(actual.width, root.theme.dp(12)), height = Math.max(actual.height, root.theme.dp(28))
+                    return Qt.rect(actual.x + (actual.width - width) / 2, actual.y + (actual.height - height) / 2, width, height)
+                }
+                if (modelData !== "title" || !control) return actual
+                const width = Math.min(actual.width, control.implicitWidth + root.theme.dp(12))
+                return Qt.rect(actual.x + (actual.width - width) / 2, actual.y + root.theme.dp(4), width, Math.max(0, actual.height - root.theme.dp(8)))
+            }
+            activeFocusOnTab: true
+            objectName: "customizeHandle_" + modelData
+            x: rect.x; y: rect.y; width: rect.width; height: rect.height
+            visible: root.player.layoutReady && !!control && control.visible && width > 0 && height > 0
+            Accessible.role: Accessible.Button
+            Accessible.name: qsTr("Move %1").arg(catalog.definition(modelData).label)
+            Accessible.onPressAction: root.showPlacement(modelData, handle)
+            Keys.onReturnPressed: root.showPlacement(modelData, handle)
+            Keys.onEnterPressed: root.showPlacement(modelData, handle)
+            Keys.onSpacePressed: root.showPlacement(modelData, handle)
+            Outline { anchors.fill: parent; stroke: handle.activeFocus ? root.theme.accent : root.theme.playerLabel }
+            PointerArea { anchors.fill: parent; controlId: handle.modelData; anchorItem: handle }
+        }
+    }
+    component BarDrop: DropArea {
+        property string bar
+        enabled: root.opened && root.dragging && !root.saving
+        function update(drag) {
+            if (drag.source !== ghost) return
+            root.dropLocation = bar === "above" ? {zone: "above", index: root.insertionIndex("above", drag.x)} : root.locationFor(bar, drag.x)
+        }
+        onEntered: drag => update(drag)
+        onPositionChanged: drag => update(drag)
+        onExited: root.dropLocation = null
+        onDropped: drop => {
+            if (drop.source !== ghost || !root.dropLocation) return
+            const target = root.dropLocation
+            root.queueMove(root.dragId, target.zone, target.index)
+            drop.acceptProposedAction()
+        }
+    }
+    BarDrop { width: parent.width; height: root.theme.dp(40); bar: "header" }
+    BarDrop { width: parent.width; height: root.theme.dp(54); y: parent.height - height; bar: "footer" }
+    BarDrop {
+        id: upperDrop
+        width: parent.width; height: root.theme.dp(54)
+        y: parent.height - root.player.controlsHeight - (root.model.layout.zones.above.length ? 0 : height)
+        bar: "above"
+        Outline { anchors.fill: parent; anchors.margins: root.theme.dp(6); visible: root.opened && root.dragging; stroke: upperDrop.containsDrag ? root.theme.accent : root.theme.playerLabel }
+    }
+    Rectangle {
+        visible: root.dragging && !!root.dropLocation
+        width: root.theme.dp(3); height: root.theme.dp(28); radius: width / 2; color: root.theme.accent
+        x: {
+            if (!root.dropLocation) return 0
+            const zone = root.dropLocation.zone, ids = root.model.layout.zones[zone], index = root.dropLocation.index
+            if (!ids.length) return root.theme.dp(20)
+            const rect = root.bounds(root.player.chromeItems[ids[Math.min(index, ids.length - 1)]])
+            return index < ids.length ? rect.x - root.theme.dp(5) : rect.x + rect.width + root.theme.dp(3)
+        }
+        y: !root.dropLocation ? 0 : root.dropLocation.zone.startsWith("header") ? root.theme.dp(6)
+            : root.dropLocation.zone === "above" ? upperDrop.y + root.theme.dp(13) : root.height - root.theme.dp(41)
+    }
+    Rectangle {
+        id: ghost
+        objectName: "customizationDragGhost"
+        parent: root.active ? root.player.C.Overlay.overlay : root
+        z: 10000
+        readonly property string controlId: root.dragId
+        width: root.theme.dp(60); height: root.theme.dp(46)
+        radius: root.theme.dp(6); color: root.theme.panel; border.color: root.theme.accent
+        visible: root.opened && root.dragging
+        Drag.active: root.dragging
+        Drag.source: ghost
+        Drag.supportedActions: Qt.MoveAction
+        Drag.proposedAction: Qt.MoveAction
+        Drag.hotSpot.x: width / 2; Drag.hotSpot.y: height / 2
+        RedesignIcon {
+            anchors.centerIn: parent; width: root.theme.dp(24); height: width
+            name: (catalog.definition(root.dragId) || {}).icon || ""
+            color: root.theme.foreground
+        }
+    }
+    C.Popup {
+        id: panel
+        objectName: "customizationPanel"
+        z: root.z + 1
+        popupType: C.Popup.Item
+        parent: root.player
+        width: Math.max(0, Math.min(root.theme.dp(1048), parent.width - root.theme.dp(30)))
+        height: Math.max(0, Math.min(root.theme.dp(655), parent.height - root.theme.dp(70) - root.player.controlsHeight))
+        x: (parent.width - width) / 2
+        y: Math.max(root.theme.dp(55), Math.min((parent.height - height) / 2 - root.theme.dp(23), parent.height - root.player.controlsHeight - height - root.theme.dp(15)))
+        padding: 0; modal: false; dim: false; focus: true
+        closePolicy: C.Popup.NoAutoClose
+        background: RedesignDialogSurface { theme: root.theme; fill: root.theme.lightTheme ? root.theme.panel : "#0e0e0e"; videoBackdropContent: root.videoBackdropContent }
+        onAboutToShow: controlPalette.positionViewAtBeginning()
+        onClosed: {
+            ++root.generation; root.endDrag(); placement.close()
+            if (root.model.editing) root.model.cancel()
+            if (Qt.isQtObject(root.previousFocus) && root.previousFocus.visible) root.previousFocus.forceActiveFocus()
+            else root.player.forceActiveFocus()
+            root.active = false; root.finished()
+        }
+        contentItem: Item {
+            Keys.onEscapePressed: root.cancel()
+            Rectangle {
+                width: parent.width; height: root.theme.dp(94); radius: root.theme.dp(14); color: root.theme.field
+                Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: parent.height / 2; color: parent.color }
+            }
+            Text {
+                x: root.theme.dp(20); y: root.theme.dp(10); height: root.theme.dp(32); width: parent.width - root.theme.dp(80)
+                text: qsTr("Customize Player"); color: root.theme.foreground; font.pixelSize: root.theme.dp(14)
+                verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight
+            }
+            RedesignButton {
+                objectName: "customizationClose"
+                x: parent.width - width - root.theme.dp(7); y: root.theme.dp(7)
+                scaleFactor: root.theme.scaleFactor; lightTheme: root.theme.lightTheme; accentColor: root.theme.accentColor
+                iconName: "close"; text: qsTr("Close player editor"); enabled: !root.saving
+                onClicked: root.cancel()
+            }
+            Text {
+                x: root.theme.dp(20); y: root.theme.dp(54); width: parent.width - root.theme.dp(40); height: root.theme.dp(34)
+                text: qsTr("Drag items to the player to add or move them. Drag items into this box to remove them.")
+                color: root.theme.playerLabel; font.pixelSize: root.theme.dp(14); wrapMode: Text.WordWrap; verticalAlignment: Text.AlignVCenter
+            }
+            GridView {
+                id: controlPalette
+                objectName: "customizationPalette"
+                x: root.theme.dp(22); y: root.theme.dp(114); width: Math.max(0, parent.width - root.theme.dp(44))
+                height: Math.max(0, parent.height - y - root.theme.dp(74)); clip: true
+                cellWidth: Math.min(width, root.theme.dp(110))
+                cellHeight: root.theme.dp(120)
+                model: root.available
+                C.ScrollBar.vertical: C.ScrollBar { }
+                delegate: FocusScope {
+                    id: cell
+                    required property var modelData
+                    activeFocusOnTab: true
+                    objectName: "customizePalette_" + modelData.id
+                    width: controlPalette.cellWidth; height: controlPalette.cellHeight
+                    Accessible.role: Accessible.Button
+                    Accessible.name: qsTr("Add %1").arg(modelData.label)
+                    Accessible.onPressAction: root.showPlacement(modelData.id, cell)
+                    Keys.onReturnPressed: root.showPlacement(modelData.id, cell)
+                    Keys.onEnterPressed: root.showPlacement(modelData.id, cell)
+                    Keys.onSpacePressed: root.showPlacement(modelData.id, cell)
+                    Outline {
+                        anchors.horizontalCenter: parent.horizontalCenter; y: root.theme.dp(14)
+                        width: root.theme.dp(28); height: root.theme.dp(32)
+                        stroke: cell.activeFocus ? root.theme.accent : root.theme.playerLabel
+                        RedesignIcon { anchors.centerIn: parent; width: root.theme.dp(24); height: width; name: cell.modelData.icon; color: cell.modelData.id === "thumbnail" ? root.theme.background : root.theme.foreground }
+                    }
+                    Text {
+                        x: root.theme.dp(5); y: root.theme.dp(62); width: parent.width - root.theme.dp(10); height: root.theme.dp(40)
+                        text: root.paletteLabels[cell.modelData.id] || cell.modelData.label; textFormat: Text.PlainText
+                        font.pixelSize: root.theme.dp(14); color: root.theme.foreground
+                        wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter
+                    }
+                    PointerArea { anchors.fill: parent; controlId: cell.modelData.id; anchorItem: cell }
+                }
+            }
+            DropArea {
+                x: controlPalette.x; y: root.theme.dp(94); width: controlPalette.width; height: parent.height - y - root.theme.dp(74)
+                enabled: root.dragging && !root.saving
+                onDropped: drop => { if (drop.source === ghost) { root.queueRemove(root.dragId); drop.acceptProposedAction() } }
+            }
+            RedesignButton {
+                objectName: "customizationCancel"
+                x: root.theme.dp(20); y: parent.height - root.theme.dp(52); width: root.theme.dp(100); height: root.theme.dp(32)
+                scaleFactor: root.theme.scaleFactor; lightTheme: root.theme.lightTheme; accentColor: root.theme.accentColor
+                caption: qsTr("Cancel"); text: caption; enabled: !root.saving; onClicked: root.cancel()
+                background: Rectangle { radius: root.theme.dp(6); color: parent.hovered ? root.theme.hover : root.theme.background; border.width: parent.visualFocus ? 1 : 0; border.color: root.theme.accent }
+            }
+            Text {
+                x: root.theme.dp(136); y: parent.height - root.theme.dp(52); width: Math.max(0, parent.width - root.theme.dp(272)); height: root.theme.dp(32)
+                objectName: "customizationError"
+                Accessible.role: Accessible.StaticText; Accessible.name: text; Accessible.ignored: text.length === 0
+                text: root.errorMessage; textFormat: Text.PlainText; color: root.theme.danger; font.pixelSize: root.theme.dp(12)
+                wrapMode: Text.WordWrap; verticalAlignment: Text.AlignVCenter
+            }
+            RedesignButton {
+                objectName: "customizationSave"
+                x: parent.width - width - root.theme.dp(20); y: parent.height - root.theme.dp(52); width: root.theme.dp(100); height: root.theme.dp(32)
+                scaleFactor: root.theme.scaleFactor; lightTheme: root.theme.lightTheme; accentColor: root.theme.accentColor
+                caption: qsTr("Save"); text: caption; enabled: root.model.dirty && !root.saving; onClicked: root.save()
+                foreground: root.theme.accent
+                background: Rectangle { radius: root.theme.dp(6); color: parent.hovered ? root.theme.selected : root.theme.progress; border.width: parent.visualFocus ? 1 : 0; border.color: root.theme.accent }
+            }
+        }
+    }
+    Item { id: placementAnchor }
+    RedesignActionMenu {
+        id: placement
+        objectName: "customizationPlacement"
+        z: root.z + 2
+        onOpened: { currentIndex = 0; itemAt(0).forceActiveFocus() }
+        property string controlId: ""
+        parent: root
+        scaleFactor: root.theme.scaleFactor; lightTheme: root.theme.lightTheme; accentColor: root.theme.accentColor
+        videoBackdropContent: root.videoBackdropContent
+        onActionRequested: action => {
+            if (action === "remove") root.queueRemove(controlId)
+            else root.queueMove(controlId, action, root.model.layout.zones[action].length)
+        }
+    }
+}

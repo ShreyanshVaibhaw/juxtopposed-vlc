@@ -1230,6 +1230,7 @@ libqml_module_player_a_QML = \
 	player/qml/redesign/RedesignPlayerLayout.qml \
 	player/qml/redesign/RedesignPlayerChrome.qml \
 	player/qml/redesign/RedesignCustomizationCatalog.qml \
+	player/qml/redesign/RedesignCustomizationEditor.qml \
 	player/qml/redesign/RedesignExtraControl.qml \
 	player/qml/redesign/RedesignMediaFavorite.qml \
 	player/qml/redesign/RedesignPlayerFavorite.qml \
