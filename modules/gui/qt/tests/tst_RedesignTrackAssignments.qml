@@ -29,6 +29,7 @@ TestCase {
         dialog.loadSources(dialog.sourceRequestId,{success:true,sources:[{url:english,name:"English.srt"},{url:spanish,name:"Spanish.srt"}]})
     }
     function init() {
+        dialog.sourceFolderDisplay = Qt.binding(() => dialog.sourceFolder)
         finishMatching=true
         width=1280; height=900; dialog.scaleFactor=1; dialog.lightTheme=false
         dialog.saving=false; dialog.close(); tryCompare(dialog,"visible",false)
@@ -102,6 +103,30 @@ TestCase {
             pixel(list.itemAtIndex(0).background,80,3,data.light ? "#dedede" : "#090909")
             fuzzyCompare(label.mapToItem(dialog.background,0,0).x,66 * data.scale,.1)
         }
+    }
+    function test_folderCaptionUsesNativeDisplayWithoutChangingTheUrl_data() {
+        return [
+            {tag:"drive",url:"file:///C:/My%20Movies/Subtitles/",display:"C:\\My Movies\\Subtitles\\"},
+            {tag:"unc",url:"file://NAS/Shows%20%26%20Films/",display:"\\\\NAS\\Shows & Films\\"},
+            {tag:"unix",url:"file:///videos/%3Cb%3EFavorite%3C/b%3E/",display:"/videos/<b>Favorite</b>/"},
+            {tag:"percent",url:"file:///videos/100%25/",display:"/videos/100%/"},
+            {tag:"remote",url:"smb://viewer:hidden@example.test/Shows/",display:"smb://viewer@example.test/Shows/"}
+        ]
+    }
+    function test_folderCaptionUsesNativeDisplayWithoutChangingTheUrl(data) {
+        dialog.sourceFolder = data.url; dialog.sourceFolderDisplay = data.display
+        const button=findChild(dialog,"trackAssignmentFolder"), caption=findChild(dialog,"trackAssignmentFolderCaption")
+        compare(button.text,data.display); compare(caption.text,data.display)
+        compare(caption.textFormat,Text.PlainText)
+        const tooltip=findChild(button,"redesignToolTip")
+        compare(tooltip.text,data.display); compare(tooltip.contentItem.textFormat,Text.PlainText)
+        compare(dialog.sourceFolder,data.url)
+        dialog.sourceFolder=""
+        compare(button.text,"Select track folder"); compare(caption.text,"Select track folder")
+    }
+    function test_invalidEscapeDoesNotBreakFolderCaption() {
+        dialog.sourceFolder="file:///videos/100%broken/"
+        compare(findChild(dialog,"trackAssignmentFolderCaption").text,dialog.sourceFolder)
     }
     function test_selectAndCancelDoesNotSave() {
         compare(dialog.changedRows.length,0)

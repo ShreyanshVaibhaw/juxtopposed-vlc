@@ -9,6 +9,7 @@ T.Button {
     property color accentColor: "#d37918"
     property bool lightTheme: false
     property string iconName
+    property int tooltipTextFormat: Text.AutoText
     property string caption
     property bool leftAligned: false
     property bool accent: false
@@ -35,6 +36,7 @@ T.Button {
     RedesignToolTip {
         theme: root.theme
         text: root.text
+        contentTextFormat: root.tooltipTextFormat
         visible: root.text.length > 0 && (root.hovered || root.visualFocus)
     }
 

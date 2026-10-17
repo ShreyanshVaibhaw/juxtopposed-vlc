@@ -8,6 +8,7 @@ import VLC.Style
 
 RedesignTrackAssignmentDialog {
     id: root
+    sourceFolderDisplay: MainCtx.displayMRL(sourceFolder)
     property bool restartNeeded: false
     property double pendingSearch: -1
     property int pendingSearchRequest: -1

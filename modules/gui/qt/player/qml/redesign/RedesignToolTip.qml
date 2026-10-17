@@ -10,6 +10,7 @@ C.ToolTip {
     id: tip
     objectName: "redesignToolTip"
     property RedesignTheme theme
+    property int contentTextFormat: Text.AutoText
     readonly property var controlWindow: parent ? parent.Window.window : null
     readonly property var hostWindow: controlWindow && controlWindow.renderWindow !== undefined
                                       ? controlWindow.renderWindow : controlWindow
@@ -30,6 +31,7 @@ C.ToolTip {
 
     contentItem: Text {
         text: tip.text
+        textFormat: tip.contentTextFormat
         font: tip.font
         color: tip.theme ? tip.theme.bright : "#e5e5e5"
         wrapMode: Text.Wrap

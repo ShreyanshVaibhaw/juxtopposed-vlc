@@ -20,6 +20,8 @@ C.Dialog {
     property string anchorFile: ""
     property string targetFolder: ""
     property string sourceFolder: ""
+    property string sourceFolderDisplay: sourceFolder
+    readonly property string sourceFolderCaption: sourceFolder.length ? sourceFolderDisplay : qsTr("Select track folder")
     property int sourceIndex: 0
     property bool providerHasCustomKey: false
     property bool providerHasConsumerKey: false
@@ -416,13 +418,13 @@ C.Dialog {
                 visible: root.sourceIndex === 0
                 Layout.fillWidth: true; Layout.preferredHeight: root.theme.dp(34)
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                iconName: "folder"; text: root.sourceFolder || qsTr("Select track folder"); leftAligned: true
+                iconName: "folder"; text: root.sourceFolderCaption; tooltipTextFormat: Text.PlainText; leftAligned: true
                 enabled: !root.saving && !root.loadingDrop
                 background: Rectangle { color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 contentItem: RowLayout {
                     spacing: root.theme.dp(10)
                     RedesignIcon { objectName: "trackAssignmentFolderIcon"; sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio); Layout.leftMargin: root.theme.dp(8); Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24); name: "folder"; color: root.theme.foreground }
-                    Text { Layout.fillWidth: true; Layout.rightMargin: root.theme.dp(12); text: root.sourceFolder ? decodeURIComponent(root.sourceFolder.replace(/^file:\/\//, "")) : qsTr("Select track folder"); elide: Text.ElideMiddle; font.pixelSize: root.theme.dp(14); color: root.theme.foreground }
+                    Text { objectName: "trackAssignmentFolderCaption"; Layout.fillWidth: true; Layout.rightMargin: root.theme.dp(12); text: root.sourceFolderCaption; textFormat: Text.PlainText; elide: Text.ElideMiddle; font.pixelSize: root.theme.dp(14); color: root.theme.foreground }
                 }
                 onClicked: root.folderRequested()
             }

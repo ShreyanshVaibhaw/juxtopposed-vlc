@@ -22,6 +22,7 @@ TestCase {
     function init() {
         testCase.Window.window.visibility = Window.Windowed
         button.scaleFactor = 1; button.lightTheme = false
+        button.text = "Playback settings"; button.tooltipTextFormat = Text.AutoText
         button.x = 20; button.y = 100
         const tip = findChild(button, "redesignToolTip")
         tip.close(); mouseMove(testCase, 400, 300)
@@ -29,6 +30,32 @@ TestCase {
     function cleanup() {
         findChild(button, "redesignToolTip").close()
         testCase.Window.window.visibility = Window.Windowed
+    }
+    function test_fileNamesCanRequestPlainText() {
+        const tip = findChild(button, "redesignToolTip")
+        compare(tip.contentItem.textFormat, Text.AutoText)
+        button.text = "/videos/<b>Favorite</b>/"
+        button.tooltipTextFormat = Text.PlainText
+        mouseMove(button, button.width / 2, button.height / 2)
+        tryCompare(tip, "opened", true, 2000)
+        compare(tip.contentItem.text, button.text)
+        compare(tip.contentItem.textFormat, Text.PlainText)
+    }
+    function test_longFileNameFitsWindow_data() {
+        return [{tag:"dark",scale:1,light:false},{tag:"light-scaled",scale:1.5,light:true}]
+    }
+    function test_longFileNameFitsWindow(data) {
+        button.scaleFactor = data.scale; button.lightTheme = data.light
+        button.text = "/videos/" + "Very_Long_File_Name_".repeat(20)
+        button.tooltipTextFormat = Text.PlainText
+        const tip = findChild(button, "redesignToolTip")
+        mouseMove(button, button.width / 2, button.height / 2)
+        tryCompare(tip, "opened", true, 2000)
+        verify(tip.contentItem.lineCount > 1)
+        const position = tip.contentItem.mapToItem(testCase, 0, 0)
+        verify(position.x >= 0 && position.y >= 0)
+        verify(position.x + tip.contentItem.width <= width)
+        verify(position.y + tip.contentItem.height <= height)
     }
     function test_hoverUsesThemeAndApplicationFont() {
         const tip = findChild(button, "redesignToolTip")
