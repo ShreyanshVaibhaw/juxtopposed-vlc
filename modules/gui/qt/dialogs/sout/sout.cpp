@@ -36,6 +36,7 @@
 
 #include <cassert>
 #include <QWindow>
+#include <QStyle>
 
 SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inputChain )
 {
@@ -52,6 +53,7 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
 
     /* UI stuff */
     ui.setupUi( this );
+    ui.profileSelect->setThemeContext(p_intf->p_mi);
     ui.inputBox->setMRL( inputChain );
     ui.helpEdit->setPlainText( qtr("This wizard will allow you to stream or "
             "convert your media for use locally, on your private network, "
@@ -96,6 +98,13 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
     setButtonText( QWizard::CancelButton, qtr("Cancel") );
     setButtonText( QWizard::NextButton, qtr("Next") );
     setButtonText( QWizard::FinishButton, qtr("Stream") );
+    for (const auto role : {QWizard::NextButton, QWizard::FinishButton})
+    {
+        auto *primary = button(role);
+        primary->setProperty("redesignPrimary", true);
+        primary->style()->unpolish(primary);
+        primary->style()->polish(primary);
+    }
 }
 
 void SoutDialog::closeTab( int i )

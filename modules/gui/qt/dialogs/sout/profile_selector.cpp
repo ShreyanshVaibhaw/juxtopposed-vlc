@@ -24,6 +24,8 @@
 #include "dialogs/sout/profiles.hpp"
 #include "dialogs/sout/sout.hpp"
 #include "util/soutchain.hpp"
+#include "util/redesign_widget_theme.hpp"
+#include "maininterface/mainctx.hpp"
 
 #include <QHBoxLayout>
 #include <QToolButton>
@@ -93,6 +95,11 @@ VLCProfileSelector::~VLCProfileSelector()
     settings.setValue( "codecs-profiles-selected", profileBox->currentText() );
 }
 
+void VLCProfileSelector::setThemeContext(MainCtx* ctx)
+{
+    m_themeContext = ctx;
+}
+
 inline void VLCProfileSelector::fillProfilesCombo()
 {
     QSettings settings(
@@ -122,9 +129,9 @@ inline void VLCProfileSelector::fillProfilesCombo()
     }
     settings.endArray();
 
-    profileBox->setCurrentIndex(
+    profileBox->setCurrentIndex(qMax(0,
         profileBox->findText(
-            settings.value( "codecs-profiles-selected" ).toString() ));
+            settings.value( "codecs-profiles-selected" ).toString() )));
 
 }
 
@@ -145,12 +152,7 @@ void VLCProfileSelector::editProfilePrivate( const QString& qs, const QString& v
     QWidget* windowWidget = window();
     QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
     VLCProfileEditor *editor = new VLCProfileEditor( qs, value,  parentWindow );
-    if (windowWidget && windowWidget->property("redesignDialog").toBool())
-    {
-        editor->setPalette(windowWidget->palette());
-        editor->setFont(windowWidget->font());
-        editor->setStyleSheet(windowWidget->styleSheet());
-    }
+    applyRedesignWidgetTheme(editor, m_themeContext.data());
 
     /* Show it */
     if( QDialog::Accepted == editor->exec() )
@@ -455,6 +457,7 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
                  : QVLCDialog( _parent, NULL )
 {
     ui.setupUi( this );
+    setWindowTitle(qs_name.isEmpty() ? qtr("Create Profile") : qtr("Edit Profile"));
     ui.buttonGroup->setObjectName( CATPROP2NAME( CATANDPROP( "muxer", "mux" ) ) );
     if( !qs_name.isEmpty() )
     {
@@ -467,6 +470,8 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
 
     QPushButton *saveButton = new QPushButton(
                 ( qs_name.isEmpty() ) ? qtr( "Create" ) : qtr( "Save" ) );
+    saveButton->setProperty("redesignPrimary", true);
+    saveButton->setDefault(true);
     ui.buttonBox->addButton( saveButton, QDialogButtonBox::AcceptRole );
     connect( ui.buttonBox, &QDialogButtonBox::accepted, this, &VLCProfileEditor::accept );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );

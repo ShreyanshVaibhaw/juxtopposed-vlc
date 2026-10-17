@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QSet>
 #include <QHash>
+#include <QPointer>
 
 #include "widgets/native/qvlcframe.hpp"
 #include "util/soutchain.hpp"
@@ -36,6 +37,7 @@
 #include "ui_profiles.h"
 
 class QComboBox;
+class MainCtx;
 
 class VLCProfileSelector : public QWidget
 {
@@ -44,6 +46,7 @@ class VLCProfileSelector : public QWidget
 public:
     VLCProfileSelector( QWidget *_parent );
     ~VLCProfileSelector();
+    void setThemeContext(MainCtx* ctx);
     QString getMux() { return mux; }
     SoutChain getTranscode() { return transcode; }
 private:
@@ -53,6 +56,7 @@ private:
     void saveProfiles();
     QString mux;
     SoutChain transcode;
+    QPointer<MainCtx> m_themeContext;
 private slots:
     void newProfile();
     void editProfile();

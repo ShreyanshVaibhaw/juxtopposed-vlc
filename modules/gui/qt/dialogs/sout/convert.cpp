@@ -124,6 +124,7 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
     convertLayout->addWidget( deinterBox );
 
     profile = new VLCProfileSelector( this );
+    profile->setThemeContext(p_intf->p_mi);
     convertLayout->addWidget( profile );
 
     settingLayout->addWidget( convertPanel, 2, 0 );
@@ -134,6 +135,7 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
 
     /* Buttons */
     okButton = new QPushButton( qtr( "&Start" ) );
+    okButton->setProperty("redesignPrimary", true);
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
