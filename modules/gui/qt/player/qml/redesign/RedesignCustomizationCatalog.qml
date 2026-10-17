@@ -50,7 +50,7 @@ QtObject {
         {id: "volume", label: qsTr("Volume"), icon: "volume"},
         {id: "audio", label: qsTr("Audio"), icon: "audio"},
         {id: "subtitles", label: qsTr("Subtitles"), icon: "subtitles"},
-        {id: "settings", label: qsTr("Playback Settings"), icon: "settings"},
+        {id: "settings", label: qsTr("Playback Settings"), icon: "playback-settings"},
         {id: "queue", label: qsTr("Queue"), icon: "queue"}
     ]
     function definition(id) { return entries.find(row => row.id === id.split(":")[0]) }

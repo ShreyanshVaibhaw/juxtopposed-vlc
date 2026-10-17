@@ -722,7 +722,7 @@ FocusScope {
                 id: playbackSettingsButton
                 objectName: "playbackSettingsButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                iconName: "settings"; text: qsTr("Playback settings")
+                iconName: "playback-settings"; text: qsTr("Playback settings")
                 selectedIconName: "playback-settings-active"
                 selected: root.settingsPage.length > 0
                 onClicked: root.toggleSettings("playback")
