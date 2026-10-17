@@ -23,6 +23,7 @@ TestCase {
     SignalSpy { id: rowSpy; target: dialog; signalName: "rowsRequested" }
     SignalSpy { id: searchSpy; target: dialog; signalName: "searchRequested" }
     SignalSpy { id: linkSpy; target: dialog; signalName: "linksRequested" }
+    TextMetrics { id: literalMetrics }
     function rows() { return [{url:first,name:"Show_S01E01.mkv",baseline:[]},{url:second,name:"Show_S01E02.mkv",baseline:[]}] }
     function load(items) {
         dialog.loadRows(dialog.requestId,{success:true,rows:items})
@@ -137,6 +138,44 @@ TestCase {
         compare(dialog.changedRows.length,1)
         mouseClick(findChild(dialog,"trackAssignmentCancel")); tryCompare(dialog,"visible",false)
         compare(saveSpy.count,0); compare(Object.keys(dialog.drafts).length,0)
+    }
+    function test_trackNamesRenderLiterally_data() {
+        return [{tag:"subtitles",subtitles:true},{tag:"audio",subtitles:false}]
+    }
+    function test_trackNamesRenderLiterally(data) {
+        const media="file:///show/%3Cb%3EShow.mkv"
+        const source="file:///show/%3Cb%3EEN." + (data.subtitles ? "srt" : "wav")
+        const mediaName="<b>Show.mkv", trackName="<b>EN." + (data.subtitles ? "srt" : "wav")
+        dialog.reject(); tryCompare(dialog,"visible",false)
+        verify(dialog.begin({scope:"file",url:media},data.subtitles)); tryCompare(dialog,"opened",true)
+        function loadNames() {
+            dialog.loadRows(dialog.requestId,{success:true,rows:[{url:media,name:mediaName,baseline:[]}]})
+            dialog.loadSources(dialog.sourceRequestId,{success:true,sources:[{url:source,name:trackName}]})
+        }
+        function literal(label, expected) {
+            verify(!!label)
+            compare(label.text,expected)
+            literalMetrics.font=label.font; literalMetrics.text=expected
+            fuzzyCompare(label.contentWidth,literalMetrics.advanceWidth,1,"Filename must retain all literal characters")
+        }
+        loadNames()
+        const list=findChild(dialog,"trackAssignmentList")
+        tryVerify(() => !!list.itemAtIndex(0))
+        literal(findChild(list.itemAtIndex(0),"trackAssignmentName_0"),trackName)
+        dialog.selectScope(1); loadNames(); dialog.setTracks(media,[source])
+        tryVerify(() => !!list.itemAtIndex(0))
+        literal(findChild(list.itemAtIndex(0),"trackAssignmentName_0"),mediaName)
+        literal(findChild(list.itemAtIndex(0),"trackAssignmentSelection_0"),trackName)
+        mouseClick(findChild(list.itemAtIndex(0),"trackAssignmentChoose_0"))
+        const picker=findChild(dialog,"trackAssignmentPicker")
+        tryCompare(picker,"opened",true)
+        literal(findChild(picker,"trackAssignmentPickerTitle"),mediaName)
+        const choices=findChild(picker,"trackAssignmentPickerList")
+        tryVerify(() => !!choices.itemAtIndex(0))
+        literal(findChild(choices.itemAtIndex(0),"trackAssignmentPickerName"),trackName)
+        picker.close(); tryCompare(picker,"visible",false)
+        dialog.errorMessage="VLC cannot read " + trackName
+        literal(findChild(dialog,"trackAssignmentError"),dialog.errorMessage)
     }
     function test_scopeSwitchPreservesAllDrafts() {
         dialog.toggle(first,english)

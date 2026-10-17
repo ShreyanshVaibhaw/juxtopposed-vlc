@@ -565,7 +565,7 @@ C.Dialog {
                             objectName: "trackAssignmentName_" + entry.index
                             Layout.fillWidth: root.fileMode; Layout.preferredWidth: root.fileMode ? -1 : root.theme.dp(156)
                             Layout.minimumWidth: 0; Layout.topMargin: root.fileMode ? 0 : root.theme.dp(4)
-                            text: entry.modelData.name; font.pixelSize: root.theme.dp(14); color: root.theme.playerHeading; elide: Text.ElideMiddle
+                            text: entry.modelData.name; textFormat: Text.PlainText; font.pixelSize: root.theme.dp(14); color: root.theme.playerHeading; elide: Text.ElideMiddle
                         }
                         Item {
                             objectName: "trackAssignmentConnector_" + entry.index
@@ -584,10 +584,11 @@ C.Dialog {
                             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                             iconName: root.subtitles ? "subtitle-file" : "audio-file"; leftAligned: true
                             text: qsTr("Select tracks for %1").arg(entry.modelData.name)
+                            tooltipTextFormat: Text.PlainText
                             contentItem: RowLayout {
                                 spacing: root.theme.dp(14)
                                 RedesignIcon { sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio); Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(24); name: root.subtitles ? "subtitle-file" : "audio-file"; color: root.theme.playerLabel }
-                                Text { Layout.fillWidth: true; text: root.tracks(entry.modelData.url).length ? root.tracks(entry.modelData.url).map(url => root.fileName(url)).join(", ") : qsTr("Select tracks"); elide: Text.ElideMiddle; color: root.theme.playerHeading; font.pixelSize: root.theme.dp(14) }
+                                Text { objectName: "trackAssignmentSelection_" + entry.index; Layout.fillWidth: true; text: root.tracks(entry.modelData.url).length ? root.tracks(entry.modelData.url).map(url => root.fileName(url)).join(", ") : qsTr("Select tracks"); textFormat: Text.PlainText; elide: Text.ElideMiddle; color: root.theme.playerHeading; font.pixelSize: root.theme.dp(14) }
                             }
                             onClicked: root.chooseRow(entry.modelData.url)
                         }
@@ -631,7 +632,7 @@ C.Dialog {
                 : root.folderRuleDefinition.length || root.folderRuleNeedsPreparation ? qsTr("VLC will use these matches for new files in this folder.")
                 : qsTr("VLC will save these choices for the current files.")
                 : root.folderRuleChanged ? qsTr("VLC will also save the folder matches.") : "")
-            wrapMode: Text.WordWrap
+            textFormat: Text.PlainText; wrapMode: Text.WordWrap
             font.pixelSize: root.theme.dp(14); color: root.errorMessage.length ? root.theme.danger : root.theme.foreground
             Accessible.role: root.errorMessage.length ? Accessible.AlertMessage : Accessible.StaticText
         }
@@ -703,8 +704,9 @@ C.Dialog {
         background: Rectangle { color: root.theme.panel; radius: root.theme.dp(8); border.color: root.theme.border }
         contentItem: ColumnLayout {
             spacing: root.theme.dp(10)
-            Text { Layout.fillWidth: true; text: root.fileName(picker.targetUrl); elide: Text.ElideMiddle; color: root.theme.bright; font.pixelSize: root.theme.dp(14) }
+            Text { objectName: "trackAssignmentPickerTitle"; Layout.fillWidth: true; text: root.fileName(picker.targetUrl); textFormat: Text.PlainText; elide: Text.ElideMiddle; color: root.theme.bright; font.pixelSize: root.theme.dp(14) }
             ListView {
+                objectName: "trackAssignmentPickerList"
                 Layout.fillWidth: true; Layout.fillHeight: true; clip: true
                 model: root.visibleSources
                 DropArea {
@@ -725,7 +727,7 @@ C.Dialog {
                     onClicked: root.toggle(picker.targetUrl, modelData.url)
                     background: Rectangle { radius: root.theme.dp(4); color: parent.highlighted ? root.theme.field : parent.hovered ? root.theme.hover : "transparent"; border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                     contentItem: RowLayout {
-                        Text { Layout.fillWidth: true; text: parent.parent.text; elide: Text.ElideMiddle; color: root.theme.foreground; font.pixelSize: root.theme.dp(14) }
+                        Text { objectName: "trackAssignmentPickerName"; Layout.fillWidth: true; text: parent.parent.text; textFormat: Text.PlainText; elide: Text.ElideMiddle; color: root.theme.foreground; font.pixelSize: root.theme.dp(14) }
                         RedesignIcon { sourceSize: Qt.size(root.theme.dp(40), root.theme.dp(40)); Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20); name: "check"; color: root.theme.accent; visible: parent.parent.highlighted }
                     }
                 }
