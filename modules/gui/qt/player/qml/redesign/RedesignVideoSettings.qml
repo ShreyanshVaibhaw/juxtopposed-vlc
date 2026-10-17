@@ -177,6 +177,7 @@ ColumnLayout {
     }
     component Option: RedesignPreferenceRow {
         Layout.fillWidth: true
+        compactEditorWidth: 217
         backend: videoStore
         scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
         presentation: ({compact: true})
@@ -492,8 +493,8 @@ ColumnLayout {
                 Layout.fillWidth: true; visible: root.enabledFilter("puzzle"); spacing: theme.dp(12)
                 NumberOption { objectName: "videoPuzzleRows"; label: qsTr("Rows"); optionName: "puzzle-rows"; from: 2; to: 42 }
                 NumberOption { objectName: "videoPuzzleColumns"; label: qsTr("Columns"); optionName: "puzzle-cols"; from: 2; to: 42 }
-                Option { optionName: "puzzle-mode"; label: qsTr("Game Mode") }
-                Option { optionName: "puzzle-rotation"; label: qsTr("Piece Rotation") }
+                Option { objectName: "videoPuzzleMode"; optionName: "puzzle-mode"; label: qsTr("Game Mode") }
+                Option { objectName: "videoPuzzleRotation"; optionName: "puzzle-rotation"; label: qsTr("Piece Rotation") }
                 NumberOption { label: qsTr("Border"); optionName: "puzzle-border"; suffix: " %"; to: 40 }
                 Option { objectName: "videoPuzzlePreview"; optionName: "puzzle-preview"; label: qsTr("Preview") }
                 ParameterSlider { label: qsTr("Preview Size"); optionName: "puzzle-preview-size"; from: 0; to: 100; suffix: " %"; stepSize: 1; enabled: !!root.current("puzzle-preview"); opacity: enabled ? 1 : .5 }

@@ -21,6 +21,8 @@ TestCase {
             if (name === "d3d11-hdr-mode") return hdrSupported ? {kind: "string", choices: ["auto", "never", "always", "generate"].map(value => ({value: value}))} : {}
             if (["marq-opacity", "logo-opacity", "puzzle-rows", "puzzle-cols"].includes(name)) return {kind: "integer", minimum: 0, maximum: 255}
             if (["puzzle-preview", "brightness-threshold"].includes(name)) return {kind: "bool"}
+            if (name === "puzzle-mode") return {kind: "integer", choices: ["jigsaw puzzle", "sliding puzzle", "swap puzzle", "exchange puzzle"].map((label, value) => ({label: label, value: value}))}
+            if (name === "puzzle-rotation") return {kind: "integer", choices: ["0", "0/180", "0/90/180/270", "0/90/180/270/mirror"].map((label, value) => ({label: label, value: value}))}
             if (["marq-marquee", "marq-file", "logo-file", "erase-mask"].includes(name)) return {kind: "string", editor: name.endsWith("file") || name.endsWith("mask") ? "file" : ""}
             if (name === "preferred-resolution") return {kind: "integer", choices: [{label: "Best Available", value: -1}, {label: "720p", value: 720}]}
             if (name === "gradient-mode") return {kind: "string", choices: [{label: "Gradient", value: "gradient"}, {label: "Edge", value: "edge"}]}
@@ -46,6 +48,8 @@ TestCase {
     RedesignVideoSettings { id: video; x: 24; width: 356; backend: store }
     function item(name) { return findChild(video, name) }
     function init() {
+        video.width = 356
+        video.y = 0
         store.values = {"video-filter": "", "transform-type": "90", "rotate-angle": 30, "fit": 1, "autoscale": true, "zoom": 1,
             "preferred-resolution": -1, "aspect-ratio": "", "crop": "", "hue": 0, "brightness": 1, "contrast": 1,
             "saturation": 1, "gamma": 1, "sharpen-sigma": .05, "gradfun-radius": 16, "grain-variance": 2,
@@ -321,6 +325,41 @@ TestCase {
         compare(item("videoPuzzleColumns").from, 2); compare(item("videoPuzzleColumns").to, 42)
         item("videoPuzzle").toggled(false); verify(!item("videoPuzzleOptions").visible)
         compare(store.values["puzzle-rows"], 8)
+    }
+    function test_puzzleChoicesKeepNativeLabelsVisible() {
+        item("videoGeometrySection").expanded = true
+        item("videoPuzzle").toggled(true)
+        for (const name of ["videoPuzzleMode", "videoPuzzleRotation"]) {
+            const row = item(name), choice = findChild(row, "preferenceChoiceEditor")
+            compare(choice.Accessible.name, row.label)
+            for (let i = 0; i < choice.count; ++i) {
+                choice.currentIndex = i
+                choice.activated(i)
+                wait(20)
+                verify(!choice.contentItem.truncated, "The native choice must fit: " + choice.displayText)
+                compare(store.values[row.optionName], choice.model[i].value)
+            }
+        }
+    }
+    function test_narrowPuzzleChoiceKeepsItsFullValueInATooltip() {
+        item("videoGeometrySection").expanded = true
+        item("videoPuzzle").toggled(true)
+        const row = item("videoPuzzleRotation"), choice = findChild(row, "preferenceChoiceEditor")
+        choice.currentIndex = 3
+        choice.activated(3)
+        video.width = 240
+        tryCompare(choice.contentItem, "truncated", true)
+        const point = choice.mapToItem(row, choice.width, 0)
+        verify(point.x <= row.width + 1)
+        const tooltip = findChild(choice, "redesignToolTip")
+        video.y = 200 - choice.mapToItem(testCase, 0, 0).y
+        mouseMove(choice)
+        tryCompare(choice, "hovered", true)
+        tryCompare(tooltip, "visible", true)
+        compare(tooltip.text, "0/90/180/270/mirror")
+        compare(store.values["puzzle-rotation"], 3)
+        mouseMove(testCase, 0, 0)
+        tryCompare(tooltip, "visible", false)
     }
     function test_advancedParametersKeepFullNativeNumericInput() {
         compare(item("videoGaussianSigma").to, 8); compare(item("videoGaussianSigma").inputTo, 4096)

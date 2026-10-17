@@ -12,6 +12,7 @@ ColumnLayout {
     property string label
     property var presentation: ({})
     property real scaleFactor: 1
+    property real compactEditorWidth: 138
     property color accentColor: "#d37918"
     property bool lightTheme: false
     signal actionRequested(string action)
@@ -90,7 +91,7 @@ ColumnLayout {
             active: visible
             enabled: root.editorEnabled
             Layout.preferredWidth: root.compact ? root.editor === "language"
-                ? Math.min(theme.dp(184),Math.max(theme.dp(138),languageMetrics.advanceWidth+theme.dp(56))) : theme.dp(138)
+                ? Math.min(theme.dp(184),Math.max(theme.dp(138),languageMetrics.advanceWidth+theme.dp(56))) : Math.min(theme.dp(root.compactEditorWidth), root.width * .61)
                 : Math.min(theme.dp(320), Math.max(theme.dp(150), root.width * 0.43))
             Layout.preferredHeight: item ? item.implicitHeight || theme.dp(34) : theme.dp(34)
             sourceComponent: root.editorComponent
@@ -322,8 +323,10 @@ ColumnLayout {
         id: choiceEditor
         RedesignComboBox {
             id: choice
+            hoverEnabled: true
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             objectName: "preferenceChoiceEditor"
+            Accessible.name: root.label || root.description.title
             implicitHeight: theme.dp(34)
             model: root.choices; textRole: "label"; valueRole: "value"
             showCurvePreviews: root.choices.some(row => row.curve !== undefined)
@@ -333,6 +336,10 @@ ColumnLayout {
             }
             onAboutToOpen: if (root.presentation.dynamicChoices) root.backend.refresh()
             onActivated: root.commit(currentValue)
+            RedesignToolTip {
+                theme: root.theme; text: choice.displayText; contentTextFormat: Text.PlainText
+                visible: choice.hovered && choice.contentItem.truncated
+            }
         }
     }
     Component {
