@@ -419,11 +419,15 @@ void MainCtx::setWindowExtendedMargin(unsigned int margin) {
 
 QVariantMap MainCtx::redesignPlayerPreferences() const
 {
-    return {{QStringLiteral("autoHide"), QVariant::fromValue<qlonglong>(config_GetInt("qt-controls-autohide"))},
+    char* layout = config_GetPsz("qt-player-layout");
+    QVariantMap preferences{{QStringLiteral("autoHide"), QVariant::fromValue<qlonglong>(config_GetInt("qt-controls-autohide"))},
         {QStringLiteral("hideTimeout"), QVariant::fromValue<qlonglong>(config_GetInt("qt-controls-hide-timeout"))},
         {QStringLiteral("fullscreenControls"), bool(config_GetInt("qt-fs-controller"))},
         {QStringLiteral("seekPreview"), bool(config_GetInt("qt-seek-preview"))},
-        {QStringLiteral("subtitleTimeline"), bool(config_GetInt("qt-subtitle-timeline"))}};
+        {QStringLiteral("subtitleTimeline"), bool(config_GetInt("qt-subtitle-timeline"))},
+        {QStringLiteral("layout"), qfu(layout ? layout : "")}};
+    free(layout);
+    return preferences;
 }
 
 void MainCtx::loadPrefs(const bool callSignals)

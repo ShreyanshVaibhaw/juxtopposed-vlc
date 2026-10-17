@@ -499,6 +499,9 @@ vlc_module_begin ()
     add_string( "qt-player-presets", "", "Player settings presets", nullptr )
         change_private()
 
+    add_string( "qt-player-layout", "", "Player control layout", nullptr )
+        change_private()
+
     // Preserve the logical Rotate/Flip pair when native transforms overlap.
     add_string( "qt-video-transform-state", "", "Video rotation and flip state", nullptr )
         change_private()

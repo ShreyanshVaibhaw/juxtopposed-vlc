@@ -1227,6 +1227,7 @@ libqml_module_player_a_QML = \
 	player/qml/redesign/RedesignQueuePanel.qml \
 	player/qml/redesign/RedesignLibrary.qml \
 	player/qml/redesign/RedesignPlayer.qml \
+	player/qml/redesign/RedesignPlayerLayout.qml \
 	player/qml/redesign/RedesignPreferencesCatalog.qml \
 	player/qml/redesign/RedesignPreferenceRow.qml \
 	player/qml/redesign/RedesignComboBox.qml \

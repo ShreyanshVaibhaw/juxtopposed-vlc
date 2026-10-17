@@ -124,12 +124,13 @@ const QStringList& overlayOptions()
 
 const QStringList& presetOptions()
 {
-    // Only media presentation belongs in a show preset. Overlay images and
+    // Media presentation and player layout belong in a show preset. Overlay images and
     // text files are presentation assets. Do not capture device selections,
     // credentials, general file paths or other machine preferences.
     static const QStringList names = [] {
         QStringList names{
             QStringLiteral("qt-subtitle-timeline"),
+            QStringLiteral("qt-player-layout"),
             QStringLiteral("audio-track"), QStringLiteral("audio-track-id"), QStringLiteral("audio-language"),
             QStringLiteral("sub-track"), QStringLiteral("sub-track-id"), QStringLiteral("sub-language"),
             QStringLiteral("audio-desync"), QStringLiteral("sub-delay"), QStringLiteral("sub-delay-ms"), QStringLiteral("sub-fps"),
@@ -617,6 +618,9 @@ QVariantMap RedesignPreferences::playerPresetState() const
     const auto withScaling = [](QVariantMap options) {
         if (!options.contains(QStringLiteral("autoscale")) && options.contains(QStringLiteral("fit")))
             options.insert(QStringLiteral("autoscale"), options.value(QStringLiteral("fit")).toInt() != VLC_VIDEO_FIT_NONE);
+        // Presets made before layout editing use the original player layout.
+        if (!options.contains(QStringLiteral("qt-player-layout")))
+            options.insert(QStringLiteral("qt-player-layout"), QString());
         return options;
     };
     state.insert(QStringLiteral("default"), withScaling(state.value(QStringLiteral("default")).toMap()));
