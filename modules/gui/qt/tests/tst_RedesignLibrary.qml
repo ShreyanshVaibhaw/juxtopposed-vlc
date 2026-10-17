@@ -66,6 +66,7 @@ TestCase {
     SignalSpy { id: folderSpy; target: library; signalName: "folderRequested" }
     SignalSpy { id: playlistSpy; target: library; signalName: "newPlaylistRequested" }
     SignalSpy { id: settingsSpy; target: library; signalName: "preferencesRequested" }
+    SignalSpy { id: fullLibrarySpy; target: library; signalName: "fullLibraryRequested" }
     SignalSpy { id: activateSpy; target: library; signalName: "activated" }
     SignalSpy { id: categorySpy; target: library; signalName: "categoryRequested" }
     SignalSpy { id: breadcrumbSpy; target: library; signalName: "breadcrumbActivated" }
@@ -375,6 +376,17 @@ TestCase {
             const entry=findChild(menu,"libraryAction_add-files");verify(waitForRendering(entry));mouseClick(entry)
         }
         compare(filesSpy.count,2);compare(folderSpy.count,0)
+    }
+    function test_expandedFolderCanReturnToCompactLibrary() {
+        library.locationPinTarget={kind:"folder",key:"file:///Movies",name:"Movies"}
+        library.expanded=true
+        fullLibrarySpy.clear()
+        const menu=findChild(library,"libraryMoreMenu")
+        mouseClick(findChild(library,"libraryMoreButton"));tryCompare(menu,"opened",true)
+        compare(menu.entries.map(entry=>entry.action).join(","),"add-files,add-folder,subtitle-tracks,audio-tracks,resync,folder-info,compact")
+        const compact=findChild(menu,"libraryAction_compact")
+        verify(waitForRendering(compact));mouseClick(compact)
+        compare(fullLibrarySpy.count,1);tryCompare(menu,"visible",false)
     }
     function test_sortMenuRestrictsChoicesToFolderData() {
         library.sortFields = ["title", "insertion", "uri"]

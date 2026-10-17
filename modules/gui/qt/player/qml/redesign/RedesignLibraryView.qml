@@ -147,7 +147,7 @@ Item {
         videoBackdropContent: root.videoBackdropContent
         objectName: "libraryMoreMenu"
         scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-        entries: root.locationPinTarget && root.locationPinTarget.kind === "folder" ? [
+        entries: (root.locationPinTarget && root.locationPinTarget.kind === "folder" ? [
             {action: "add-files", label: qsTr("Add File"), icon: "add"},
             {action: "add-folder", label: qsTr("Add Folder"), icon: "new-folder-two-tone", accent: true},
             {action: "subtitle-tracks", label: qsTr("Edit Subtitle Tracks"), icon: "subtitles-two-tone", accent: true},
@@ -163,7 +163,7 @@ Item {
             .concat(root.playlistOpen && root.locationPinTarget ? [
                 {action: "add-playlist", label: qsTr("Add to Playlist"), icon: "playlist", accent: true},
                 {action: "properties", label: qsTr("Properties & Metadata"), icon: "info-two-tone", accent: true}] : [])
-            .concat(root.locationPinTarget ? [{action: "pin", label: root.locationPinned ? qsTr("Remove from sidebar") : qsTr("Add to sidebar"), icon: root.locationPinned ? "favorite-active" : "favorite", accent: true}] : [])
+            .concat(root.locationPinTarget ? [{action: "pin", label: root.locationPinned ? qsTr("Remove from sidebar") : qsTr("Add to sidebar"), icon: root.locationPinned ? "favorite-active" : "favorite", accent: true}] : []))
             .concat(root.expanded ? [{action: "compact", label: qsTr("Open compact library"), icon: "sidebar"}] : [])
         onActionRequested: action => {
             moreMenu.close()
