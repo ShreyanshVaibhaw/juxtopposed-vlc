@@ -23,6 +23,7 @@ TestCase {
     SignalSpy { id: rowSpy; target: dialog; signalName: "rowsRequested" }
     SignalSpy { id: searchSpy; target: dialog; signalName: "searchRequested" }
     SignalSpy { id: linkSpy; target: dialog; signalName: "linksRequested" }
+    SignalSpy { id: folderSpy; target: dialog; signalName: "folderRequested" }
     TextMetrics { id: literalMetrics }
     function rows() { return [{url:first,name:"Show_S01E01.mkv",baseline:[]},{url:second,name:"Show_S01E02.mkv",baseline:[]}] }
     function load(items) {
@@ -31,10 +32,11 @@ TestCase {
     }
     function init() {
         dialog.sourceFolderDisplay = Qt.binding(() => dialog.sourceFolder)
+        dialog.sourceFolderRoots = []
         finishMatching=true
         width=1280; height=900; dialog.scaleFactor=1; dialog.lightTheme=false
         dialog.saving=false; dialog.close(); tryCompare(dialog,"visible",false)
-        saveSpy.clear(); rowSpy.clear(); dropSpy.clear(); searchSpy.clear(); linkSpy.clear(); dialog.providerConfigured=false; dialog.folderRuleDefinition=""
+        saveSpy.clear(); rowSpy.clear(); dropSpy.clear(); searchSpy.clear(); linkSpy.clear(); folderSpy.clear(); dialog.providerConfigured=false; dialog.folderRuleDefinition=""
         dialog.preferredSearchLanguages=[]
         dialog.onlineLanguages=[{code:"en",text:"English"},{code:"es",text:"Spanish"},{code:"ja",text:"Japanese"},{code:"nl",text:"Dutch"}]
         verify(dialog.begin({scope:"file",url:first,urls:[first,second]},true))
@@ -128,6 +130,30 @@ TestCase {
     function test_invalidEscapeDoesNotBreakFolderCaption() {
         dialog.sourceFolder="file:///videos/100%broken/"
         compare(findChild(dialog,"trackAssignmentFolderCaption").text,dialog.sourceFolder)
+    }
+    function test_libraryFolderCaptionKeepsTheAddressAndSelection() {
+        const media="file://NAS/Shows/The%20Wand/S01/Episode.mkv", folder="file://NAS/Shows/The%20Wand/S01/"
+        const address="\\\\NAS\\Shows\\The Wand\\S01\\"
+        dialog.reject(); tryCompare(dialog,"visible",false)
+        verify(dialog.begin({scope:"file",url:media,runtimeCategory:1},true)); tryCompare(dialog,"opened",true)
+        compare(rowSpy.signalArguments[rowSpy.count-1][0].runtimeCategory,1)
+        dialog.sourceFolderRoots=["file://nas/Shows"]
+        dialog.loadRows(dialog.requestId,{success:true,rows:[{url:media,name:"Episode.mkv",baseline:[]}],folderCategory:1})
+        dialog.loadSources(dialog.sourceRequestId,{success:true,sources:[]})
+        dialog.sourceFolderDisplay=address
+        const button=findChild(dialog,"trackAssignmentFolder"), caption=findChild(dialog,"trackAssignmentFolderCaption")
+        compare(caption.text,"Videos / Shows / The Wand / S01")
+        compare(button.text,address); compare(button.Accessible.name,address)
+        compare(findChild(button,"redesignToolTip").text,address)
+        compare(dialog.sourceFolder,folder)
+        mouseClick(button); compare(folderSpy.count,1); compare(dialog.sourceFolder,folder)
+        dialog.sourceFolder="file://NAS/Other/"
+        dialog.sourceFolderDisplay="\\\\NAS\\Other\\"
+        compare(caption.text,dialog.sourceFolderDisplay)
+        compare(button.text,dialog.sourceFolderDisplay)
+        dialog.reject(); tryCompare(dialog,"visible",false)
+        verify(dialog.begin({scope:"file",url:first},true)); tryCompare(dialog,"opened",true)
+        compare(dialog.sourceFolderCaption,dialog.sourceFolderDisplay); compare(dialog.sourceFolderCategory,0)
     }
     function test_selectAndCancelDoesNotSave() {
         compare(dialog.changedRows.length,0)

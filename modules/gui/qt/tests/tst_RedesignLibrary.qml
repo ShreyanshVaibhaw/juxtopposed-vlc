@@ -464,6 +464,25 @@ TestCase {
             {tag: "filesystem-root", url: "file:///", roots: [], expected: ["file:///"]}
         ]
     }
+    function test_libraryFolderCaptions_data() {
+        return [
+            {tag:"reference",url:"file:///media/Shows/The%20Wand/S01",roots:["file:///media/Shows"],category:"Videos",expected:"Videos / Shows / The Wand / S01"},
+            {tag:"category-root",url:"file:///home/me/Videos/Shows",roots:["file:///home/me/Videos"],category:"Videos",expected:"Videos / Shows"},
+            {tag:"longest-root",url:"file:///media/Shows/The%20Wand/S01",roots:["/media/Shows","/media/Shows/The Wand"],category:"Videos",expected:"Videos / The Wand / S01"},
+            {tag:"different-segment",url:"file:///media/Shows2/S01",roots:["/media/Shows"],category:"Videos",expected:""},
+            {tag:"drive-case",url:"file:///C:/Movies/S01/",roots:["file:///c:/movies"],category:"Videos",expected:"Videos / Movies / S01"},
+            {tag:"drive-root",url:"file:///C:/Albums",roots:["C:\\"],category:"Music",expected:"Music / C: / Albums"},
+            {tag:"unc",url:"file://NAS/Shows/The%20Wand/S01",roots:["\\\\nas\\Shows"],category:"Videos",expected:"Videos / Shows / The Wand / S01"},
+            {tag:"different-server",url:"file://NAS2/Shows/S01",roots:["file://NAS/Shows"],category:"Videos",expected:""},
+            {tag:"unicode-percent",url:"file:///media/%E7%8C%AB/%2520",roots:["/media/猫"],category:"Videos",expected:"Videos / 猫 / %20"},
+            {tag:"no-category",url:"file:///media/Shows/S01",roots:["/media/Shows"],category:"",expected:"Shows / S01"},
+            {tag:"filesystem-root",url:"file:///home/Movies",roots:["/"],category:"",expected:"/ home / Movies"},
+            {tag:"empty-library",url:"file:///media/Shows",roots:[],category:"Videos",expected:""}
+        ]
+    }
+    function test_libraryFolderCaptions(data) {
+        compare(folderPath.libraryCaption(data.url,data.roots,data.category),data.expected)
+    }
     function test_folderPathAncestors(data) {
         compare(folderPath.trail(data.url, data.roots), data.expected)
         compare(folderPath.location(data.url), data.expected[data.expected.length - 1])

@@ -963,6 +963,59 @@ private slots:
         QCOMPARE(writes, 0);
     }
 
+    void testTrackFolderCaptionContext_data()
+    {
+        QTest::addColumn<int>("mediaCategory"); QTest::addColumn<int>("runtimeCategory");
+        QTest::addColumn<int>("libraryCategory"); QTest::addColumn<bool>("mixed"); QTest::addColumn<int>("expected");
+        QTest::newRow("stored-video") << 1 << 0 << 0 << false << 1;
+        QTest::newRow("stored-audio") << 2 << 0 << 0 << false << 2;
+        QTest::newRow("playing-video") << 0 << 1 << 0 << false << 1;
+        QTest::newRow("playing-audio") << 0 << 2 << 0 << false << 2;
+        QTest::newRow("library-context") << 1 << 1 << 2 << false << 2;
+        QTest::newRow("video-playlist") << 1 << 0 << 4 << false << 1;
+        QTest::newRow("mixed-playlist") << 1 << 1 << 4 << true << 0;
+        QTest::newRow("unknown") << 0 << 0 << 0 << false << 0;
+    }
+
+    void testTrackFolderCaptionContext()
+    {
+        QFETCH(int, mediaCategory); QFETCH(int, runtimeCategory); QFETCH(int, libraryCategory);
+        QFETCH(bool, mixed); QFETCH(int, expected);
+        QQmlEngine engine;
+        QQmlEngine::setObjectOwnership(m_medialib.get(), QQmlEngine::CppOwnership);
+        QQmlEngine::setContextForObject(m_medialib.get(), engine.rootContext()); engine.newQObject(m_medialib.get());
+        const QUrl first("file:///media/Shows/Episode.mkv"), second("file:///media/Album/Song.flac");
+        m_env->mediaGet = [&](int query, va_list args) -> void* {
+            if (query != VLC_ML_GET_MEDIA_BY_MRL) return nullptr;
+            const auto url = QUrl(QString::fromUtf8(va_arg(args, const char*)));
+            auto* media = static_cast<vlc_ml_media_t*>(calloc(1, sizeof(vlc_ml_media_t)));
+            const auto category = url == second ? 2 : mediaCategory;
+            media->i_type = category == 1 ? VLC_ML_MEDIA_TYPE_VIDEO : category == 2 ? VLC_ML_MEDIA_TYPE_AUDIO : VLC_ML_MEDIA_TYPE_UNKNOWN;
+            media->b_subtitle_track_selection = true;
+            return media;
+        };
+        int lists = 0;
+        m_env->mediaList = [&](int, const vlc_ml_query_params_t*, va_list) { ++lists; return VLC_EGENERIC; };
+        QSignalSpy changed(m_medialib.get(), &MediaLib::folderRootsChanged);
+        const QStringList roots{"file:///media/Shows", "file://nas/Shows%20%26%20Films"};
+        auto duplicateRoots = roots; duplicateRoots.append(roots.first()); duplicateRoots.append(QString());
+        m_medialib->setFolderRoots(duplicateRoots); m_medialib->setFolderRoots(roots);
+        QCOMPARE(changed.count(), 1); QCOMPARE(m_medialib->folderRoots(), roots);
+        int writes = 0;
+        m_env->mediaControl = [&](int, va_list) { ++writes; return VLC_EGENERIC; };
+        QVariantList urls{first}; if (mixed) urls.append(second);
+        const QVariantMap target{{"scope","queue"},{"urls",urls},{"runtimeUrl",first},
+            {"runtimeCategory",runtimeCategory},{"libraryCategory",libraryCategory}};
+        engine.globalObject().setProperty("answer", QJSValue(QJSValue::NullValue));
+        m_medialib->trackAssignmentRows(target, true, engine.evaluate("(function(value) { answer=value; })"));
+        QVERIFY(QTest::qWaitFor([&] { return !engine.globalObject().property("answer").isNull(); }));
+        const auto result = engine.globalObject().property("answer");
+        QVERIFY(result.property("success").toBool());
+        QCOMPARE(result.property("folderCategory").toInt(), expected);
+        QCOMPARE(result.property("rows").property("length").toInt(), mixed ? 2 : 1);
+        QCOMPARE(writes, 0); QCOMPARE(lists, 0);
+    }
+
     void testTrackDropSources()
     {
         QQmlEngine engine;

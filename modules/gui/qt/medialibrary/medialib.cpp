@@ -61,6 +61,15 @@ MediaLib::~MediaLib()
     m_runner->destroy();
 }
 
+void MediaLib::setFolderRoots(QStringList roots)
+{
+    roots.removeAll(QString());
+    roots.removeDuplicates();
+    if (roots == m_folderRoots) return;
+    m_folderRoots = std::move(roots);
+    emit folderRootsChanged();
+}
+
 static void convertMLItemToPlaylistMedias(vlc_medialibrary_t* ml, const MLItemId & itemId, const QStringList &options, QVector<vlc::playlist::Media>& medias)
 {
     //invalid item
@@ -495,11 +504,16 @@ void MediaLib::trackAssignmentRows(const QVariantMap& target, bool subtitles, QJ
             }
             QVariantList rows;
             QSet<QUrl> seen;
+            int commonCategory = -1;
             for (const auto& url : urls) {
                 if (!url.isValid() || url.scheme().isEmpty() || seen.contains(url)) continue;
                 seen.insert(url);
                 const auto uri = url.toEncoded();
                 ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media_by_mrl(ml, uri.constData()));
+                int category = media && media->i_type == VLC_ML_MEDIA_TYPE_VIDEO ? 1 : media && media->i_type == VLC_ML_MEDIA_TYPE_AUDIO ? 2 : 0;
+                const auto runtimeCategory = target.value("runtimeCategory").toInt();
+                if (url == target.value("runtimeUrl").toUrl() && (runtimeCategory == 1 || runtimeCategory == 2)) category = runtimeCategory;
+                commonCategory = commonCategory < 0 ? category : commonCategory == category ? category : 0;
                 auto name = url.fileName();
                 if (name.isEmpty() && media) name = qfu(media->psz_title);
                 if (name.isEmpty()) name = url.toDisplayString();
@@ -525,6 +539,8 @@ void MediaLib::trackAssignmentRows(const QVariantMap& target, bool subtitles, QJ
                     {"explicitSelection", explicitSelection}, {"inheritedRule", inherited}, {"initialTracks", initial},
                     {"baseline", baseline}});
             }
+            const auto category = target.value("libraryCategory").toInt();
+            result.insert("folderCategory", category == 1 || category == 2 ? category : std::max(0, commonCategory));
             result.insert("success", true); result.insert("error", QString()); result.insert("rows", rows);
         },
         [this, callback](quint64, const QVariantMap& result) mutable {

@@ -50,12 +50,8 @@ QtObject {
         const driveRoot = length === 1 && /^[a-z]:$/i.test(path.parts[0])
         return path.prefix + "/" + path.parts.slice(0, length).join("/") + (driveRoot ? "/" : "")
     }
-    function trail(value, roots) {
-        if (!value) return []
-        const path = split(value)
-        if (!path) return [value.toString()]
-        // Keep a drive or network share as the first navigable location.
-        let start = path.windows && path.parts.length ? 1 : 0
+    function rootLength(path, roots) {
+        let start = -1
         const same = (a, b) => path.windows ? a.toLowerCase() === b.toLowerCase() : a === b
         for (const root of roots) {
             const candidate = split(root)
@@ -63,6 +59,25 @@ QtObject {
                     && candidate.parts.every((part, index) => same(part, path.parts[index])))
                 start = Math.max(start, candidate.parts.length)
         }
+        return start
+    }
+    function libraryCaption(value, roots, category) {
+        if (!value) return ""
+        const path = split(value)
+        if (!path) return ""
+        const start = rootLength(path, roots)
+        if (start < 0) return ""
+        const labels = path.parts.slice(Math.max(0, start - 1)).map(part => decode(part))
+        if (start === 0 && !category) return "/" + (labels.length ? " " + labels.join(" / ") : "")
+        if (category && (!labels.length || labels[0].toLocaleLowerCase() !== category.toLocaleLowerCase())) labels.unshift(category)
+        return labels.join(" / ")
+    }
+    function trail(value, roots) {
+        if (!value) return []
+        const path = split(value)
+        if (!path) return [value.toString()]
+        // Keep a drive or network share as the first navigable location.
+        const start = Math.max(path.windows && path.parts.length ? 1 : 0, rootLength(path, roots))
         const result = []
         for (let length = start; length <= path.parts.length; ++length)
             result.push(urlFor(path, length))

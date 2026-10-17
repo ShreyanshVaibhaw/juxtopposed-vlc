@@ -149,12 +149,17 @@ void MLFoldersBaseModel::updateImpl(vlc_ml_folder_list_t* (*folderListFunc)( vlc
         }
     },
     //UI thread
-    [this](quint64, Ctx& ctx)
+    [this, publishRoots = folderListFunc == vlc_ml_list_entry_points](quint64, Ctx& ctx)
     {
         beginResetModel();
         m_mrls = std::move(ctx.r);
         m_updatePending = false;
         endResetModel();
+        if (publishRoots && m_mediaLib) {
+            QStringList roots;
+            for (const auto& entry : m_mrls) if (!entry.banned && !entry.mrl.isEmpty()) roots.append(entry.mrl);
+            m_mediaLib->setFolderRoots(std::move(roots));
+        }
     });
 }
 

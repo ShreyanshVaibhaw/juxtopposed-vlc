@@ -1256,6 +1256,8 @@ void DialogsProvider::showTrackAssignments(const QVariantMap& target, bool subti
         if (auto* media = vlc_player_GetCurrentMedia(p_intf->p_player)) {
             char* uri = input_item_GetURI(media);
             context.insert("runtimeUrl", QUrl(qfu(uri))); free(uri);
+            context.insert("runtimeCategory", vlc_player_GetTrackCount(p_intf->p_player, VIDEO_ES) > 0 ? 1
+                : vlc_player_GetTrackCount(p_intf->p_player, AUDIO_ES) > 0 ? 2 : 0);
             QVariantList tracks;
             const auto category = subtitles ? SPU_ES : AUDIO_ES;
             QSet<QUrl> seen;

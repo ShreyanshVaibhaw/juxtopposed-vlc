@@ -111,11 +111,11 @@ RedesignLibraryView {
         } else if (action === "stream" || action === "convert") DialogsProvider.streamingDialog([Qt.resolvedUrl(target.url || target.key)], action === "convert")
         else if (action === "subtitle-tracks" || action === "audio-tracks") {
             if (target.kind === "playlist") {
-                DialogsProvider.showTrackAssignments({scope: "playlist", key: target.key}, action === "subtitle-tracks")
+                DialogsProvider.showTrackAssignments({scope: "playlist", key: target.key, libraryCategory: target.category}, action === "subtitle-tracks")
             } else if (target.kind === "folder") {
-                DialogsProvider.showTrackAssignments({scope: "folder", folder: target.key}, action === "subtitle-tracks")
+                DialogsProvider.showTrackAssignments({scope: "folder", folder: target.key, libraryCategory: target.category}, action === "subtitle-tracks")
             } else DialogsProvider.showTrackAssignments({scope: "file", url: target.url || target.key,
-                key: target.playlistKey || ""}, action === "subtitle-tracks")
+                key: target.playlistKey || "", libraryCategory: target.category}, action === "subtitle-tracks")
         }
         else if (action === "explorer") Qt.openUrlExternally(folderPath.parentFolder(target.url || target.key))
         else if (action === "source") {

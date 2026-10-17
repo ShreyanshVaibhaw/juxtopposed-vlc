@@ -42,10 +42,14 @@ public:
     Q_PROPERTY(int  parsingProgress READ parsingProgress NOTIFY parsingProgressChanged FINAL)
     Q_PROPERTY(QString discoveryEntryPoint READ discoveryEntryPoint NOTIFY discoveryEntryPointChanged FINAL)
     Q_PROPERTY(bool idle READ idle NOTIFY idleChanged FINAL)
+    Q_PROPERTY(QStringList folderRoots READ folderRoots NOTIFY folderRootsChanged FINAL)
 
 public:
     MediaLib(qt_intf_t* _intf, vlc::playlist::PlaylistController* playlistController, QObject* _parent = nullptr );
     ~MediaLib();
+    // Reuse roots already read by the library/settings model without probing devices.
+    QStringList folderRoots() const { return m_folderRoots; }
+    void setFolderRoots(QStringList roots);
 
     Q_INVOKABLE static MLItemId deserializeMlItemIdFromString(const QString& serialized_id);
 
@@ -195,6 +199,7 @@ public:
     void cancelMLTask(const QObject* object, quint64 taskId);
 
 signals:
+    void folderRootsChanged();
     void mediaStateChanged(const QString& id);
     void playlistDetailsChanged(const MLItemId& id, const QString& name, const QUrl& cover);
     void discoveryStarted();
@@ -220,6 +225,7 @@ private:
     bool m_discoveryPending = false;
     int m_parsingProgress = 0;
     QString m_discoveryEntryPoint;
+    QStringList m_folderRoots;
 
     /* Medialibrary */
     vlc_medialibrary_t* m_ml;

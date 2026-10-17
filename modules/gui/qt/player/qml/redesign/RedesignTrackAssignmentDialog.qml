@@ -21,7 +21,12 @@ C.Dialog {
     property string targetFolder: ""
     property string sourceFolder: ""
     property string sourceFolderDisplay: sourceFolder
-    readonly property string sourceFolderCaption: sourceFolder.length ? sourceFolderDisplay : qsTr("Select track folder")
+    property var sourceFolderRoots: []
+    property int sourceFolderCategory: 0
+    readonly property string sourceFolderCaption: sourceFolder.length
+        ? folderPath.libraryCaption(sourceFolder, sourceFolderRoots, sourceFolderCategory === 1 ? qsTr("Videos") : sourceFolderCategory === 2 ? qsTr("Music") : "") || sourceFolderDisplay
+        : qsTr("Select track folder")
+    RedesignLibraryPath { id: folderPath }
     property int sourceIndex: 0
     property bool providerHasCustomKey: false
     property bool providerHasConsumerKey: false
@@ -143,6 +148,7 @@ C.Dialog {
         sourceIndex = 0; onlineSources = []; linkSources = []; linkText = ""; sourceMappings = ({}); sourceKinds = ({}); searchTitle = ""; manualSearchLanguage = false; searching = false; cancelableSave = false
         refreshSearchLanguage()
         rows = []; sources = []; drafts = ({}); selectedRows = ({}); errorMessage = ""
+        sourceFolderCategory = 0
         folderRuleBaseline = ""; folderRuleLoaded = false; folderRuleTouched = false; folderRuleAutomatic = true; removeFolderRule = false; pendingFolderRule = ({})
         anchorFile = target.scope === "folder" || target.scope === "playlist" ? "" : String(target.url || "")
         targetFolder = target.scope === "folder" ? String(target.folder || target.url || "") : parentFolder(anchorFile)
@@ -161,12 +167,15 @@ C.Dialog {
             : context.key ? {scope: "playlist", key: context.key} : {scope: "queue", urls: context.urls || []}
         target.runtimeUrl = context.runtimeUrl
         target.runtimeTracks = context.runtimeTracks
+        target.runtimeCategory = context.runtimeCategory
+        target.libraryCategory = context.libraryCategory
         rowsRequested(target, subtitles, requestId)
     }
     function loadRows(request, result) {
         if (!visible || request !== requestId) return
         loading = false
         if (!result.success) { rows = []; errorMessage = result.error || qsTr("VLC cannot read these files. Try again."); return }
+        sourceFolderCategory = result.folderCategory || 0
         rows = result.rows || []
         if (scopeIndex === 1) {
             folderRuleBaseline = result.folderRule || ""
@@ -418,7 +427,7 @@ C.Dialog {
                 visible: root.sourceIndex === 0
                 Layout.fillWidth: true; Layout.preferredHeight: root.theme.dp(34)
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                iconName: "folder"; text: root.sourceFolderCaption; tooltipTextFormat: Text.PlainText; leftAligned: true
+                iconName: "folder"; text: root.sourceFolder.length ? root.sourceFolderDisplay : root.sourceFolderCaption; tooltipTextFormat: Text.PlainText; leftAligned: true
                 enabled: !root.saving && !root.loadingDrop
                 background: Rectangle { color: root.lightTheme ? root.theme.panel : "#151515"; radius: root.theme.dp(6); border.color: parent.visualFocus ? root.theme.accent : "transparent" }
                 contentItem: RowLayout {
