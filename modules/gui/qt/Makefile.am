@@ -2258,6 +2258,18 @@ EXTRA_DIST += tests/tst_RedesignPlaylistProperties.qml
 TESTS += tests/tst_RedesignPlaylistProperties.qml
 EXTRA_DIST += tests/tst_RedesignPlaylistTrackTarget.qml
 TESTS += tests/tst_RedesignPlaylistTrackTarget.qml
+EXTRA_DIST += tests/tst_RedesignMediaFavorite.qml tests/tst_RedesignCustomizationControls.qml \
+	tests/tst_RedesignCustomizationEditor.qml tests/tst_RedesignAddToPlaylist.qml \
+	tests/tst_RedesignPlayerLayout.qml tests/tst_RedesignPlayerChrome.qml \
+	tests/tst_RedesignEqualizerScroll.qml tests/tst_RedesignPlayerPreset.qml \
+	tests/tst_RedesignVolume.qml tests/tst_RedesignSpatializer.qml \
+	tests/tst_RedesignSubtitles.qml tests/tst_RedesignToolTip.qml tests/tst_RedesignGlobalEqualizer.qml
+TESTS += tests/tst_RedesignMediaFavorite.qml tests/tst_RedesignCustomizationControls.qml \
+	tests/tst_RedesignCustomizationEditor.qml tests/tst_RedesignAddToPlaylist.qml \
+	tests/tst_RedesignPlayerLayout.qml tests/tst_RedesignPlayerChrome.qml \
+	tests/tst_RedesignEqualizerScroll.qml tests/tst_RedesignPlayerPreset.qml \
+	tests/tst_RedesignVolume.qml tests/tst_RedesignSpatializer.qml \
+	tests/tst_RedesignSubtitles.qml tests/tst_RedesignToolTip.qml tests/tst_RedesignGlobalEqualizer.qml
 EXTRA_DIST += tests/tst_RedesignTrackAssignments.qml
 TESTS += tests/tst_RedesignTrackAssignments.qml
 EXTRA_DIST += tests/tst_RedesignFolderInfo.qml
