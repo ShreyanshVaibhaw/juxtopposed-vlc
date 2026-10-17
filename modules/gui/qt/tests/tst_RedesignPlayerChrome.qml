@@ -32,6 +32,7 @@ TestCase {
         player.scaleFactor = 1; player.lightTheme = false
         player.libraryOpen = false; player.libraryExpanded = false
         player.fullscreen = false; player.controlsHideTimeout = 1800
+        player.customMenuOpen = false
         testCase.width = 1920; testCase.height = 1080
         player.mediaTitle = "The Wand S01E11"; player.mediaFolderTitle = "S01"
         playSpy.clear(); volumeSpy.clear(); fullscreenSpy.clear()
@@ -98,6 +99,15 @@ TestCase {
         player.layoutModel.cancel()
         tryCompare(player, "topVisible", false)
         tryCompare(player, "bottomVisible", false)
+    }
+    function test_customMenuKeepsFullscreenControlsVisible() {
+        player.controlsHideTimeout = 30; player.fullscreen = true
+        player.customMenuOpen = true
+        mouseMove(player, width / 2, height / 2)
+        wait(60)
+        verify(player.topVisible); verify(player.bottomVisible)
+        player.customMenuOpen = false
+        tryCompare(player, "topVisible", false); tryCompare(player, "bottomVisible", false)
     }
     function test_savedLayoutAppliesWithoutEditor() {
         alternate()

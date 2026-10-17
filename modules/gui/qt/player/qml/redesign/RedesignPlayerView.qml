@@ -12,6 +12,10 @@ FocusScope {
     property string playerLayout: ""
     readonly property alias layoutModel: chromeLayout
     readonly property real controlsHeight: chrome.controlsHeight
+    readonly property var chromeItems: chrome.allControls
+    property var customControlStates: ({})
+    property bool customMenuOpen: false
+    signal customActionRequested(string action, Item anchor)
     property bool playing: false
     property bool started: false
     property bool hasVideo: false
@@ -92,9 +96,9 @@ FocusScope {
         for (let item = seek; item && item !== root; item = item.parent) y += item.y
         return y
     }
-    readonly property bool controlsLocked: chromeLayout.editing || queueOpen || libraryOpen || settingsPage.length > 0 || resumeAvailable || !!trackPopup && trackPopup.visible
-    readonly property bool topVisible: !minimalView && (!fullscreen || headerHover.hovered || header.activeFocus || revealTimer.running || controlsLocked)
-    readonly property bool bottomVisible: !minimalView && !libraryExpanded && (!fullscreen || showFullscreenControls) && (!autoHideActive || bottomHover.hovered || toolbar.activeFocus || revealTimer.running || controlsLocked)
+    readonly property bool controlsLocked: chromeLayout.editing || customMenuOpen || queueOpen || libraryOpen || settingsPage.length > 0 || resumeAvailable || !!trackPopup && trackPopup.visible
+    readonly property alias topVisible: header.visible
+    readonly property alias bottomVisible: toolbar.visible
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
 
     signal togglePlayback()
@@ -461,7 +465,7 @@ FocusScope {
         objectName: "redesignHeader"
         anchors.top: parent.top; width: parent.width; height: theme.dp(40)
         color: theme.background
-        visible: root.topVisible
+        visible: !root.minimalView && (!root.fullscreen || headerHover.hovered || header.activeFocus || revealTimer.running || root.controlsLocked)
         Loader { anchors.fill: parent; sourceComponent: root.titleBarDragContent }
         RowLayout {
             id: headerLeft
@@ -579,7 +583,8 @@ FocusScope {
         objectName: "redesignToolbar"
         anchors.bottom: parent.bottom; width: parent.width; height: root.controlsHeight
         color: theme.background
-        visible: root.bottomVisible
+        visible: !root.minimalView && !root.libraryExpanded && (!root.fullscreen || root.showFullscreenControls)
+            && (!root.autoHideActive || bottomHover.hovered || toolbar.activeFocus || revealTimer.running || root.controlsLocked)
         RowLayout {
             id: originalToolbar
             visible: !chrome.custom && !chrome.applying
@@ -729,11 +734,19 @@ FocusScope {
         }
     }
     RedesignPlayerLayout { id: chromeLayout; savedLayout: root.playerLayout }
+    RedesignCustomizationCatalog { id: customizationCatalog }
     RedesignPlayerChrome {
         id: chrome
         theme: root.theme; model: chromeLayout
         headerHost: header; footerHost: toolbar
-        headerVisible: root.topVisible; footerVisible: root.bottomVisible
+        extraControlComponent: Component {
+            RedesignExtraControl {
+                theme: root.theme
+                specification: customizationCatalog.definition(controlId)
+                controlState: root.customControlStates[controlId] || ({})
+                onTriggered: anchor => root.customActionRequested(controlId, anchor)
+            }
+        }
         controls: ({menu: mainMenuButton, library: libraryToggleButton, "divider:1": headerDivider, folder: mediaFolderButton,
             title: titleControl, minimize: minimizeButton, maximize: maximizeButton, fullscreen: fullscreenButton, close: closeButton,
             previous: previousButton, play: playButton, next: nextButton, timeline: timelineControl,

@@ -54,6 +54,7 @@ public:
     Q_PROPERTY(QString title READ getTitle CONSTANT  FINAL)
     Q_PROPERTY(QString artist READ getArtist CONSTANT  FINAL)
     Q_PROPERTY(QString album READ getAlbum CONSTANT  FINAL)
+    Q_PROPERTY(QString playlistName READ getPlaylistName CONSTANT FINAL)
     Q_PROPERTY(QUrl artwork READ getArtwork CONSTANT  FINAL)
     Q_PROPERTY(VLCDuration duration READ getDuration CONSTANT  FINAL)
     Q_PROPERTY(QUrl url READ getUrl CONSTANT  FINAL)
@@ -83,6 +84,7 @@ public:
     QString getArtist() const;
 
     QString getAlbum() const;
+    QString getPlaylistName() const;
 
     QUrl getArtwork() const;
 
@@ -103,6 +105,7 @@ private:
         QString title;
         QString artist;
         QString album;
+        QString playlistName;
         QUrl artwork;
 
         VLCDuration duration;

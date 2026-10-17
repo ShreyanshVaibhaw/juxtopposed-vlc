@@ -195,6 +195,7 @@ public:
     void cancelMLTask(const QObject* object, quint64 taskId);
 
 signals:
+    void mediaStateChanged(const QString& id);
     void playlistDetailsChanged(const MLItemId& id, const QString& name, const QUrl& cover);
     void discoveryStarted();
     void discoveryCompleted();

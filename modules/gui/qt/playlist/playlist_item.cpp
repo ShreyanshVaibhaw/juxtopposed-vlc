@@ -57,6 +57,11 @@ QString PlaylistItem::getAlbum() const
     return d->album;
 }
 
+QString PlaylistItem::getPlaylistName() const
+{
+    return d->playlistName;
+}
+
 QUrl PlaylistItem::getArtwork() const
 {
     return d->artwork;
@@ -84,6 +89,7 @@ void PlaylistItem::sync() {
     d->url      = media->psz_uri;
 
     if (media->p_meta) {
+        d->playlistName = vlc_meta_GetExtra(media->p_meta, "Source playlist");
         d->title   = vlc_meta_Get(media->p_meta, vlc_meta_Title);
         d->artist  = vlc_meta_Get(media->p_meta, vlc_meta_Artist);
         d->album   = vlc_meta_Get(media->p_meta, vlc_meta_Album);

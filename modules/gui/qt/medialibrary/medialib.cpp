@@ -79,10 +79,20 @@ static void convertMLItemToPlaylistMedias(vlc_medialibrary_t* ml, const MLItemId
         if (media_list == nullptr || media_list->i_nb_items == 0)
             return;
 
+        QByteArray playlistName;
+        if (itemId.type == VLC_ML_PARENT_PLAYLIST) {
+            ml_unique_ptr<vlc_ml_playlist_t> playlist(vlc_ml_get_playlist(ml, itemId.id));
+            if (playlist && playlist->psz_name) playlistName = playlist->psz_name;
+        }
         auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
         std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
             SharedInputItem item(vlc_ml_get_input_item( ml, m.i_id ), false);
-            return vlc::playlist::Media(item.get(), options);
+            vlc::playlist::Media media(item.get(), options);
+            // Media owns a copy: provenance belongs to this queued instance,
+            // so the same file can also be played from another playlist.
+            if (media && !playlistName.isEmpty())
+                input_item_SetMetaExtra(media.raw(), "Source playlist", playlistName.constData());
+            return media;
         });
     }
 }
@@ -1151,6 +1161,12 @@ void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
     MediaLib* self = static_cast<MediaLib*>( data );
     switch ( event->i_type )
     {
+        case VLC_ML_EVENT_MEDIA_UPDATED:
+        {
+            const auto id = MLItemId(event->modification.i_entity_id, VLC_ML_PARENT_UNKNOWN).toString();
+            QMetaObject::invokeMethod(self, [self, id]() { emit self->mediaStateChanged(id); });
+            break;
+        }
         case VLC_ML_EVENT_PARSING_PROGRESS_UPDATED:
         {
             int percent =  event->parsing_progress.i_percent;

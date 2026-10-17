@@ -1928,6 +1928,26 @@ void PlayerController::jumpBwd()
     vlc_player_JumpTime( d->m_player, vlc_tick_from_sec( -i_interval ) );
 }
 
+void PlayerController::replay()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if (!d->isCurrentItemSynced() || !vlc_player_IsStarted(d->m_player)
+        || !vlc_player_CanSeek(d->m_player))
+        return;
+    vlc_player_SetPosition(d->m_player, 0);
+    vlc_player_Resume(d->m_player);
+}
+
+void PlayerController::jumpSeconds(int seconds)
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if (!d->isCurrentItemSynced())
+        return;
+    vlc_player_JumpTime(d->m_player, vlc_tick_from_sec(seconds));
+}
+
 void PlayerController::jumpTime(VLCTime i_time)
 {
     Q_D(PlayerController);

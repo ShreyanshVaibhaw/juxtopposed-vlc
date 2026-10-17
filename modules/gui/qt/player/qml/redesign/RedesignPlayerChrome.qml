@@ -9,8 +9,9 @@ Item {
     required property Item headerHost
     required property Item footerHost
     required property var controls
-    property bool headerVisible: true
-    property bool footerVisible: true
+    property Component extraControlComponent
+    property var extras: ({})
+    readonly property var allControls: Object.assign({}, controls, extras)
     property var renderedLayout: model.defaults()
     readonly property bool custom: JSON.stringify(renderedLayout) !== JSON.stringify(model.defaults())
     readonly property real controlsHeight: theme.dp(custom && renderedLayout.zones.above.length ? 108 : 54)
@@ -20,12 +21,14 @@ Item {
     visible: false
 
     function hasTimeline(zone) { return renderedLayout.zones[zone].includes("timeline") }
+    function hasSpacer(zone) { return renderedLayout.zones[zone].some(id => id.startsWith("spacer:")) }
+    function hasStretch(zone) { return hasTimeline(zone) || hasSpacer(zone) }
     function preferredWidth(zone) {
         let width = 0, count = 0
         for (const id of renderedLayout.zones[zone]) {
-            const control = controls[id]
+            const control = allControls[id]
             if (!control) continue
-            width += control.implicitWidth
+            width += (control.implicitWidth || control.width) + control.Layout.leftMargin + control.Layout.rightMargin
             ++count
         }
         return width + Math.max(0, count - 1) * theme.dp(10)
@@ -37,15 +40,21 @@ Item {
         const next = model.clone(model.layout)
         const isCustom = JSON.stringify(next) !== JSON.stringify(model.defaults())
         applying = true
+        const extra = Object.assign({}, extras)
+        for (const zone of model.zones)
+            for (const id of next.zones[zone])
+                if (!controls[id] && !extra[id] && extraControlComponent)
+                    extra[id] = extraControlComponent.createObject(root, {controlId: id})
+        extras = extra
         // Keep the real controls alive: seeking, focus, menus and volume input
         // must keep their state when a layout moves a control to another bar.
-        for (const id of Object.keys(controls)) controls[id].parent = root
+        for (const id of Object.keys(allControls)) allControls[id].parent = root
         if (!isCustom) {
             for (const id of Object.keys(controls)) controls[id].parent = originalParents[id]
         } else {
             for (const zone of model.zones)
                 for (const id of next.zones[zone])
-                    if (controls[id]) controls[id].parent = targets[zone]
+                    if (allControls[id]) allControls[id].parent = targets[zone]
         }
         renderedLayout = next
         applying = false
@@ -62,7 +71,7 @@ Item {
     Item {
         parent: root.headerHost
         anchors.fill: parent
-        visible: root.custom && !root.applying && root.headerVisible
+        visible: root.custom && !root.applying
         RowLayout {
             id: headerLeft
             objectName: "customHeaderLeft"
@@ -90,7 +99,7 @@ Item {
         parent: root.footerHost
         anchors.bottom: parent.bottom
         width: parent.width; height: root.controlsHeight
-        visible: root.custom && !root.applying && root.footerVisible
+        visible: root.custom && !root.applying
         RowLayout {
             id: above
             objectName: "customTimelineRow"
@@ -105,14 +114,16 @@ Item {
                 id: footerLeft
                 objectName: "customFooterLeft"
                 x: root.theme.dp(18)
+                width: root.hasSpacer("footerLeft") && !root.hasStretch("footerCenter")
+                    ? Math.max(implicitWidth, (parent.width - root.preferredWidth("footerCenter")) / 2 - root.theme.dp(28)) : implicitWidth
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: root.theme.dp(10)
             }
             RowLayout {
                 id: footerCenter
                 objectName: "customFooterCenter"
-                x: root.hasTimeline("footerCenter") ? footerLeft.x + footerLeft.width + root.theme.dp(10) : (parent.width - width) / 2
-                width: root.hasTimeline("footerCenter") ? Math.max(0, parent.width - footerLeft.width - footerRight.width - root.theme.dp(56)) : root.preferredWidth("footerCenter")
+                x: root.hasStretch("footerCenter") ? footerLeft.x + footerLeft.width + root.theme.dp(10) : (parent.width - width) / 2
+                width: root.hasStretch("footerCenter") ? Math.max(0, parent.width - footerLeft.width - footerRight.width - root.theme.dp(56)) : root.preferredWidth("footerCenter")
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: root.theme.dp(10)
             }
@@ -120,6 +131,8 @@ Item {
                 id: footerRight
                 objectName: "customFooterRight"
                 anchors.right: parent.right; anchors.rightMargin: root.theme.dp(18)
+                width: root.hasSpacer("footerRight") && !root.hasStretch("footerCenter")
+                    ? Math.max(implicitWidth, (parent.width - root.preferredWidth("footerCenter")) / 2 - root.theme.dp(28)) : implicitWidth
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: root.theme.dp(10)
             }

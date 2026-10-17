@@ -16,6 +16,62 @@ FocusScope {
     readonly property ColorContext colorContext: ColorContext { palette: VLCStyle.palette; colorSet: ColorContext.Window }
     property bool resumeAvailable: false
     property int queueTab: 0
+    property int requestedLibraryCategory: -1
+    function openLibraryCategory(category) {
+        requestedLibraryCategory = category
+        view.libraryOpen = true
+        Qt.callLater(applyLibraryCategory)
+    }
+    function applyLibraryCategory() {
+        const library = view.libraryItem ? view.libraryItem.item : null
+        if (requestedLibraryCategory < 0 || !library) return
+        library.resetLocation(requestedLibraryCategory)
+        requestedLibraryCategory = -1
+    }
+    function showCustomChoice(action, anchor) {
+        customChoice.mode = action
+        if (action === "speed") {
+            customChoice.entries = [.25, .5, .75, 1, 1.25, 1.5, 2].map(value => ({action: String(value), label: value + "×"}))
+                .concat([{action: "custom", label: qsTr("Custom speed…")}])
+        } else if (action === "zoom") {
+            customChoice.entries = [{action: "0.25", label: qsTr("1:4 Quarter")}, {action: "0.5", label: qsTr("1:2 Half")},
+                {action: "1", label: qsTr("1:1 Original")}, {action: "2", label: qsTr("2:1 Double")},
+                {action: "-1", label: qsTr("Fit Inside Window")}, {action: "-2", label: qsTr("Fill Window")},
+                {action: "-3", label: qsTr("Fit Window Width")}, {action: "-4", label: qsTr("Fit Window Height")}]
+        } else {
+            const supported = playerPreferences.describe("d3d11-hdr-mode").choices || []
+            customChoice.entries = [{action: "auto", label: qsTr("Auto")}, {action: "never", label: qsTr("Off")},
+                {action: "always", label: "HDR10"}, {action: "hdr10plus", label: "HDR10+"},
+                {action: "dolbyvision", label: "Dolby Vision"}, {action: "hlg", label: "HLG"}]
+                .map(row => Object.assign({}, row, {enabled: supported.some(choice => choice.value === row.action)}))
+        }
+        customChoice.toggleFrom(anchor)
+    }
+    function runCustomAction(action, anchor) {
+        if (["speed", "hdr", "zoom"].includes(action)) { showCustomChoice(action, anchor); return }
+        if (["forward10", "backward10", "forward15", "backward15"].includes(action)) {
+            if (!view.seekable) return
+            const seconds = Number(action.endsWith("10") ? 10 : 15) * (action.startsWith("backward") ? -1 : 1)
+            Player.jumpSeconds(seconds)
+        } else if (action === "stop") MainPlaylistController.stop()
+        else if (action === "repeat") MainPlaylistController.toggleRepeatMode()
+        else if (action === "shuffle") MainPlaylistController.toggleRandom()
+        else if (action === "record") Player.toggleRecord()
+        else if (action === "snapshot") Player.snapshot()
+        else if (action === "pip") { view.libraryOpen = true; view.libraryExpanded = true; view.miniPlayerVisible = true }
+        else if (action === "rightSidebar") { view.settingsPage = ""; view.queueOpen = !view.queueOpen }
+        else if (action === "quit") DialogsProvider.quit()
+        else if (action === "preferences") DialogsProvider.prefsDialog()
+        else if (action === "home" || action === "playlists") openLibraryCategory(action === "home" ? 0 : 4)
+        else if (action === "properties") DialogsProvider.mediaInfoDialog()
+        else if (action === "replay") Player.replay()
+        else if (action === "chapters" || action === "bookmarks") {
+            rootPlayer.queueTab = action === "chapters" ? 2 : 1
+            view.settingsPage = ""; view.queueOpen = true
+            Qt.callLater(() => { if (view.queueItem) view.queueItem.tab = rootPlayer.queueTab })
+        } else if (action === "bookmark") DialogsProvider.addBookmark()
+        else if (action === "favorite" && favoriteLoader.item) favoriteLoader.item.toggle()
+    }
     readonly property string mediaFolderUrl: {
         const url = String(Player.url || "")
         return url.startsWith("file:") ? url.substring(0, url.lastIndexOf("/") + 1) : ""
@@ -61,13 +117,51 @@ FocusScope {
     // player panels below them without including the menu in its own capture.
     property Component menuBackdropContent: Component { SurfaceBackdrop { sourceItem: view } }
     RedesignPreferences { id: playerPreferences; ctx: MainCtx; autoSave: true; editPlayerPreset: true }
+    Loader {
+        id: favoriteLoader
+        active: MainCtx.mediaLibraryAvailable && !!view.layoutModel.location("favorite")
+        source: active ? "qrc:///qt/qml/VLC/Player/RedesignPlayerFavorite.qml" : ""
+        onLoaded: {
+            item.mediaUrl = Qt.binding(() => Player.url)
+            item.errorOccurred.connect(message => DialogsProvider.messageDialog(message, qsTr("VLC Media Player")))
+        }
+    }
+    RedesignActionMenu {
+        id: customChoice
+        property string mode: ""
+        parent: view
+        videoBackdropContent: rootPlayer.menuBackdropContent
+        scaleFactor: view.scaleFactor; lightTheme: view.lightTheme; accentColor: view.accentColor
+        checkedAction: {
+            playerPreferences.revision
+            if (mode === "speed") return String(Math.abs(Player.rate))
+            if (mode === "hdr") return String(playerPreferences.value("d3d11-hdr-mode"))
+            return String(playerPreferences.value("autoscale") ? -Math.max(1, Number(playerPreferences.value("fit")) || 1) : playerPreferences.value("zoom"))
+        }
+        onActionRequested: action => {
+            if (mode === "speed") {
+                if (action === "custom") { view.queueOpen = false; view.settingsPage = "playback" }
+                else Player.rate = (Player.rate < 0 ? -1 : 1) * Number(action)
+            } else if (mode === "hdr") playerPreferences.stage("d3d11-hdr-mode", action)
+            else {
+                const value = Number(action)
+                if (value < 0) { playerPreferences.stage("fit", -value); playerPreferences.stage("autoscale", true) }
+                else { playerPreferences.stage("zoom", value); playerPreferences.stage("fit", 0); playerPreferences.stage("autoscale", false) }
+            }
+        }
+    }
+    Binding {
+        target: MainCtx; property: "useGlobalShortcuts"; value: false
+        when: customChoice.visible
+        restoreMode: Binding.RestoreBindingOrValue
+    }
     Shortcut {
         sequences: ["Menu", "Shift+F10"]
         context: Qt.WindowShortcut
         enabled: {
             const window = rootPlayer.Window.window
             const item = window ? window.activeFocusItem : null
-            return MainCtx.useGlobalShortcuts && !(item instanceof TextInput) && !(item instanceof TextEdit)
+            return MainCtx.useGlobalShortcuts && MainCtx.preferHotkeys && !(item instanceof TextInput) && !(item instanceof TextEdit)
         }
         onActivated: {
             mediaMenu.dismiss()
@@ -105,6 +199,30 @@ FocusScope {
         lightTheme: !VLCStyle.palette.isDark
         accentColor: MainCtx.redesignAccent
         playerLayout: MainCtx.redesignPlayerPreferences.layout
+        customMenuOpen: customChoice.visible
+        customControlStates: ({
+            speed: {enabled: Player.ratechangable},
+            forward10: {enabled: view.seekable}, backward10: {enabled: view.seekable},
+            forward15: {enabled: view.seekable}, backward15: {enabled: view.seekable},
+            stop: {enabled: Player.isStarted},
+            repeat: {checked: MainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE,
+                badge: MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT ? "1" : "",
+                description: MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT ? qsTr("Repeat this item")
+                    : MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_NONE ? qsTr("Repeat off") : qsTr("Repeat all")},
+            shuffle: {checked: MainPlaylistController.random}, record: {enabled: Player.isStarted, checked: Player.recording},
+            snapshot: {enabled: Player.isStarted && view.hasVideo}, pip: {enabled: Player.isStarted && view.hasVideo},
+            hdr: {enabled: Player.hasVideoOutput && playerPreferences.describe("d3d11-hdr-mode").kind !== undefined},
+            zoom: {enabled: Player.hasVideoOutput}, home: {enabled: MainCtx.mediaLibraryAvailable},
+            playlists: {enabled: MainCtx.mediaLibraryAvailable},
+            favorite: {enabled: Player.isStarted && !!favoriteLoader.item && !favoriteLoader.item.busy,
+                checked: !!favoriteLoader.item && favoriteLoader.item.favorite,
+                icon: favoriteLoader.item && favoriteLoader.item.favorite ? "favorite-active" : "favorite"},
+            bookmark: {enabled: Player.isStarted && MainCtx.mediaLibraryAvailable}, bookmarks: {enabled: MainCtx.mediaLibraryAvailable},
+            chapters: {enabled: Player.isStarted && Player.hasChapters}, properties: {enabled: Player.isStarted}, replay: {enabled: view.seekable},
+            thumbnail: {artwork: Player.artwork}, fileName: {value: Player.name}, artist: {value: Player.artist},
+            folderName: {value: rootPlayer.mediaFolderName()}, playlistName: {value: MainPlaylistController.currentItem.playlistName}
+        })
+        onCustomActionRequested: (action, anchor) => rootPlayer.runCustomAction(action, anchor)
         playing: Player.playingState === Player.PLAYING_STATE_PLAYING
         started: Player.isStarted
         hasVideo: MainCtx.hasEmbededVideo
@@ -240,6 +358,7 @@ FocusScope {
                     item.videoBackdropContent = rootPlayer.menuBackdropContent
                     item.expanded = Qt.binding(() => view.libraryExpanded)
                     item.fullLibraryRequested.connect(() => { view.libraryExpanded = !view.libraryExpanded })
+                    rootPlayer.applyLibraryCategory()
                 }
                 RedesignLibraryView {
                     videoBackdropContent: rootPlayer.menuBackdropContent
