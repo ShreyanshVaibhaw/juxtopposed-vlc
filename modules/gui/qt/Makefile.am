@@ -1299,6 +1299,7 @@ libqml_module_player_a_QML = \
 	player/qml/redesign/RedesignPlayerView.qml \
 	player/qml/redesign/RedesignQueue.qml \
 	player/qml/redesign/RedesignSeekBar.qml \
+	player/qml/redesign/RedesignSeekThumbnail.qml \
 	player/qml/redesign/RedesignPlayerSeekBar.qml \
 	player/qml/redesign/RedesignMiniPlayer.qml \
 	player/qml/redesign/RedesignTheme.qml \

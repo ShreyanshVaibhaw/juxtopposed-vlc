@@ -15,9 +15,9 @@ T.Slider {
     property Component videoBackdropContent
     Component {
         id: defaultThumbnail
-        Image {
-            objectName: "seekThumbnailImage"
-            source: root.previewImage; cache: false; fillMode: Image.PreserveAspectFit
+        RedesignSeekThumbnail {
+            frameSource: root.previewImage
+            scaleFactor: root.scaleFactor
         }
     }
     property real previewImagePosition: -1
@@ -268,7 +268,8 @@ T.Slider {
         contentItem: Item {
             Rectangle {
                 width: parent.width; height: root.theme.dp(142); radius: root.theme.dp(4)
-                color: "#000000"
+                // Prepared software frames already include their letterbox and alpha edge.
+                color: thumbnail.item && thumbnail.item.preparedFrame === true ? "transparent" : "#000000"
                 Loader {
                     id: thumbnail
                     anchors.fill: parent

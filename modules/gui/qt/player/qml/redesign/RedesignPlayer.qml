@@ -270,9 +270,12 @@ FocusScope {
         timeForPosition: value => rootPlayer.clockText(Player.length.scale(value))
         seekPreviewImage: Player.seekPreview
         videoBackdropContent: Component { SurfaceBackdrop { } }
-        seekThumbnailContent: Component {
+        seekThumbnailContent: GraphicsInfo.shaderType === GraphicsInfo.RhiShader ? shaderSeekThumbnail : softwareSeekThumbnail
+        Component {
+            id: shaderSeekThumbnail
             Widgets.ImageExt {
                 objectName: "seekThumbnailImage"
+                readonly property bool preparedFrame: false
                 source: view.seekPreviewImage; cache: false
                 // Keep the shader's soft edge under the clip, without a dark outline.
                 anchors.fill: parent; anchors.margins: -0.5
@@ -281,6 +284,13 @@ FocusScope {
                 fillMode: sourceTextureProviderItem.implicitHeight > 0 && parent && parent.width > 0
                     && Math.abs(sourceTextureProviderItem.implicitHeight - sourceTextureProviderItem.implicitWidth * parent.height / parent.width) <= 1.01
                     ? Image.Stretch : Image.PreserveAspectFit
+            }
+        }
+        Component {
+            id: softwareSeekThumbnail
+            RedesignSeekThumbnail {
+                frameSource: view.seekPreviewImage
+                scaleFactor: view.scaleFactor
             }
         }
         seekPreviewImagePosition: Player.seekPreviewPosition

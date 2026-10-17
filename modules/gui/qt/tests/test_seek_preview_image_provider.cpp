@@ -4,6 +4,8 @@
 #include <QBuffer>
 #include <QQmlEngine>
 #include <QQmlComponent>
+#include <QQuickView>
+#include <QQuickItem>
 #include "../plugins.hpp"
 #include "../util/seek_preview_image_provider.hpp"
 #include "../util/seek_preview_cache.hpp"
@@ -47,6 +49,123 @@ private slots:
     {
         SeekPreviewImageProvider provider;
         QVERIFY(provider.requestImage(QStringLiteral("not-a-png"), nullptr, {}).isNull());
+    }
+
+    void roundedFrame_data()
+    {
+        QTest::addColumn<QSize>("videoSize");
+        QTest::addColumn<int>("density");
+        for (const auto density : {1, 2}) {
+            QTest::newRow(qPrintable(QString("wide-%1x").arg(density))) << QSize(160, 90) << density;
+            QTest::newRow(qPrintable(QString("portrait-%1x").arg(density))) << QSize(80, 160) << density;
+            QTest::newRow(qPrintable(QString("cinema-%1x").arg(density))) << QSize(160, 68) << density;
+        }
+    }
+
+    void roundedFrame()
+    {
+        QFETCH(QSize, videoSize); QFETCH(int, density);
+        QImage video(videoSize, QImage::Format_RGB32); video.fill(Qt::red);
+        QByteArray png; QBuffer buffer(&png); QVERIFY(buffer.open(QIODevice::WriteOnly)); QVERIFY(video.save(&buffer, "PNG"));
+        SeekPreviewImageProvider provider;
+        const auto id = SeekPreviewImageProvider::url(png).path().mid(1) + "?rounded=1&radius=4&width=252";
+        QSize intrinsic;
+        const auto frame = provider.requestImage(id, &intrinsic, QSize(252, 142) * density);
+        QCOMPARE(frame.size(), QSize(252, 142) * density);
+        QCOMPARE(intrinsic, frame.size());
+        QCOMPARE(frame.pixelColor(0, 0).alpha(), 0);
+        QCOMPARE(frame.pixelColor(frame.width()-1, 0).alpha(), 0);
+        QCOMPARE(frame.pixelColor(0, frame.height()-1).alpha(), 0);
+        QCOMPARE(frame.pixelColor(frame.width()-1, frame.height()-1).alpha(), 0);
+        QCOMPARE(frame.pixelColor(126*density, 71*density), QColor(Qt::red));
+        bool antialiased = false;
+        for (int y=0; y<4*density; ++y) for (int x=0; x<4*density; ++x) {
+            const auto alpha = frame.pixelColor(x,y).alpha();
+            antialiased |= alpha > 0 && alpha < 255;
+        }
+        QVERIFY(antialiased);
+        if (videoSize.height() > videoSize.width()) {
+            QCOMPARE(frame.pixelColor(2*density,71*density), QColor(Qt::black));
+            QCOMPARE(frame.pixelColor(89*density,71*density), QColor(Qt::black));
+            QVERIFY(frame.pixelColor(92*density,71*density).red() > 240);
+        } else if (videoSize.width() * 9 > videoSize.height() * 16) {
+            QCOMPARE(frame.pixelColor(126*density,2*density), QColor(Qt::black));
+            QCOMPARE(frame.pixelColor(126*density,16*density), QColor(Qt::black));
+            QVERIFY(frame.pixelColor(126*density,19*density).red() > 240);
+        } else {
+            QCOMPARE(frame.pixelColor(126*density,0), QColor(Qt::red));
+            QCOMPARE(frame.pixelColor(2*density,71*density), QColor(Qt::red));
+        }
+    }
+
+    void roundedImageRendersInSoftware()
+    {
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+        QQuickView view;
+        view.engine()->addImageProvider(QStringLiteral("seekpreview"), new SeekPreviewImageProvider());
+        QQmlComponent component(view.engine());
+        component.setData("import QtQuick\nimport \".\" as Redesign\n"
+            "Rectangle { width: 300; height: 190; color: \"#506070\"\n"
+            "Redesign.RedesignSeekThumbnail { objectName: \"thumbnail\"; x: 20; y: 20; width: 252; height: 142 }\n}",
+            QUrl::fromLocalFile(QStringLiteral(TOP_SRCDIR "/modules/gui/qt/player/qml/redesign/")));
+        QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+        auto* root = qobject_cast<QQuickItem*>(component.create());
+        QVERIFY2(root, qPrintable(component.errorString()));
+        view.setContent(QUrl(), &component, root); view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        auto* image = root->findChild<QObject*>("thumbnail"); QVERIFY(image);
+        image->setProperty("frameSource", SeekPreviewImageProvider::url(m_png));
+        QTRY_COMPARE(image->property("status").toInt(), 1);
+        QTest::qWait(50);
+        const auto pixels = view.grabWindow(); QVERIFY(!pixels.isNull());
+        const auto density = pixels.width() / 300.;
+        QCOMPARE(pixels.pixelColor(qRound(20*density),qRound(20*density)), QColor("#506070"));
+        QCOMPARE(pixels.pixelColor(qRound(145*density),qRound(90*density)), QColor(Qt::red));
+        const auto output = qEnvironmentVariable("VLC_TEST_THUMBNAIL_OUTPUT");
+        if (!output.isEmpty()) QVERIFY(pixels.save(output));
+        image->setProperty("frameSource", QUrl());
+        QTRY_COMPARE(image->property("status").toInt(), 0);
+    }
+
+    void previewCardDoesNotAddABlackOutline()
+    {
+        QQuickView view;
+        view.engine()->addImageProvider(QStringLiteral("seekpreview"), new SeekPreviewImageProvider());
+        QQmlComponent component(view.engine());
+        component.setData("import QtQuick\nimport \".\" as Redesign\n"
+            "Rectangle { width: 400; height: 400; color: \"#506070\"\n"
+            "Redesign.RedesignSeekBar { objectName: \"bar\"; x: 20; y: 250; width: 300; height: 26; value: 0.5; previewEnabled: true; previewImagePosition: 0.5 }\n}",
+            QUrl::fromLocalFile(QStringLiteral(TOP_SRCDIR "/modules/gui/qt/player/qml/redesign/")));
+        QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+        auto* root = qobject_cast<QQuickItem*>(component.create());
+        QVERIFY2(root, qPrintable(component.errorString()));
+        view.setContent(QUrl(), &component, root); view.show(); view.requestActivate();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        auto* bar = root->findChild<QQuickItem*>("bar"); QVERIFY(bar);
+        bar->forceActiveFocus(Qt::TabFocusReason);
+        bar->setProperty("previewImage", SeekPreviewImageProvider::url(m_png));
+        auto* image = root->findChild<QQuickItem*>("seekThumbnailImage"); QVERIFY(image);
+        QTRY_COMPARE(image->property("status").toInt(), 1);
+        auto* popup = bar->findChild<QObject*>("seekThumbnailPopup"); QVERIFY(popup);
+        QTRY_VERIFY(popup->property("visible").toBool());
+        QTest::qWait(50);
+        const auto pixels = view.grabWindow(); QVERIFY(!pixels.isNull());
+        const auto density = pixels.width() / 400.;
+        const auto origin = image->mapToScene(QPointF(0,0)) * density;
+        const int left = qRound(origin.x()), top = qRound(origin.y());
+        const auto background = pixels.pixelColor(left - 1, top + qRound(10*density));
+        const QSize frameSize(qRound(252*density), qRound(142*density));
+        SeekPreviewImageProvider provider;
+        const auto frame = provider.requestImage(SeekPreviewImageProvider::url(m_png).path().mid(1) + "?rounded=1&radius=4&width=252", nullptr, frameSize);
+        QImage expected(frameSize, QImage::Format_ARGB32_Premultiplied); expected.fill(background);
+        { QPainter painter(&expected); painter.drawImage(0,0,frame); }
+        for (int y=0; y<4*density; ++y) for (int x=0; x<4*density; ++x) {
+            const auto actual = pixels.pixelColor(left+x,top+y), reference = expected.pixelColor(x,y);
+            QVERIFY2(std::abs(actual.red()-reference.red()) <= 1 && std::abs(actual.green()-reference.green()) <= 1
+                && std::abs(actual.blue()-reference.blue()) <= 1, qPrintable(QString("Incorrect corner composition at %1,%2: %3 instead of %4").arg(x).arg(y).arg(actual.name()).arg(reference.name())));
+        }
+        const auto output = qEnvironmentVariable("VLC_TEST_PREVIEW_CARD_OUTPUT");
+        if (!output.isEmpty()) QVERIFY(pixels.save(output));
     }
 
     void samplesCoverTheTimelineWithinBounds()
