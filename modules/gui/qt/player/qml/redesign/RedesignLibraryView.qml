@@ -277,6 +277,7 @@ Item {
         id: button
         objectName: "libraryMoreButton"
         iconName: "more"; text: qsTr("More library actions")
+        foreground: root.wideToolbar ? root.theme.foreground : root.theme.playerLabel
         onClicked: moreMenu.toggleFrom(button)
     }
     component SortButton: LibraryButton {
@@ -285,6 +286,7 @@ Item {
         enabled: sorting.options.length > 0
         iconName: enabled && (root.sortPopup || sorting.selection.id !== root.defaultSortChoice) ? "sort-active" : "sort"
         iconDetailColor: root.theme.accent
+        foreground: root.wideToolbar ? root.theme.foreground : root.theme.playerLabel
         text: qsTr("Sort options")
         onClicked: root.openSortMenu(button)
     }
@@ -292,11 +294,13 @@ Item {
         id: button
         objectName: "libraryViewButton"
         iconName: root.grid ? "grid" : "list-view"; text: qsTr("View options")
+        foreground: root.wideToolbar ? root.theme.foreground : root.theme.playerLabel
         onClicked: viewMenu.toggleFrom(button)
     }
     component ItemCount: Text {
         text: qsTr("%n item", "%n items", root.itemCount)
-        color: root.theme.foreground; font.pixelSize: root.theme.dp(14)
+        color: root.wideToolbar ? root.theme.foreground : root.theme.playerLabel
+        font.pixelSize: root.theme.dp(14)
     }
     component Location: RedesignBreadcrumbs {
         videoBackdropContent: root.videoBackdropContent
@@ -321,27 +325,31 @@ Item {
     Component {
         id: compactToolbar
         ColumnLayout {
-            spacing: root.theme.dp(10)
+            spacing: root.theme.dp(8)
             RowLayout {
-                Layout.fillWidth: true; Layout.rightMargin: -root.theme.dp(6)
+                Layout.fillWidth: true; Layout.leftMargin: -root.theme.dp(6); Layout.rightMargin: -root.theme.dp(6)
                 spacing: 0
                 BackButton {}
                 ForwardButton {}
-                Location { Layout.fillWidth: true }
+                Location { Layout.fillWidth: true; Layout.leftMargin: root.theme.dp(4) }
                 MoreButton {}
                 LibraryButton {
                     objectName: "expandLibraryButton"
                     iconName: "expand"; text: qsTr("Open full library")
+                    foreground: root.theme.playerLabel
                     onClicked: root.fullLibraryRequested()
                 }
             }
             RowLayout {
-                Layout.fillWidth: true
+                Layout.fillWidth: true; Layout.rightMargin: -root.theme.dp(6)
+                spacing: 0
                 ItemCount { Layout.fillWidth: true }
                 SortButton {}
                 ViewButton {}
                 LibraryButton {
+                    objectName: "librarySearchButton"
                     iconName: "search"; text: qsTr("Search library"); selected: root.searchOpen
+                    foreground: root.theme.playerLabel
                     onClicked: {
                         root.searchOpen = !root.searchOpen
                         if (root.searchOpen) compactSearch.forceActiveFocus()
@@ -368,7 +376,7 @@ Item {
         }
     }
     ColumnLayout {
-        anchors { top: parent.top; bottom: parent.bottom; left: rail.right; right: parent.right; margins: theme.dp(20); leftMargin: theme.dp(root.expanded ? 28 : 20); topMargin: theme.dp(root.wideToolbar ? 20 : 12) }
+        anchors { top: parent.top; bottom: parent.bottom; left: rail.right; right: parent.right; margins: theme.dp(20); leftMargin: theme.dp(root.expanded ? 28 : 20); topMargin: theme.dp(root.wideToolbar ? 20 : 14) }
         spacing: theme.dp(root.wideToolbar ? 16 : 10)
         Loader {
             Layout.fillWidth: true
@@ -406,9 +414,9 @@ Item {
                 spacing: theme.dp(10)
                 Item {
                     width: theme.dp(32); height: theme.dp(42)
-                    RedesignIcon { anchors.centerIn: parent; width: theme.dp(24); height: width; name: "add"; color: theme.foreground }
+                    RedesignIcon { anchors.centerIn: parent; width: theme.dp(24); height: width; name: "add"; color: theme.playerLabel }
                 }
-                Text { anchors.verticalCenter: parent.verticalCenter; text: root.addLabel; color: theme.foreground; font.pixelSize: theme.dp(14) }
+                Text { anchors.verticalCenter: parent.verticalCenter; text: root.addLabel; color: theme.playerLabel; font.pixelSize: theme.dp(14) }
             }
         }
         RedesignHomeView {
@@ -542,7 +550,7 @@ Item {
                             y: root.grid ? thumbnail.y + thumbnail.height + theme.dp(root.expanded ? 20 : 6) : (parent.height - height) / 2
                             width: root.grid ? parent.width - (root.expanded ? 0 : theme.dp(8)) : Math.max(0, parent.width - x - theme.dp(26))
                             text: delegate.displayTitle; elide: Text.ElideRight
-                            color: mediaButton.hovered || mediaButton.visualFocus ? theme.bright : theme.foreground
+                            color: mediaButton.hovered || mediaButton.visualFocus ? theme.bright : root.expanded ? theme.foreground : theme.playerLabel
                             font.pixelSize: theme.dp(root.expanded && root.grid ? 16 : 14)
                         }
                         Text {
