@@ -36,24 +36,26 @@ ColumnLayout {
     opacity: editorEnabled ? 1 : 0.5
     function commit(value) {
         if (presentation.inverted) value = !value
+        if (presentation.toggleValues) value = value ? presentation.toggleValues.on : presentation.toggleValues.off
         return backend.stage(optionName, value)
     }
-    readonly property var displayedValue: presentation.inverted ? !currentValue : currentValue
+    readonly property var displayedValue: presentation.toggleValues ? currentValue !== presentation.toggleValues.off
+        : presentation.inverted ? !currentValue : currentValue
     TextMetrics {
         id: languageMetrics
         font.family: Qt.application.font.family; font.pixelSize: root.theme.dp(14)
         text: root.editor === "language" ? (root.choices.find(row => row.value === root.currentValue)?.label || "") : ""
     }
-    readonly property Component editorComponent: editor === "action" ? actionEditor : editor === "startup-volume" ? startupVolumeEditor : editor === "slider" ? sliderEditor
+    readonly property Component editorComponent: editor === "action" ? actionEditor : editor === "toggle" ? toggleEditor : editor === "startup-volume" ? startupVolumeEditor : editor === "slider" ? sliderEditor
         : editor === "track" ? trackEditor : editor === "language" ? languageEditor
         : description.kind === "bool" && !choices.length ? toggleEditor
         : editor === "color" ? colorEditor
         : choices.length ? choiceEditor : textEditor
     RowLayout {
         Layout.fillWidth: true
-        Layout.minimumHeight: !available ? 0 : theme.dp(root.compact ? 52 : root.editor === "startup-volume" ? 92 : root.editor === "slider" ? root.presentation.inlineSlider ? 42 : 68 : root.choices.length ? 46 : root.description.kind === "bool" ? 42 : 48)
+        Layout.minimumHeight: !available ? 0 : theme.dp(root.presentation.rowHeight || (root.compact ? 52 : root.editor === "startup-volume" ? 92 : root.editor === "slider" ? root.presentation.inlineSlider ? 42 : 68 : root.editor === "toggle" ? 42 : root.choices.length ? 46 : root.description.kind === "bool" ? 42 : 48))
         spacing: theme.dp(10)
-        implicitHeight: available ? Math.max(theme.dp(root.presentation.inlineSlider ? 42 : 44), labelText.implicitHeight + theme.dp(10)) : 0
+        implicitHeight: available ? Math.max(theme.dp(root.presentation.rowHeight || (root.presentation.inlineSlider ? 42 : 44)), labelText.implicitHeight + theme.dp(10)) : 0
         Item {
             id: labelArea
             Layout.fillWidth: true; Layout.preferredWidth: 1
@@ -491,6 +493,8 @@ ColumnLayout {
                 Layout.minimumHeight: theme.dp(34)
                 color: invalid ? "#e56b6b" : theme.foreground; font.pixelSize: theme.dp(14)
                 selectByMouse: true
+                placeholderText: root.presentation.placeholder || ""
+                placeholderTextColor: theme.playerLabel
                 echoMode: root.description.kind === "password" ? TextInput.Password : TextInput.Normal
                 inputMethodHints: root.description.kind === "integer" || root.description.kind === "float" ? Qt.ImhFormattedNumbersOnly : Qt.ImhNone
                 Accessible.name: root.label || root.description.title

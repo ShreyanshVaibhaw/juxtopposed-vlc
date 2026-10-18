@@ -22,6 +22,7 @@ TestCase {
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
         function describe(name) {
+            if (name === "screensaverPolicy") return {kind: "integer", choices: [{label: "Never", value: 0}, {label: "When fullscreen", value: 2}, {label: "Always", value: 1}]}
             if (name.endsWith("-track")) return {kind: "integer", editor: "track", maximum: 2147483647}
             if (name.endsWith("-language")) return {kind: "string", editor: "language", choices: [
                 {label:"System language",value:"system"},{label:"Automatic",value:""},
@@ -544,6 +545,30 @@ TestCase {
             label: "Delay"
             presentation: ({editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, suffix: " s", inlineSlider: true})
         }
+    }
+    Component {
+        id: policyToggleRow
+        RedesignPreferenceRow {
+            width: 784; y: 450; backend: store; optionName: "screensaverPolicy"
+            label: "Stop the screensaver during playback"
+            presentation: ({editor: "toggle", toggleValues: {on: 1, off: 0}})
+        }
+    }
+    function test_policyToggleKeepsTheNativePolicyUntilChanged() {
+        store.stage("screensaverPolicy", 2)
+        const row = createTemporaryObject(policyToggleRow, testCase)
+        verify(row !== null)
+        const toggle = findChild(row, "preferenceToggleEditor")
+        verify(toggle !== null)
+        verify(findChild(row, "preferenceChoiceEditor") === null)
+        compare(store.value("screensaverPolicy"), 2)
+        verify(toggle.checked)
+        mouseClick(toggle)
+        compare(store.value("screensaverPolicy"), 0)
+        verify(!toggle.checked)
+        mouseClick(toggle)
+        compare(store.value("screensaverPolicy"), 1)
+        verify(toggle.checked)
     }
     function test_inlineSliderKeepsItsRangeAndUnitConversion() {
         const row = createTemporaryObject(inlineSliderRow, testCase)
