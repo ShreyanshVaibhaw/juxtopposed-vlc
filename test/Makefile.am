@@ -85,6 +85,7 @@ check_PROGRAMS = \
 	test_src_video_output_filter_format \
 	test_src_video_output_inhibit \
 	test_src_video_output_opengl \
+	test_src_video_output_osd \
 	test_src_video_output_spu \
 	test_modules_lua_extension \
 	test_modules_misc_medialibrary \
@@ -407,6 +408,10 @@ test_src_video_output_opengl_SOURCES = src/video_output/opengl.c
 test_src_video_output_opengl_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_video_output_spu_SOURCES = src/video_output/spu.c
 test_src_video_output_spu_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_video_output_osd_SOURCES = src/video_output/osd.c \
+	../src/video_output/video_text.c ../src/video_output/video_widgets.c
+test_src_video_output_osd_CPPFLAGS = $(AM_CPPFLAGS) -Dvout_PutSubpicture=CaptureSubpicture
+test_src_video_output_osd_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_src_input_decoder_SOURCES = \
 	src/input/decoder/input_decoder.c \

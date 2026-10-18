@@ -166,6 +166,30 @@ bool subtitleStyleOption(const QString& name)
     return name.startsWith(QLatin1String("freetype-")) || name.startsWith(QLatin1String("sub-text-"));
 }
 
+void applyOsdPreferences(qt_intf_t* intf)
+{
+    auto* instance = vlc_object_instance(intf);
+    const bool enabled = config_GetInt("osd");
+    const auto duration = config_GetInt("osd-duration");
+    if (var_Type(instance, "osd") == 0) var_Create(instance, "osd", VLC_VAR_BOOL);
+    if (var_Type(instance, "osd-duration") == 0) var_Create(instance, "osd-duration", VLC_VAR_INTEGER);
+    var_SetBool(instance, "osd", enabled);
+    var_SetInteger(instance, "osd-duration", duration);
+
+    size_t count = 0;
+    vlc_player_Lock(intf->p_player);
+    auto** outputs = vlc_player_vout_HoldAll(intf->p_player, &count);
+    vlc_player_Unlock(intf->p_player);
+    for (size_t i = 0; i < count; ++i) {
+        if (var_Type(outputs[i], "osd") == 0) var_Create(outputs[i], "osd", VLC_VAR_BOOL);
+        if (var_Type(outputs[i], "osd-duration") == 0) var_Create(outputs[i], "osd-duration", VLC_VAR_INTEGER);
+        var_SetBool(outputs[i], "osd", enabled);
+        var_SetInteger(outputs[i], "osd-duration", duration);
+        vout_Release(outputs[i]);
+    }
+    free(outputs);
+}
+
 const QStringList& videoOutputOptions()
 {
     // Output variables own the current presentation. Hotkeys and the native
@@ -1555,6 +1579,8 @@ bool RedesignPreferences::save()
     }
     // These controls are inherited by the current input and action dispatcher.
     auto* instance = vlc_object_instance(m_ctx->getIntf());
+    if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
+        applyOsdPreferences(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("qt-backdrop-blur"))) {
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -1840,6 +1866,7 @@ bool RedesignPreferences::resetAll()
     if (var_Type(intf, "qt-backdrop-blur") == 0)
         var_Create(intf, "qt-backdrop-blur", VLC_VAR_BOOL);
     var_SetBool(intf, "qt-backdrop-blur", bool(config_GetInt("qt-backdrop-blur")));
+    applyOsdPreferences(intf);
     vlc_subpicture_InvalidateTextStyle();
     vlc_player_Lock(intf->p_player);
     vlc_player_SetSubtitleTextScale(intf->p_player, config_GetInt("sub-text-scale"));

@@ -131,7 +131,9 @@ QtObject {
                 ["freetype-background-color", qsTr("Background color")],
                 ["freetype-background-opacity", qsTr("Background opacity"), {editor: "slider", from: 0, to: 100, factor: 100/255, suffix: "%", ticks: [0, 50, 100], trackTicks: [10, 20, 30, 40, 50, 60, 70, 80, 90]}] ] },
             { title: qsTr("Timing"), rows: [ ["redesign-subtitle-delay", qsTr("Subtitle delay"), {editor: "slider", from: -5, to: 5, factor: 0.001, step: 0.001, decimals: 3, suffix: " s", ticks: [-5, 0, 5], positiveTickSign: true, trackTicks: [-4, -3, -2, -1, 0, 1, 2, 3, 4]}] ] },
-            { title: qsTr("On-Screen Messages"), rows: [ ["osd", qsTr("Show feedback for shortcuts")], ["video-title-show", qsTr("Show filename when a video starts")],
+            { title: qsTr("On-Screen Messages"), rows: [ ["osd", qsTr("Show feedback for shortcuts")],
+                ["osd-duration", qsTr("Show feedback for"), {editor: "slider", from: 0.5, to: 5, factor: 0.001, step: 0.1, decimals: 1, suffix: " s", ticks: [0.5, 5], trackTicks: [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5], enabledWhen: "osd"}],
+                ["video-title-show", qsTr("Show filename when a video starts")],
                 ["video-title-timeout", qsTr("Show filename for"), {editor: "slider", from: 1, to: 10, factor: 0.001, step: 0.1, suffix: " s", ticks: [1, 10], trackTicks: [2, 3, 4, 5, 6, 7, 8, 9]}] ] } ],
         library: [
             { title: qsTr("Opening Files"), rows: [ ["one-instance", qsTr("Only allow one VLC window")],

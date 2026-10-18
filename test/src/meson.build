@@ -558,3 +558,13 @@ vlc_tests += {
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
 }
+
+vlc_tests += {
+    'name' : 'test_src_video_output_osd',
+    'sources' : files('video_output/osd.c',
+                      '../../src/video_output/video_text.c',
+                      '../../src/video_output/video_widgets.c'),
+    'suite' : ['src', 'test_src'],
+    'c_args' : ['-Dvout_PutSubpicture=CaptureSubpicture'],
+    'link_with' : [libvlc, libvlccore],
+}

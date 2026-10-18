@@ -619,6 +619,23 @@ TestCase {
         keyClick(Qt.Key_End); compare(store.value("timeout"), 5000)
         store.stage("timeout", 1234); wait(20); fuzzyCompare(slider.value, 1.234, .000001)
     }
+    function test_shortcutFeedbackDurationHasItsOwnScaleAndEnableSwitch() {
+        const rows = catalog.sections.subtitles.find(section => section.title === "On-Screen Messages").rows
+        const feedback = rows.find(row => row[0] === "osd-duration")
+        verify(feedback !== undefined); compare(feedback[1], "Show feedback for")
+        const row = createTemporaryObject(inlineSliderRow, testCase, {presentation: feedback[2]})
+        verify(row !== null); store.stage("osd", false); wait(20)
+        verify(!row.editorEnabled)
+        store.stage("osd", true); store.stage("timeout", 2750); wait(20)
+        verify(row.editorEnabled)
+        const slider = findChild(row, "preferenceSliderEditor")
+        fuzzyCompare(slider.value, 2.75, .000001)
+        compare(findChild(row, "preferenceSliderTick_0").text, "0.5 s")
+        compare(findChild(row, "preferenceSliderTick_1").text, "5 s")
+        slider.forceActiveFocus(); keyClick(Qt.Key_Home); compare(store.value("timeout"), 500)
+        keyClick(Qt.Key_End); compare(store.value("timeout"), 5000)
+        verify(rows.findIndex(row => row[0] === "osd-duration") < rows.findIndex(row => row[0] === "video-title-show"))
+    }
     function test_speedScaleUsesTheReferenceRatios() {
         const spec = catalog.sections.playback.reduce((rows, section) => rows.concat(section.rows), []).find(row => row[0] === "rate")[2]
         const row = createTemporaryObject(inlineSliderRow, testCase, {presentation: spec})

@@ -863,6 +863,8 @@ static const char* const ppsz_restore_playback_desc[] = {
 #define OSD_LONGTEXT N_( \
     "VLC can display messages on the video. This is called OSD (On Screen " \
     "Display).")
+#define OSD_DURATION_TEXT N_("Shortcut feedback duration (ms)")
+#define OSD_DURATION_LONGTEXT N_("Set how long shortcut messages and icons stay on the video. This does not change the filename display time.")
 
 #define TEXTRENDERER_TEXT N_("Text rendering module")
 #define TEXTRENDERER_LONGTEXT N_( \
@@ -1852,6 +1854,8 @@ vlc_module_begin ()
     add_bool( "spu-fill", true, SPU_FULL_TEXT, SPU_FULL_LONGTEXT )
         change_safe ()
     add_bool( "osd", true, OSD_TEXT, OSD_LONGTEXT )
+    add_integer_with_range( "osd-duration", 1000, 500, 5000,
+                            OSD_DURATION_TEXT, OSD_DURATION_LONGTEXT )
     add_module("text-renderer", "text renderer", "any",
                TEXTRENDERER_TEXT, TEXTRENDERER_LONGTEXT)
 
