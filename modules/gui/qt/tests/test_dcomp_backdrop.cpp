@@ -8,6 +8,7 @@
 #include <dxgi1_2.h>
 #include <QTest>
 #include "maininterface/compositor_dcomp_backdrop.hpp"
+#include "maininterface/compositor_dcomp_background.hpp"
 
 using Microsoft::WRL::ComPtr;
 
@@ -15,6 +16,100 @@ class TestDCompBackdrop : public QObject
 {
     Q_OBJECT
 private slots:
+    void opaqueResizeBackground_data()
+    {
+        QTest::addColumn<bool>("ownDevice");
+        QTest::newRow("supplied-device") << false;
+        QTest::newRow("independent-device") << true;
+    }
+    void opaqueResizeBackground()
+    {
+        QFETCH(bool, ownDevice);
+        QVERIFY(SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)));
+        struct ComGuard { ~ComGuard() { CoUninitialize(); } } comGuard;
+        ComPtr<ID3D11Device> gpu;
+        QCOMPARE(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_WARP, nullptr,
+            D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0, D3D11_SDK_VERSION,
+            &gpu, nullptr, nullptr), S_OK);
+        ComPtr<IDXGIDevice> dxgi;
+        QCOMPARE(gpu.As(&dxgi), S_OK);
+        ComPtr<IDCompositionDevice> device;
+        QCOMPARE(DCompositionCreateDevice(dxgi.Get(), IID_PPV_ARGS(&device)), S_OK);
+        vlc::DCompOpaqueBackground background;
+        QCOMPARE(background.initialize(device.Get(), ownDevice ? nullptr : gpu.Get()), S_OK);
+        QVERIFY(background.visual());
+        const HWND hwnd = CreateWindowExW(0x00200000L /* WS_EX_NOREDIRECTIONBITMAP */, L"STATIC", L"Opaque resize test",
+            WS_POPUP, 0, 0, 960, 540, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+        QVERIFY(hwnd);
+        struct WindowGuard { HWND hwnd; ~WindowGuard() { DestroyWindow(hwnd); } } guard{hwnd};
+        ComPtr<IDCompositionTarget> target;
+        QCOMPARE(device->CreateTargetForHwnd(hwnd, TRUE, &target), S_OK);
+        ComPtr<IDCompositionVisual> root, ui, video;
+        QCOMPARE(device->CreateVisual(&root), S_OK);
+        QCOMPARE(device->CreateVisual(&ui), S_OK);
+        QCOMPARE(device->CreateVisual(&video), S_OK);
+        QCOMPARE(root->AddVisual(ui.Get(), FALSE, nullptr), S_OK);
+        // Reject the exact null-reference call that put black above the UI.
+        QCOMPARE(background.attachBelow(root.Get(), nullptr), E_INVALIDARG);
+        QCOMPARE(background.attachBelow(nullptr, ui.Get()), E_INVALIDARG);
+        QCOMPARE(background.attachBelow(root.Get(), ui.Get()), S_OK);
+        QCOMPARE(root->AddVisual(video.Get(), FALSE, ui.Get()), S_OK);
+        QCOMPARE(target->SetRoot(root.Get()), S_OK);
+        ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+        auto *content = background.content();
+        QVERIFY(content);
+        DXGI_SWAP_CHAIN_DESC1 desc{};
+        QCOMPARE(content->GetDesc1(&desc), S_OK);
+        QCOMPARE(desc.Width, 1u); QCOMPARE(desc.Height, 1u);
+        QCOMPARE(desc.AlphaMode, DXGI_ALPHA_MODE_IGNORE);
+        for (const auto size : {QSize(960, 540), QSize(961, 541), QSize(1921, 1081),
+                               QSize(3840, 2160), QSize(621, 421), QSize(2560, 1392)})
+        {
+            QVERIFY(SetWindowPos(hwnd, nullptr, 0, 0, size.width(), size.height(),
+                SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER));
+            RECT client{};
+            QVERIFY(GetClientRect(hwnd, &client));
+            const QSize nativeSize(client.right - client.left, client.bottom - client.top);
+            QCOMPARE(nativeSize, size);
+            QCOMPARE(background.setSize(nativeSize), S_OK);
+            QCOMPARE(background.setSize(size), S_FALSE);
+            QCOMPARE(device->Commit(), S_OK);
+            QCOMPARE(background.content(), content);
+            QCOMPARE(content->GetDesc1(&desc), S_OK);
+            QCOMPARE(desc.Width, 1u); QCOMPARE(desc.Height, 1u);
+        }
+        // Both buffers stay opaque black; no new frame or allocation is needed
+        // when the independently sized video/UI expose a new row or column.
+        ComPtr<ID3D11Device> drawingDevice;
+        QCOMPARE(content->GetDevice(IID_PPV_ARGS(&drawingDevice)), S_OK);
+        ComPtr<ID3D11DeviceContext> context;
+        drawingDevice->GetImmediateContext(&context);
+        for (UINT i = 0; i < desc.BufferCount; ++i)
+        {
+            ComPtr<ID3D11Texture2D> pixel;
+            QCOMPARE(content->GetBuffer(i, IID_PPV_ARGS(&pixel)), S_OK);
+            D3D11_TEXTURE2D_DESC texture{};
+            pixel->GetDesc(&texture);
+            texture.Usage = D3D11_USAGE_STAGING;
+            texture.BindFlags = 0; texture.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            texture.MiscFlags = 0;
+            ComPtr<ID3D11Texture2D> readback;
+            QCOMPARE(drawingDevice->CreateTexture2D(&texture, nullptr, &readback), S_OK);
+            context->CopyResource(readback.Get(), pixel.Get());
+            D3D11_MAPPED_SUBRESOURCE mapped{};
+            QCOMPARE(context->Map(readback.Get(), 0, D3D11_MAP_READ, 0, &mapped), S_OK);
+            const auto rgba = *static_cast<const quint32 *>(mapped.pData);
+            context->Unmap(readback.Get(), 0);
+            QCOMPARE(rgba, 0xff000000u);
+        }
+        QCOMPARE(device->WaitForCommitCompletion(), S_OK);
+        BOOL valid = FALSE;
+        QCOMPARE(device->CheckDeviceState(&valid), S_OK);
+        QVERIFY(valid);
+        QCOMPARE(target->SetRoot(nullptr), S_OK);
+        QCOMPARE(device->Commit(), S_OK);
+        QCOMPARE(device->WaitForCommitCompletion(), S_OK);
+    }
     void lifecycle()
     {
         QVERIFY(SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)));

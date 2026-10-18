@@ -588,6 +588,7 @@ if host_system == 'windows'
         'util/csdmenu_win32.h',
         'util/win32_emutls.cpp',
         'maininterface/compositor_dcomp.cpp',
+        'maininterface/compositor_dcomp_background.hpp',
         'maininterface/compositor_dcomp_backdrop.cpp',
         'maininterface/compositor_dcomp_backdrop.hpp',
         'maininterface/compositor_dcomp_acrylicsurface.cpp',

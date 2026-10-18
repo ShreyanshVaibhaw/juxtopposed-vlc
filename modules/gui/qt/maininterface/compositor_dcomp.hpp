@@ -27,6 +27,7 @@
 #include <QPointer>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QAbstractNativeEventFilter>
 
 #include <memory>
 
@@ -44,8 +45,9 @@ namespace vlc {
 
 class CompositorDCompositionAcrylicSurface;
 class DCompVideoBackdrop;
+class DCompOpaqueBackground;
 
-class CompositorDirectComposition : public CompositorVideo
+class CompositorDirectComposition : public CompositorVideo, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 public:
@@ -70,6 +72,7 @@ public:
     QQuickItem * activeFocusItem() const override;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
+    bool nativeEventFilter(const QByteArray &, void *, qintptr *) override;
 
     bool canDoThreadedSurfaceUpdates() const override { return true; };
 
@@ -80,6 +83,7 @@ protected:
 private:
     [[nodiscard]] bool setup();
     void cleanup();
+    void updateOpaqueBackground();
 
 private slots:
     void onSurfacePositionChanged(const QPointF& position) override;
@@ -108,6 +112,7 @@ private:
     Microsoft::WRL::ComPtr<IDCompositionVisual> m_videoProxy;
     IDCompositionVisual *m_uiVisual = nullptr;
     std::shared_ptr<DCompVideoBackdrop> m_videoBackdrop;
+    std::unique_ptr<DCompOpaqueBackground> m_opaqueBackground;
     QMetaObject::Connection m_backdropConnection;
 
     std::unique_ptr<CompositorDCompositionAcrylicSurface> m_acrylicSurface;

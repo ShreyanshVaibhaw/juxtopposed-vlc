@@ -623,6 +623,7 @@ nodist_libqt_plugin_la_SOURCES += maininterface/mainctx_win32.moc.cpp \
 libqt_plugin_la_SOURCES += \
 	maininterface/compositor_dcomp.cpp \
 	maininterface/compositor_dcomp.hpp \
+	maininterface/compositor_dcomp_background.hpp \
 	maininterface/compositor_dcomp_backdrop.cpp maininterface/compositor_dcomp_backdrop.hpp \
 	maininterface/compositor_dcomp_error.hpp \
 	maininterface/compositor_dcomp_acrylicsurface.hpp \
@@ -1928,7 +1929,7 @@ test_window_fullscreen_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_window_fullscreen
 TESTS += test_window_fullscreen
 
-test_dcomp_backdrop_SOURCES = tests/test_dcomp_backdrop.cpp maininterface/compositor_dcomp_backdrop.cpp maininterface/compositor_dcomp_backdrop.hpp util/video_backdrop_region.hpp
+test_dcomp_backdrop_SOURCES = maininterface/compositor_dcomp_background.hpp tests/test_dcomp_backdrop.cpp maininterface/compositor_dcomp_backdrop.cpp maininterface/compositor_dcomp_backdrop.hpp util/video_backdrop_region.hpp
 nodist_test_dcomp_backdrop_SOURCES = tests/test_dcomp_backdrop.moc
 BUILT_SOURCES += tests/test_dcomp_backdrop.moc
 CLEANFILES += tests/test_dcomp_backdrop.moc
