@@ -1249,6 +1249,7 @@ libqml_module_player_a_QML = \
 	player/qml/redesign/RedesignTrackAssignmentDialog.qml \
 	player/qml/redesign/RedesignSubtitleProviderSetup.qml \
 	player/qml/redesign/RedesignSubtitleSourcePreferences.qml \
+	player/qml/redesign/RedesignAddons.qml \
 	player/qml/redesign/RedesignTrackAssignments.qml \
 	player/qml/redesign/RedesignFolderInfo.qml \
 	player/qml/redesign/RedesignAddToPlaylistDialog.qml \
@@ -2250,6 +2251,8 @@ EXTRA_DIST += tests/tst_RedesignChapters.qml
 TESTS += tests/tst_RedesignChapters.qml
 EXTRA_DIST += tests/tst_RedesignLibrary.qml
 TESTS += tests/tst_RedesignLibrary.qml
+EXTRA_DIST += tests/tst_RedesignAddons.qml
+TESTS += tests/tst_RedesignAddons.qml
 TESTS += tests/tst_RedesignQueue.qml
 EXTRA_DIST += tests/tst_RedesignNetwork.qml
 TESTS += tests/tst_RedesignNetwork.qml

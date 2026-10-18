@@ -7,6 +7,7 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Dialogs
 import VLC.Player
+import VLC.Network
 
 RedesignSettingsDialog {
     id: root
@@ -23,6 +24,8 @@ RedesignSettingsDialog {
     property bool resetFailed: false
     RedesignPreferences { id: preferenceStore; ctx: MainCtx; autoSave: true }
     RedesignPreferencesCatalog { id: specification }
+    property bool addonsVisited: false
+    onCategoryChanged: if (category === "extensions") addonsVisited = true
     Binding {
         target: MainCtx; property: "useGlobalShortcuts"; value: false
         when: root.visible
@@ -209,6 +212,15 @@ RedesignSettingsDialog {
             Column {
                 width: scroll.availableWidth
                 spacing: theme.dp(6)
+                Loader {
+                    width: parent.width
+                    active: root.addonsVisited
+                    visible: root.category === "extensions" && !root.search.length
+                    sourceComponent: RedesignAddons {
+                        backend: ServicesDiscoveryModel { ctx: MainCtx }
+                        scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    }
+                }
                 ColumnLayout {
                     visible: root.category === "general" && !root.search.length
                     width: parent.width
@@ -279,10 +291,13 @@ RedesignSettingsDialog {
                         required property var modelData
                         required property int index
                         width: parent.width
+                        topPadding: root.category === "extensions" ? theme.dp(6) : 0
+                        bottomPadding: root.category === "extensions" ? theme.dp(12) : 0
                         visible: modelData.rows.some(row => preferenceStore.describe(row[0]).kind !== undefined) || root.category === "controls" && modelData.title === qsTr("Keyboard Shortcuts")
                         Text {
                             topPadding: theme.dp(index === 0 && root.category !== "general" ? 8 : 24); bottomPadding: theme.dp(10)
                             text: modelData.title; color: theme.settingsHeading; font.pixelSize: theme.dp(16)
+                            visible: text.length > 0
                         }
                         ColumnLayout {
                             width: parent.width
@@ -335,7 +350,7 @@ RedesignSettingsDialog {
                 }
                 RedesignButton {
                     visible: !root.search.length
-                    width: parent.width; height: theme.dp(40)
+                    width: parent.width; height: theme.dp(root.category === "extensions" ? 38 : 40)
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                     caption: root.advanced ? qsTr("Hide Advanced Options") : qsTr("Advanced Options")
                     text: caption

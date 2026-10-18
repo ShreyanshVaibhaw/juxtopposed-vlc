@@ -153,7 +153,7 @@ QtObject {
             { title: qsTr("Casting"), rows: [ ["sout-chromecast-conversion-quality", qsTr("Cast quality")] ] },
             { title: qsTr("Streaming"), rows: [ ["sout-display", qsTr("Play locally while streaming")], ["sout-audio", qsTr("Include audio")],
                 ["sout-video", qsTr("Include video")], ["sout-spu", qsTr("Include subtitles")], ["sout-x264-preset", qsTr("Encoding preset")], ["sout-x264-tune", qsTr("Tuning")] ] } ],
-        extensions: [ { title: qsTr("Add-ons"), rows: [ ["qt-autoload-extensions", qsTr("Load add-ons on startup")] ] } ]
+        extensions: [ { title: "", rows: [ ["qt-autoload-extensions", qsTr("Load add-ons on startup")] ] } ]
     })
     readonly property var advancedSections: ({
         general: [ {title: "", rows: [ ["logmode", qsTr("Log format")], ["stats", qsTr("Collect playback statistics")], ["redesign-config-folder", qsTr("Open configurations folder")], ["redesign-reset-all", qsTr("Reset all settings")] ] },

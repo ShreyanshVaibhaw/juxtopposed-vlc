@@ -35,6 +35,8 @@ public:
     Q_PROPERTY(State stateFilter READ getStateFilter WRITE setStateFilter NOTIFY stateFilterChanged FINAL)
 
     Q_PROPERTY(int maxScore READ getMaxScore CONSTANT FINAL)
+    Q_PROPERTY(unsigned int revision READ revision NOTIFY catalogChanged FINAL)
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY catalogChanged FINAL)
 
     enum class State // equivalent to addon_state_t
     {
@@ -64,6 +66,7 @@ public:
         BROKEN,
         MANAGEABLE,
         UPDATABLE,
+        IDENTIFIER,
     };
     Q_ENUM(Role)
 
@@ -97,6 +100,11 @@ public: //invokable functions
 
     Q_INVOKABLE void loadFromDefaultRepository();
     Q_INVOKABLE void loadFromExternalRepository(QUrl uri);
+    Q_INVOKABLE QVariantMap addonById(const QString& identifier) const;
+    Q_INVOKABLE bool installAddon(const QString& identifier);
+    Q_INVOKABLE bool removeAddon(const QString& identifier);
+    unsigned int revision() const;
+    QString errorMessage() const;
 
     Q_INVOKABLE static QString getLabelForType(Type type);
     Q_INVOKABLE static QColor getColorForType(Type type);
@@ -118,8 +126,10 @@ signals:
     void ctxChanged();
     void stateFilterChanged();
     void typeFilterChanged();
+    void catalogChanged();
 
 private:
+    bool requestAddon(const QString& identifier, bool install);
     Q_DECLARE_PRIVATE(AddonsModel);
 };
 

@@ -1,0 +1,118 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+import QtQuick
+import QtTest
+import "../player/qml/redesign"
+
+TestCase {
+    name: "JuxtopposedAddons"
+    width: 900; height: 500; visible: true; when: windowShown
+    ListModel {
+        id: store
+        property int revision: 0
+        property bool loading: false
+        property string errorMessage: ""
+        property string searchPattern: ""
+        property int discoveryCalls: 0
+        property int installCalls: 0
+        property int removeCalls: 0
+        property string lastId: ""
+        property bool acceptAction: true
+        property var records: []
+        function rebuild() {
+            clear()
+            for (const row of records)
+                if (row.name.toLowerCase().includes(searchPattern.toLowerCase())) append(row)
+            revision++
+        }
+        function addonById(id) { return records.find(row => row.identifier === id) || ({}) }
+        function loadFromDefaultRepository() { discoveryCalls++; loading = true }
+        function installAddon(id) { installCalls++; lastId = id; return begin(id, 1) }
+        function removeAddon(id) { removeCalls++; lastId = id; return begin(id, 3) }
+        function begin(id, state) {
+            if (!acceptAction) return false
+            records = records.map(row => row.identifier === id ? Object.assign({}, row, {pending: true, state: state}) : row)
+            rebuild(); return true
+        }
+        function complete(state) {
+            records = records.map(row => row.identifier === lastId ? Object.assign({}, row, {pending: false, state: state}) : row)
+            rebuild()
+        }
+        onSearchPatternChanged: rebuild()
+    }
+    RedesignAddons { id: page; width: 784; backend: store }
+    function item(name) { return findChild(page, name) }
+    function init() {
+        page.width = 784; store.errorMessage = ""
+        store.loading = false; store.searchPattern = ""
+        store.discoveryCalls = 0; store.installCalls = 0; store.removeCalls = 0; store.lastId = ""; store.acceptAction = true
+        store.records = [
+            {identifier: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", name: "Available", summary: "An available add-on", description: "Plain text", state: 0, manageable: true, broken: false, pending: false},
+            {identifier: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", name: "Installed", summary: "An installed add-on", description: "Plain text", state: 2, manageable: true, broken: false, pending: false},
+            {identifier: "cccccccccccccccccccccccccccccccc", name: "Manual", summary: "A manual install", description: "Plain text", state: 2, manageable: false, broken: false, pending: false}]
+        store.rebuild()
+        page.selectedId = ""; page.actionMessage = ""; page.discoveryRequested = false
+        item("addonsSearch").clear(); wait(30)
+    }
+    function test_initialPageDoesNotFetchOrChangeAddons() {
+        compare(store.discoveryCalls, 0); compare(store.installCalls, 0); compare(store.removeCalls, 0)
+        verify(!item("addonsAdd").enabled); verify(!item("addonsRemove").enabled)
+        mouseClick(item("addonsFindMore"))
+        compare(store.discoveryCalls, 1); verify(!item("addonsFindMore").enabled)
+        mouseClick(item("addonsFindMore")); compare(store.discoveryCalls, 1)
+    }
+    function test_actionsKeepIdentityAcrossReorderAndAsyncReset() {
+        mouseClick(item("addonRow_0"))
+        verify(item("addonsAdd").enabled)
+        store.records = [store.records[1], store.records[2], store.records[0]]; store.rebuild(); wait(20)
+        mouseClick(item("addonsAdd")); compare(store.lastId, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        verify(!item("addonsAdd").enabled); verify(!item("addonsRemove").enabled)
+        page.addSelected(); compare(store.installCalls, 1)
+        store.complete(2); wait(20); verify(item("addonsRemove").enabled)
+        mouseClick(item("addonsRemove")); compare(store.lastId, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        page.removeSelected(); compare(store.removeCalls, 1)
+        store.complete(0); wait(20); verify(item("addonsAdd").enabled)
+    }
+    function test_manualAndBrokenAddonsCannotBeInstalled() {
+        mouseClick(item("addonRow_2")); verify(!item("addonsRemove").enabled)
+        store.records[0].broken = true; store.rebuild(); wait(20)
+        mouseClick(item("addonRow_0")); verify(!item("addonsAdd").enabled)
+        compare(store.installCalls, 0); compare(store.removeCalls, 0)
+    }
+    function test_searchClearsSelectionBeforeFiltering() {
+        mouseClick(item("addonRow_1")); verify(item("addonsRemove").enabled)
+        mouseClick(item("addonsSearch"))
+        for (const key of [Qt.Key_A, Qt.Key_V, Qt.Key_A, Qt.Key_I, Qt.Key_L, Qt.Key_A, Qt.Key_B, Qt.Key_L, Qt.Key_E]) keyClick(key)
+        compare(store.searchPattern, "available"); compare(page.selectedId, "")
+        verify(!item("addonsRemove").enabled); compare(store.count, 1)
+    }
+    function test_rejectedActionKeepsItsSelectionAndShowsAnError() {
+        store.acceptAction = false
+        mouseClick(item("addonRow_0")); mouseClick(item("addonsAdd"))
+        compare(page.selectedId, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        verify(page.actionMessage.length > 0); verify(item("addonsAdd").enabled)
+    }
+    function test_keyboardSelectsWithoutInstalling() {
+        const list = item("addonsList"); list.forceActiveFocus()
+        keyClick(Qt.Key_End)
+        compare(page.selectedId, "cccccccccccccccccccccccccccccccc")
+        keyClick(Qt.Key_Home)
+        compare(page.selectedId, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        compare(store.installCalls, 0); compare(store.removeCalls, 0)
+    }
+    function test_narrowPageKeepsItsActionsInsideTheCard() {
+        page.width = 244; wait(30)
+        for (const name of ["addonsSearch", "addonsFindMore", "addonsAdd", "addonsRemove"]) {
+            const control = item(name), point = control.mapToItem(page, 0, 0)
+            verify(point.x >= 0, name); verify(point.x + control.width <= page.width + 1, name)
+        }
+        verify(item("addonsFindMore").y > item("addonsSearch").y)
+        verify(item("addonsAdd").y > item("addonsFindMore").y)
+    }
+    function test_asyncFailureNamesItsAddonAndUsesPlainText() {
+        store.errorMessage = "VLC cannot add <Fixture>."
+        const message = item("addonsError")
+        compare(message.text, store.errorMessage)
+        compare(message.textFormat, Text.PlainText)
+        verify(message.visible)
+    }
+}
