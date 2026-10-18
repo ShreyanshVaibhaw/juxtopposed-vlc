@@ -23,6 +23,9 @@ C.ToolTip {
     popupType: C.Popup.Item
     delay: 650
     margins: 6 * s
+    width: Math.min(implicitWidth, 360 * s,
+                    hostWindow ? Math.max(0, hostWindow.width - 2 * margins) : 360 * s)
+    x: parent ? (parent.width - width) / 2 : 0
     padding: 6 * s
     leftPadding: 8 * s
     rightPadding: 8 * s

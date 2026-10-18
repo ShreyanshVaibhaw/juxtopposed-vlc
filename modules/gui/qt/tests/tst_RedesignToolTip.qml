@@ -10,6 +10,7 @@ TestCase {
     name: "JuxtopposedToolTip"
     width: 600; height: 400
     visible: true; when: windowShown
+    property real originalWindowWidth: 0
     RedesignButton { id: button; x: 20; y: 100; text: "Playback settings" }
     SignalSpy { id: closedSpy; target: findChild(button, "redesignToolTip"); signalName: "closed" }
     Window {
@@ -20,6 +21,7 @@ TestCase {
         RedesignButton { id: offscreenButton; text: "Audio" }
     }
     function init() {
+        originalWindowWidth = testCase.Window.window.width
         testCase.Window.window.visibility = Window.Windowed
         button.scaleFactor = 1; button.lightTheme = false
         button.text = "Playback settings"; button.tooltipTextFormat = Text.AutoText
@@ -29,6 +31,7 @@ TestCase {
     }
     function cleanup() {
         findChild(button, "redesignToolTip").close()
+        testCase.Window.window.width = originalWindowWidth
         testCase.Window.window.visibility = Window.Windowed
     }
     function test_fileNamesCanRequestPlainText() {
@@ -51,11 +54,35 @@ TestCase {
         const tip = findChild(button, "redesignToolTip")
         mouseMove(button, button.width / 2, button.height / 2)
         tryCompare(tip, "opened", true, 2000)
+        verify(tip.width <= 360 * data.scale + 1)
         verify(tip.contentItem.lineCount > 1)
         const position = tip.contentItem.mapToItem(testCase, 0, 0)
         verify(position.x >= 0 && position.y >= 0)
         verify(position.x + tip.contentItem.width <= width)
         verify(position.y + tip.contentItem.height <= height)
+    }
+    function test_helpUsesAReadableWidth_data() {
+        return [{tag: "wide", scale: 1, windowWidth: 600},
+                {tag: "narrow", scale: 1, windowWidth: 280},
+                {tag: "scaled-narrow", scale: 1.5, windowWidth: 280}]
+    }
+    function test_helpUsesAReadableWidth(data) {
+        testCase.Window.window.width = data.windowWidth
+        button.scaleFactor = data.scale
+        button.text = "Include subfolders adds files from the folder and keeps its subfolders in the queue. "
+            + "Open folders on playback reads a folder when you play it. "
+            + "Expand all subfolders reads all files at once. Changes apply to the next folder you add."
+        button.x = (data.windowWidth - button.width) / 2
+        const tip = findChild(button, "redesignToolTip")
+        mouseMove(button, button.width / 2, button.height / 2)
+        tryCompare(tip, "opened", true, 2000)
+        verify(tip.width <= Math.min(360 * data.scale, data.windowWidth - 2 * tip.margins) + 1)
+        verify(tip.contentItem.lineCount > 1)
+        const position = tip.contentItem.mapToItem(testCase, 0, 0)
+        verify(position.x >= 0 && position.y >= 0)
+        verify(position.x + tip.contentItem.width <= data.windowWidth)
+        verify(position.y + tip.contentItem.height <= testCase.Window.window.height)
+        fuzzyCompare(position.x + tip.contentItem.width / 2, data.windowWidth / 2, 1)
     }
     function test_hoverUsesThemeAndApplicationFont() {
         const tip = findChild(button, "redesignToolTip")
