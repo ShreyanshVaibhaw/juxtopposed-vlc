@@ -60,6 +60,7 @@ check_PROGRAMS = \
 	test_src_clock_clock \
 	test_src_clock_start \
 	test_src_misc_ancillary \
+	test_src_misc_log_observer \
 	test_src_misc_variables \
 	test_src_misc_actions \
 	test_src_input_stream \
@@ -807,3 +808,6 @@ endif
 
 test_src_config_language_SOURCES = src/config/language.c
 test_src_config_language_LDADD = $(LIBVLC) $(LIBVLCCORE)
+
+test_src_misc_log_observer_SOURCES = src/misc/log_observer.c
+test_src_misc_log_observer_LDADD = $(LIBVLC) $(LIBVLCCORE)

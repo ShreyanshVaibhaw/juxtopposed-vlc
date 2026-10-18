@@ -39,6 +39,7 @@
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_interface.h>
+#include <vlc_log_observer.h>
 #include <vlc_charset.h>
 #include <vlc_modules.h>
 #include "rcu.h"
@@ -287,9 +288,18 @@ static struct vlc_logger discard_log = { &discard_ops };
  *
  * A message log that can be redirected live.
  */
+struct vlc_log_subscription {
+    struct vlc_logger_switch *owner;
+    const struct vlc_logger_operations *ops;
+    void *data;
+    struct vlc_log_subscription *next;
+};
+
 struct vlc_logger_switch {
     struct vlc_logger *_Atomic backend;
     struct vlc_logger frontend;
+    vlc_mutex_t observers_lock;
+    struct vlc_log_subscription *_Atomic observers;
 };
 
 static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
@@ -302,7 +312,27 @@ static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
 
     vlc_rcu_read_lock();
     backend = atomic_load_explicit(&logswitch->backend, memory_order_acquire);
-    backend->ops->log(backend, type, item, format, ap);
+    const bool observing = atomic_load_explicit(&logswitch->observers, memory_order_acquire) != NULL;
+    if (!observing)
+        backend->ops->log(backend, type, item, format, ap);
+    else
+    {
+        // Each recipient can consume its own argument list.
+        va_list args;
+        va_copy(args, ap);
+        backend->ops->log(backend, type, item, format, args);
+        va_end(args);
+        // The list lock covers only observers, never a slow file backend.
+        vlc_mutex_lock(&logswitch->observers_lock);
+        for (struct vlc_log_subscription *observer = atomic_load_explicit(&logswitch->observers, memory_order_relaxed);
+             observer != NULL; observer = observer->next)
+        {
+            va_copy(args, ap);
+            observer->ops->log(observer->data, type, item, format, args);
+            va_end(args);
+        }
+        vlc_mutex_unlock(&logswitch->observers_lock);
+    }
     vlc_rcu_read_unlock();
 }
 
@@ -314,8 +344,21 @@ static void vlc_LogSwitchClose(void *d)
     struct vlc_logger_switch *logswitch =
         container_of(logger, struct vlc_logger_switch, frontend);
 
-    /* Discard any further messages. */
+    /* Detach observers before closing the backend, which can log messages. */
+    vlc_mutex_lock(&logswitch->observers_lock);
+    struct vlc_log_subscription *observer =
+        atomic_exchange_explicit(&logswitch->observers, NULL, memory_order_acq_rel);
+    vlc_mutex_unlock(&logswitch->observers_lock);
     vlc_LogSwitch(logger, &discard_log);
+    // LogSwitch waits for all readers, including detached observers.
+    while (observer != NULL)
+    {
+        struct vlc_log_subscription *next = observer->next;
+        if (observer->ops->destroy != NULL)
+            observer->ops->destroy(observer->data);
+        free(observer);
+        observer = next;
+    }
     free(logswitch);
 }
 
@@ -349,6 +392,8 @@ static struct vlc_logger *vlc_LogSwitchCreate(void)
 
     logswitch->frontend.ops = &switch_ops;
     atomic_init(&logswitch->backend, &discard_log);
+    atomic_init(&logswitch->observers, NULL);
+    vlc_mutex_init(&logswitch->observers_lock);
     return &logswitch->frontend;
 }
 
@@ -566,6 +611,49 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
 
     vlc_LogSwitch(vlc->obj.logger, logger);
     vlc_LogSpam(VLC_OBJECT(vlc));
+}
+
+struct vlc_log_subscription *
+vlc_LogSubscribe(libvlc_int_t *vlc, const struct vlc_logger_operations *ops, void *data)
+{
+    assert(ops != NULL && ops->log != NULL);
+    struct vlc_logger_switch *owner = container_of(vlc->obj.logger, struct vlc_logger_switch, frontend);
+    assert(vlc->obj.logger->ops == &switch_ops);
+    struct vlc_log_subscription *observer = malloc(sizeof(*observer));
+    if (observer == NULL)
+        return NULL;
+    observer->owner = owner;
+    observer->ops = ops;
+    observer->data = data;
+    vlc_mutex_lock(&owner->observers_lock);
+    observer->next = atomic_load_explicit(&owner->observers, memory_order_relaxed);
+    atomic_store_explicit(&owner->observers, observer, memory_order_release);
+    vlc_mutex_unlock(&owner->observers_lock);
+    return observer;
+}
+
+void vlc_LogUnsubscribe(struct vlc_log_subscription *observer)
+{
+    if (observer == NULL)
+        return;
+    struct vlc_logger_switch *owner = observer->owner;
+    vlc_mutex_lock(&owner->observers_lock);
+    struct vlc_log_subscription *head = atomic_load_explicit(&owner->observers, memory_order_relaxed);
+    if (head == observer)
+        atomic_store_explicit(&owner->observers, observer->next, memory_order_release);
+    else
+    {
+        struct vlc_log_subscription *previous = head;
+        while (previous != NULL && previous->next != observer)
+            previous = previous->next;
+        assert(previous != NULL);
+        previous->next = observer->next;
+    }
+    // The lock waits for active observer callbacks, but not backend I/O.
+    vlc_mutex_unlock(&owner->observers_lock);
+    if (observer->ops->destroy != NULL)
+        observer->ops->destroy(observer->data);
+    free(observer);
 }
 
 void vlc_LogDestroy(vlc_logger_t *logger)

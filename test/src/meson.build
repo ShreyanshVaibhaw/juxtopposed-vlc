@@ -1,4 +1,11 @@
 vlc_tests += {
+    'name': 'test_src_misc_log_observer',
+    'sources': files('misc/log_observer.c'),
+    'suite': ['src', 'test_src'],
+    'link_with': [libvlc, libvlccore],
+}
+
+vlc_tests += {
     'name' : 'test_src_misc_iso_language',
     'sources' : files('misc/iso_language.c'),
     'suite' : ['src', 'test_src'],

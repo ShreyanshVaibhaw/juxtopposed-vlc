@@ -73,6 +73,7 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_media_source.h \
 	../include/vlc_memstream.h \
 	../include/vlc_messages.h \
+	../include/vlc_log_observer.h \
 	../include/vlc_tracer.h \
 	../include/vlc_meta.h \
 	../include/vlc_meta_fetcher.h \

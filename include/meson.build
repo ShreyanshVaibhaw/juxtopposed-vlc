@@ -72,6 +72,7 @@ install_headers(
     'vlc_media_source.h',
     'vlc_memstream.h',
     'vlc_messages.h',
+    'vlc_log_observer.h',
     'vlc_meta.h',
     'vlc_meta_fetcher.h',
     'vlc_mime.h',
