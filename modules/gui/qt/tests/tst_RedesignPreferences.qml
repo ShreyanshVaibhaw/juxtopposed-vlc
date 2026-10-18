@@ -537,6 +537,27 @@ TestCase {
         mouseClick(slider, slider.width / 2, slider.height / 2)
         verify(store.value("timeout") >= 4900 && store.value("timeout") <= 5100)
     }
+    Component {
+        id: inlineSliderRow
+        RedesignPreferenceRow {
+            width: 784; y: 450; backend: store; optionName: "timeout"
+            label: "Delay"
+            presentation: ({editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, suffix: " s", inlineSlider: true})
+        }
+    }
+    function test_inlineSliderKeepsItsRangeAndUnitConversion() {
+        const row = createTemporaryObject(inlineSliderRow, testCase)
+        verify(row !== null)
+        wait(20)
+        verify(row.height <= 44)
+        const slider = findChild(row, "preferenceSliderEditor")
+        compare(slider.value, 1.8)
+        slider.forceActiveFocus()
+        keyClick(Qt.Key_End)
+        compare(store.value("timeout"), 10000)
+        keyClick(Qt.Key_Home)
+        compare(store.value("timeout"), 0)
+    }
     function test_numericTextShowsUnitsAndPreservesNativeScale() {
         const field = findChild(timingTextRow, "preferenceTextEditor")
         compare(field.text, "1.8")

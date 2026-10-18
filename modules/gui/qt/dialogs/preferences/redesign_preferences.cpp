@@ -805,6 +805,9 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-video-zoom"))
+        return value(QStringLiteral("autoscale")).toBool()
+            ? -std::max(1, value(QStringLiteral("fit")).toInt()) : value(QStringLiteral("zoom"));
     if (name == QLatin1String("redesign-snapshot-size")) {
         const int width = value(QStringLiteral("snapshot-width")).toInt();
         const int height = value(QStringLiteral("snapshot-height")).toInt();
@@ -909,6 +912,8 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-video-zoom"))
+        return m_edits.contains(QStringLiteral("zoom")) || m_edits.contains(QStringLiteral("fit")) || m_edits.contains(QStringLiteral("autoscale"));
     if (name == QLatin1String("redesign-snapshot-size"))
         return m_edits.contains(QStringLiteral("snapshot-width")) || m_edits.contains(QStringLiteral("snapshot-height"));
     if (name == QLatin1String("redesign-audio-passthrough"))
@@ -928,6 +933,24 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-video-zoom")) {
+        QVariantList choices{
+            QVariantMap{{QStringLiteral("label"), qtr("Fit")}, {QStringLiteral("value"), -1.0}},
+            QVariantMap{{QStringLiteral("label"), qtr("Fill window")}, {QStringLiteral("value"), -2.0}},
+            QVariantMap{{QStringLiteral("label"), qtr("Fit window width")}, {QStringLiteral("value"), -3.0}},
+            QVariantMap{{QStringLiteral("label"), qtr("Fit window height")}, {QStringLiteral("value"), -4.0}},
+            QVariantMap{{QStringLiteral("label"), qtr("1:4 Quarter")}, {QStringLiteral("value"), .25}},
+            QVariantMap{{QStringLiteral("label"), qtr("1:2 Half")}, {QStringLiteral("value"), .5}},
+            QVariantMap{{QStringLiteral("label"), qtr("1:1 Original")}, {QStringLiteral("value"), 1.0}},
+            QVariantMap{{QStringLiteral("label"), qtr("2:1 Double")}, {QStringLiteral("value"), 2.0}}
+        };
+        const auto current = value(name);
+        if (std::none_of(choices.cbegin(), choices.cend(), [&](const auto& row) { return row.toMap().value(QStringLiteral("value")).toDouble() == current.toDouble(); }))
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom (%1×)").arg(current.toDouble())}, {QStringLiteral("value"), current}});
+        return {{QStringLiteral("kind"), QStringLiteral("float")}, {QStringLiteral("choices"), choices},
+            {QStringLiteral("defaultValue"), -1.0}, {QStringLiteral("value"), current},
+            {QStringLiteral("help"), qtr("Fit scales the video to the window. Zoom ratios use the video's actual pixel size.")}};
+    }
     if (name == QLatin1String("redesign-snapshot-size")) {
         QVariantList choices{
             QVariantMap{{QStringLiteral("label"), qtr("Same as video")}, {QStringLiteral("value"), QStringLiteral("source")}}
@@ -1139,6 +1162,21 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
             choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom (%1 MiB)").arg(current / (1024. * 1024.), 0, 'g', 4)}, {QStringLiteral("value"), current}});
         result.insert(QStringLiteral("help"), qtr("Set the maximum size of each temporary file used for time-shift playback. Small uses 10 MiB, Medium uses 50 MiB and Large uses 100 MiB."));
     }
+    if (name == QLatin1String("aspect-ratio") || name == QLatin1String("crop")) {
+        const bool crop = name == QLatin1String("crop");
+        choices = {QVariantMap{{QStringLiteral("label"), crop ? qtr("None") : qtr("Automatic")}, {QStringLiteral("value"), QString()}}};
+        QStringList ratios = crop ? QStringList{QStringLiteral("16:10"), QStringLiteral("16:9"), QStringLiteral("1.85:1"), QStringLiteral("2.21:1"), QStringLiteral("2.35:1"), QStringLiteral("2.39:1"), QStringLiteral("5:3"), QStringLiteral("4:3"), QStringLiteral("5:4"), QStringLiteral("1:1")}
+            : QStringList{QStringLiteral("1:1"), QStringLiteral("4:3"), QStringLiteral("5:4"), QStringLiteral("16:9"), QStringLiteral("16:10"), QStringLiteral("2.21:1"), QStringLiteral("2.35:1"), QStringLiteral("2.39:1")};
+        ratios += value(crop ? QStringLiteral("custom-crop-ratios") : QStringLiteral("custom-aspect-ratios")).toString().split(QLatin1Char(','));
+        ratios.append(value(name).toString());
+        QSet<QString> seen{QString()};
+        for (const auto& text : ratios) {
+            const auto ratio = text.trimmed();
+            if (seen.contains(ratio)) continue;
+            seen.insert(ratio);
+            choices.append(QVariantMap{{QStringLiteral("label"), ratio}, {QStringLiteral("value"), ratio}});
+        }
+    }
     if (name == QLatin1String("equalizer-preset")) {
         choices.clear();
         choices.append(QVariantMap{{QStringLiteral("label"), qtr("None")}, {QStringLiteral("value"), QString()}});
@@ -1158,6 +1196,14 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-video-zoom")) {
+        bool valid = false;
+        const auto zoom = proposed.toDouble(&valid);
+        if (!valid || !std::isfinite(zoom) || (zoom <= 0 && (zoom > -1 || zoom < -4 || std::trunc(zoom) != zoom))) return false;
+        if (zoom < 0)
+            return stage(QStringLiteral("fit"), -zoom) && stage(QStringLiteral("autoscale"), true);
+        return stage(QStringLiteral("zoom"), zoom) && stage(QStringLiteral("fit"), 0) && stage(QStringLiteral("autoscale"), false);
+    }
     if (name == QLatin1String("redesign-snapshot-size")) {
         const auto size = proposed.toString();
         if (size == QLatin1String("custom")) return value(name) == size;

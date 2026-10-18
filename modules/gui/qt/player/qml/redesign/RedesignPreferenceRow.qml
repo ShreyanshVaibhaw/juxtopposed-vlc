@@ -51,9 +51,9 @@ ColumnLayout {
         : choices.length ? choiceEditor : textEditor
     RowLayout {
         Layout.fillWidth: true
-        Layout.minimumHeight: !available ? 0 : theme.dp(root.compact ? 52 : root.editor === "startup-volume" ? 92 : root.editor === "slider" ? 68 : root.choices.length ? 46 : root.description.kind === "bool" ? 42 : 48)
+        Layout.minimumHeight: !available ? 0 : theme.dp(root.compact ? 52 : root.editor === "startup-volume" ? 92 : root.editor === "slider" ? root.presentation.inlineSlider ? 42 : 68 : root.choices.length ? 46 : root.description.kind === "bool" ? 42 : 48)
         spacing: theme.dp(10)
-        implicitHeight: available ? Math.max(theme.dp(44), labelText.implicitHeight + theme.dp(10)) : 0
+        implicitHeight: available ? Math.max(theme.dp(root.presentation.inlineSlider ? 42 : 44), labelText.implicitHeight + theme.dp(10)) : 0
         Item {
             id: labelArea
             Layout.fillWidth: true; Layout.preferredWidth: 1
@@ -72,7 +72,7 @@ ColumnLayout {
                 name: "info"; color: theme.foreground; opacity: 0.4
                 width: theme.dp(16); height: width
                 x: labelText.width + theme.dp(8); anchors.verticalCenter: parent.verticalCenter
-                visible: !!root.description.help && !root.compact
+                visible: !!root.description.help && !root.compact && !root.presentation.hideHelp
             }
             RedesignToolTip { theme: root.theme; text: root.description.help || ""; visible: rowHover.hovered && text.length > 0; delay: 500 }
             RedesignButton {
@@ -345,7 +345,7 @@ ColumnLayout {
     Component {
         id: sliderEditor
         ColumnLayout {
-            implicitHeight: theme.dp(48)
+            implicitHeight: theme.dp(root.presentation.inlineSlider ? 34 : 48)
             spacing: theme.dp(2)
             C.Slider {
                 id: slider
@@ -357,6 +357,12 @@ ColumnLayout {
                 stepSize: root.presentation.step || (root.description.kind === "integer" ? 1 : 0.01)
                 value: Number(root.currentValue) * root.factor
                 Accessible.name: root.label || root.description.title
+                Keys.onPressed: event => {
+                    if (event.key !== Qt.Key_Home && event.key !== Qt.Key_End) return
+                    const value = (event.key === Qt.Key_Home ? from : to) / root.factor
+                    root.commit(root.description.kind === "integer" ? Math.round(value) : value)
+                    event.accepted = true
+                }
                 background: Rectangle {
                     x: slider.leftPadding; y: (slider.height - height) / 2
                     width: slider.availableWidth; height: theme.dp(14); radius: theme.dp(5); color: theme.field
@@ -370,6 +376,15 @@ ColumnLayout {
                         width: Math.abs(slider.visualPosition - origin) * parent.width
                         height: parent.height; radius: parent.radius; color: theme.progress
                     }
+                    Repeater {
+                        model: root.presentation.trackTicks || []
+                        Rectangle {
+                            required property real modelData
+                            width: theme.dp(1); height: theme.dp(7); anchors.verticalCenter: parent.verticalCenter
+                            x: slider.handle.width / 2 + (modelData - slider.from) / (slider.to - slider.from) * (parent.width - slider.handle.width)
+                            color: theme.background
+                        }
+                    }
                 }
                 handle: Rectangle {
                     x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
@@ -382,7 +397,7 @@ ColumnLayout {
                 RedesignToolTip { theme: root.theme; text: Number(parent.value).toFixed(root.presentation.decimals || 0) + (root.presentation.suffix || ""); visible: parent.hovered || parent.pressed; delay: 0 }
             }
             RowLayout {
-                visible: !root.presentation.ticks
+                visible: !root.presentation.inlineSlider && !root.presentation.ticks
                 Layout.fillWidth: true
                 Text { text: slider.from + (root.presentation.suffix || ""); color: theme.foreground; font.pixelSize: theme.dp(11) }
                 Text { Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; text: Number(slider.value).toFixed(root.presentation.decimals || 0) + (root.presentation.suffix || ""); color: theme.foreground; font.pixelSize: theme.dp(11) }
@@ -390,7 +405,7 @@ ColumnLayout {
             }
             Item {
                 Layout.fillWidth: true; Layout.preferredHeight: theme.dp(14)
-                visible: !!root.presentation.ticks
+                visible: !root.presentation.inlineSlider && !!root.presentation.ticks
                 Repeater {
                     model: root.presentation.ticks || []
                     Text {
