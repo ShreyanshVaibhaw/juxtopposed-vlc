@@ -173,6 +173,7 @@ EXTRA_PROGRAMS = \
 	$(NULL)
 
 EXTRA_DIST = \
+	bin/cachegen.py \
 	modules/lua/extensions/extensions.lua \
 	modules/lua/playlist/playlist.lua \
 	samples/certs/certkey.pem \

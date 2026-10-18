@@ -120,7 +120,7 @@ vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
 	../compat/libcompat.la \
-	../lib/libvlc.la
+	../lib/libvlc.la ../src/libvlccore.la
 if HAVE_WIN32
 vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
 vlc_cache_gen_LDFLAGS = -Wc,-static

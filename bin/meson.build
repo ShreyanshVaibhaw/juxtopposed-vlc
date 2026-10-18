@@ -73,12 +73,25 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
 
     vlc_cache_gen_dep = executable('vlc-cache-gen',
         ['cachegen.c'] + vlc_win_extra,
-        link_with: [vlc_libcompat, libvlc],
+        link_with: [vlc_libcompat, libvlc, libvlccore],
         link_args: gc_sections_linkargs,
         include_directories: [vlc_include_dirs],
         install: true,
         install_dir: pkglibexecdir_path,
     )
+
+    if get_option('tests').allowed() and not meson.is_cross_build() and host_system != 'windows'
+        cache_test_python = find_program('python3', required: false)
+        if cache_test_python.found()
+            cache_test_args = [files('../test/bin/cachegen.py'), vlc_cache_gen_dep]
+            if vlc_plugins_targets.has_key('dummy')
+                cache_test_args += ['--plugin', vlc_plugins_targets['dummy']]
+            endif
+            test('cachegen-verified', cache_test_python,
+                args: cache_test_args,
+                suite: 'bin', timeout: 60)
+        endif
+    endif
 
     if not meson.is_cross_build() or find_program('exe_wrapper', required: false).found()
     plugins_dat  = custom_target('plugins.dat',
