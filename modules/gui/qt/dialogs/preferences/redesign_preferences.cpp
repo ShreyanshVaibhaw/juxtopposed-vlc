@@ -1376,6 +1376,18 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
             && value(name).toBool() != (directoryDepth(m_ctx) != VLC_PLAYLIST_PREPARSING_DISABLED));
         result.insert(QStringLiteral("help"), qtr("Read file information for items added to the queue. Restart VLC after a change."));
     }
+    if (name == QLatin1String("one-instance")) {
+        auto* instance = m_ctx ? vlc_object_instance(m_ctx->getIntf()) : nullptr;
+        const bool listening = instance && var_Type(instance, "single-instance-listening") != 0
+            && var_GetBool(instance, "single-instance-listening");
+        result.insert(QStringLiteral("restartRequired"), m_ctx && m_singleInstanceEdited
+            && value(name).toBool() && !listening);
+        result.insert(QStringLiteral("help"), qtr("Use one VLC window for app launches. The file manager option also includes files opened from the file manager. Close all VLC windows and start VLC again after you turn this on. Command-line options can override these settings."));
+    }
+    if (name == QLatin1String("one-instance-when-started-from-file"))
+        result.insert(QStringLiteral("help"), qtr("Use the same VLC window for files opened from the file manager."));
+    if (name == QLatin1String("playlist-enqueue"))
+        result.insert(QStringLiteral("help"), qtr("Keep the current item playing and add new files to the queue. Otherwise, start the new files."));
     result.insert(QStringLiteral("kind"), kind);
     result.insert(QStringLiteral("choices"), choices);
     return result;
@@ -1636,6 +1648,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
     m_invalid.remove(name);
     if (name == QLatin1String("media-library-startup")) m_libraryStartupEdited = true;
     if (name == QLatin1String("auto-preparse")) m_autoPreparseEdited = true;
+    if (name == QLatin1String("one-instance")) m_singleInstanceEdited = true;
     if (isBufferingOption(name) && !value(QStringLiteral("qt-buffering-custom")).toBool())
         stage(QStringLiteral("qt-buffering-custom"), true);
     if (QStringList{QStringLiteral("hue"), QStringLiteral("brightness"), QStringLiteral("contrast"), QStringLiteral("saturation"), QStringLiteral("gamma")}.contains(name))

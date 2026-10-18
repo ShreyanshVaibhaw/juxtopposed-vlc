@@ -284,7 +284,7 @@ ColumnLayout {
                 anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
                 width: theme.dp(64); height: theme.dp(30)
                 objectName: "preferenceToggleEditor"
-                checkable: true; checked: !!root.displayedValue
+                checkable: true; checked: !!root.displayedValue && (root.editorEnabled || !root.presentation.hideDisabledValue)
                 text: root.label || root.description.title
                 onClicked: root.commit(checked)
                 background: Rectangle {

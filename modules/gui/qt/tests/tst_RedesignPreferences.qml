@@ -67,6 +67,44 @@ TestCase {
         visible: false
     }
     RedesignPreferencesCatalog { id: catalog }
+    Column {
+        id: instanceControls
+        width: 784; y: 350; z: 40; visible: false
+        Repeater {
+            model: catalog.sections.library[0].rows.slice(0, 3)
+            RedesignPreferenceRow {
+                required property var modelData
+                objectName: "instanceRow_" + modelData[0]
+                width: parent.width; backend: store; optionName: modelData[0]; label: modelData[1]
+                presentation: modelData[2] || {}
+            }
+        }
+    }
+    function test_instanceMasterShowsInactiveChoicesWithoutLosingThem() {
+        store.values = Object.assign({}, store.values, {"one-instance": false,
+            "one-instance-when-started-from-file": true, "playlist-enqueue": true})
+        store.revision++; instanceControls.visible = true
+        verify(waitForRendering(instanceControls))
+        const toggle = name => findChild(findChild(instanceControls, "instanceRow_" + name), "preferenceToggleEditor")
+        const master = toggle("one-instance"), files = toggle("one-instance-when-started-from-file"), queue = toggle("playlist-enqueue")
+        verify(!master.checked); verify(!files.enabled); verify(!queue.enabled)
+        verify(!files.checked); verify(!queue.checked)
+        verify(store.value("one-instance-when-started-from-file")); verify(store.value("playlist-enqueue"))
+        mouseClick(master)
+        verify(files.enabled); verify(queue.enabled); verify(files.checked); verify(queue.checked)
+        mouseClick(files)
+        verify(!store.value("one-instance-when-started-from-file"))
+        mouseClick(master)
+        verify(!files.enabled); verify(!queue.checked); verify(store.value("playlist-enqueue"))
+        mouseClick(master)
+        verify(files.enabled); verify(!files.checked); verify(queue.checked)
+    }
+    function test_instanceSearchIncludesItsMasterSwitch() {
+        const results = catalog.searchResults("file manager", [])
+        compare(results.length, 2)
+        compare(results[0].name, "one-instance")
+        compare(results[1].name, "one-instance-when-started-from-file")
+    }
     function test_castDiscoveryUsesTheCastingSection() {
         const section = catalog.sections.recording.find(section => section.title === "Casting")
         compare(section.rows[0][0], "qt-discover-cast-devices")
@@ -490,6 +528,7 @@ TestCase {
     SignalSpy { id: confirmationAccepted; target: confirmation; signalName: "accepted" }
     SignalSpy { id: confirmationRejected; target: confirmation; signalName: "rejected" }
     function init() {
+        instanceControls.visible = false
         startupRow.visible = false
         startupStore.metadata.restartRequired = false; startupStore.savedValue = true; startupStore.revision++
         cacheControls.visible = false

@@ -82,6 +82,7 @@ signals:
 private:
     bool m_libraryStartupEdited = false;
     bool m_autoPreparseEdited = false;
+    bool m_singleInstanceEdited = false;
     struct Entry { QString name, category, title; };
     QString audioOutputModule() const;
     QVariantList audioDeviceChoices() const;
