@@ -25,6 +25,7 @@
 #include <QKeyEvent>
 #include <QRegularExpression>
 #include <QCollator>
+#include <QLocale>
 #include <QMap>
 #include <QDir>
 #include <QFileInfo>
@@ -70,6 +71,57 @@ QVariantList moduleChoices(const QStringList& capabilities)
             b.toMap().value(QStringLiteral("label")).toString()) < 0;
     });
     return choices;
+}
+
+const QVariantList& installedInterfaceLanguages()
+{
+    // Catalogs are installed outside the running app. Refresh on the next
+    // launch, rather than probing every file again on each preferences edit.
+    static const QVariantList installed = [] {
+        QVariantList rows{{QVariantMap{{QStringLiteral("label"), QStringLiteral("English")},
+                                      {QStringLiteral("value"), QStringLiteral("en")}}}};
+#ifdef ENABLE_NLS
+        char *path = config_GetSysPath(VLC_LOCALE_DIR, nullptr);
+        const QDir directory(qfu(path ? path : ""));
+        const bool havePath = path != nullptr;
+        free(path);
+        for (const auto& code : havePath ? directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot) : QStringList{}) {
+            if (code == QLatin1String("en")) continue;
+            const auto catalog = directory.filePath(code + QStringLiteral("/LC_MESSAGES/")
+                + QStringLiteral(PACKAGE_NAME) + QStringLiteral(".mo"));
+            const QFileInfo file(catalog);
+            if (!file.isFile() || !file.isReadable()) continue;
+            const QLocale locale(code);
+            QString label;
+            if (locale.language() != QLocale::C) {
+                label = locale.nativeLanguageName();
+                if (code.contains(QLatin1Char('_')) || code.contains(QLatin1Char('-')))
+                    label += QStringLiteral(" (%1)").arg(locale.nativeTerritoryName());
+            } else {
+                const auto* language = vlc_find_iso639(code.toUtf8().constData(), true);
+                label = language ? qfu(language->psz_eng_name) : code;
+            }
+            if (!label.isEmpty()) label[0] = label[0].toUpper();
+            rows.append(QVariantMap{{QStringLiteral("label"), label}, {QStringLiteral("value"), code}});
+        }
+#endif
+        QCollator collator;
+        collator.setCaseSensitivity(Qt::CaseInsensitive);
+        std::sort(rows.begin(), rows.end(), [&](const auto& a, const auto& b) {
+            return collator.compare(a.toMap().value(QStringLiteral("label")).toString(),
+                b.toMap().value(QStringLiteral("label")).toString()) < 0;
+        });
+        return rows;
+    }();
+    return installed;
+}
+
+bool installedInterfaceLanguage(const QString& code)
+{
+    return code == QLatin1String("auto") || std::any_of(installedInterfaceLanguages().cbegin(),
+        installedInterfaceLanguages().cend(), [&](const auto& row) {
+            return row.toMap().value(QStringLiteral("value")).toString() == code;
+        });
 }
 
 vlc_playlist_preparsing directoryDepth(const QString& value)
@@ -975,6 +1027,17 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("language")) {
+        QString selected = m_edits.contains(name) ? m_edits.value(name).toString() : read("language").toString();
+        if (selected.isEmpty()) {
+            if (m_ctx && var_InheritBool(m_ctx->getIntf(), "ignore-config")) return QStringLiteral("auto");
+            const char* args[] = {"--language="};
+            char* legacy = config_GetInterfaceLanguage(1, args);
+            selected = qfu(legacy ? legacy : "auto");
+            free(legacy);
+        }
+        return selected.isEmpty() ? QStringLiteral("auto") : selected;
+    }
     if (name == QLatin1String("redesign-postprocessing")) {
         const auto *cfg = config_FindConfig("postproc-q");
         if (!cfg) return {};
@@ -1600,6 +1663,16 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         }
     }
     result.insert(QStringLiteral("editor"), editor);
+    if (name == QLatin1String("language")) {
+        choices = installedInterfaceLanguages();
+        choices.prepend(QVariantMap{{QStringLiteral("label"), qtr("System language")}, {QStringLiteral("value"), QStringLiteral("auto")}});
+        const auto current = value(name).toString();
+        if (!installedInterfaceLanguage(current))
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("Saved language (%1)").arg(current)}, {QStringLiteral("value"), current}});
+        result.insert(QStringLiteral("editor"), QStringLiteral("choice"));
+        result.insert(QStringLiteral("defaultValue"), QStringLiteral("auto"));
+        result.insert(QStringLiteral("help"), qtr("Choose a language for the interface. Restart VLC after a change. Text without a translation is shown in English. Launch options can override this setting."));
+    }
     if (name == QLatin1String("codec") || name == QLatin1String("sout-transcode-venc")
         || name == QLatin1String("sout-transcode-aenc") || name == QLatin1String("sout-transcode-senc")) {
         const bool decoder = name == QLatin1String("codec");
@@ -1958,6 +2031,14 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         m_error = qtr("Enter VLC options only. Check the option names and quotation marks.");
         ++m_revision; emit changed(); return false;
     }
+    if (valid && name == QLatin1String("language")) {
+        const auto selected = normalized.toString();
+        if (!installedInterfaceLanguage(selected) && selected != value(name).toString()) {
+            m_invalid.insert(name);
+            m_error = qtr("Choose a language from the list.");
+            ++m_revision; emit changed(); return false;
+        }
+    }
     if (!valid) {
         m_invalid.insert(name);
         m_error = qtr("Enter a value within the allowed range.");
@@ -2030,6 +2111,7 @@ void RedesignPreferences::cancelLanguageEdit(const QString& name)
 
 void RedesignPreferences::reset(const QString& name)
 {
+    if (name == QLatin1String("language")) { stage(name, QStringLiteral("auto")); return; }
     if (name == QLatin1String("redesign-postprocessing")) {
         reset(QStringLiteral("postproc-q"));
         stage(name, 0);
@@ -2370,6 +2452,9 @@ bool RedesignPreferences::resetAll()
     };
     if (!uiSettings.isWritable()) return failed();
     config_ResetAll();
+    // Make the system-language reset explicit so a legacy platform choice
+    // cannot return when the new preference has its empty migration default.
+    config_PutPsz("language", "auto");
     if (config_SaveConfigFile(intf) != 0) {
         restore();
         return failed();

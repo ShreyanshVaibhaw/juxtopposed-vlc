@@ -1023,7 +1023,9 @@ static void *Thread( void *obj )
 
     /* Set application direction to locale direction,
      * necessary for  RTL locales */
-    app.setLayoutDirection(QLocale().textDirection());
+    // Follow the translation that was actually loaded, including English
+    // fallback when the system uses an unavailable right-to-left language.
+    app.setLayoutDirection(QLocale(qfu(vlc_gettext("C"))).textDirection());
 
     /* All the settings are in the .conf/.ini style */
 #ifdef _WIN32

@@ -622,7 +622,9 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     NSUInteger sel = 0;
     const char *pref = NULL;
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
-    pref = [[defaults objectForKey:@"language"] UTF8String];
+    char *configuredLanguage = config_GetPsz("language");
+    pref = configuredLanguage && *configuredLanguage ? configuredLanguage
+        : [[defaults objectForKey:@"language"] UTF8String];
     for (size_t x = 0; x < ARRAY_SIZE(language_map); x++) {
         [_intf_languagePopup addItemWithTitle:toNSStr(language_map[x].name)];
         if (pref) {
@@ -631,6 +633,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
         }
     }
     [_intf_languagePopup selectItemAtIndex:sel];
+    free(configuredLanguage);
 
     [self setupButton:_intf_continueplaybackPopup forIntList: "macosx-continue-playback"];
     if (!var_InheritBool(p_intf, "macosx-recentitems")) {
@@ -971,6 +974,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
         NSUInteger index = [_intf_languagePopup indexOfSelectedItem];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:toNSStr(language_map[index].iso) forKey:@"language"];
+        config_PutPsz("language", language_map[index].iso);
         [VLCSimplePrefsController updateRightToLeftSettings];
 
         const BOOL originalDisplayTrackNumberSetting = [defaults boolForKey:VLCDisplayTrackNumberPlayQueueKey];

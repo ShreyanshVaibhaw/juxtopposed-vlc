@@ -708,19 +708,15 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.langCombo->addItem( qfu( language_map[i].name ), language_map[i].iso );
             connect( ui.langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SPrefsPanel::langChanged );
 
-            HKEY h_key;
-            char *langReg = NULL;
-            if( RegOpenKeyEx( HKEY_CURRENT_USER, TEXT("Software\\VideoLAN\\VLC\\"), 0, KEY_READ, &h_key )
-                    == ERROR_SUCCESS )
-            {
-                WCHAR szData[256];
-                DWORD len = 256;
-                if( RegQueryValueEx( h_key, TEXT("Lang"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
-                    langReg = FromWide( szData );
-                    ui.langCombo->setCurrentIndex( ui.langCombo->findData(qfu(langReg)) );
-                }
-            }
-            free( langReg);
+            char *configured = config_GetPsz("language");
+            const char* legacyArgs[] = {"--language="};
+            char *legacy = configured && *configured ? nullptr : config_GetInterfaceLanguage(1, legacyArgs);
+            const QString selected = qfu(configured && *configured ? configured : legacy ? legacy : "auto");
+            int index = ui.langCombo->findData(selected);
+            if (index < 0) { ui.langCombo->addItem(selected, selected); index = ui.langCombo->count() - 1; }
+            ui.langCombo->setCurrentIndex(index);
+            free(configured);
+            free(legacy);
 #endif
 
 //            ui.defaultLabel->setFont( italicFont );
@@ -1378,14 +1374,14 @@ void SPrefsPanel::configML()
 #include "util/registry.hpp"
 
 void SPrefsPanel::cleanLang() {
-    QVLCRegistry qvReg( HKEY_CURRENT_USER );
-    qvReg.DeleteValue( "Software\\VideoLAN\\VLC\\", "Lang" );
-    qvReg.DeleteKey( "Software\\VideoLAN\\", "VLC" );
-    qvReg.DeleteKey( "Software\\", "VideoLAN" );
+    QSettings language(QStringLiteral("HKEY_CURRENT_USER\\Software\\VideoLAN\\VLC"), QSettings::NativeFormat);
+    language.remove(QStringLiteral("Lang"));
+    language.sync();
 }
 
 void SPrefsPanel::saveLang() {
     if( !lang ) return;
+    config_PutPsz("language", lang);
 
     if( !strncmp( lang, "auto", 4 ) ) {
         cleanLang();
