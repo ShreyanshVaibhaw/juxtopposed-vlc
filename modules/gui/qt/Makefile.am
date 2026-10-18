@@ -372,6 +372,7 @@ libqt_plugin_la_SOURCES = \
 	util/vlchotkeyconverter.cpp util/vlchotkeyconverter.hpp \
 	util/postprocessing_preferences.hpp \
 	util/file_log_preferences.hpp \
+	util/video_window_geometry.hpp \
 	util/vlctick.cpp \
 	util/vlctick.hpp \
 	util/shared_input_item.hpp \
@@ -2153,6 +2154,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_video_window_geometry
+
+test_video_window_geometry_SOURCES = tests/test_video_window_geometry.cpp util/video_window_geometry.hpp
+nodist_test_video_window_geometry_SOURCES = tests/test_video_window_geometry.moc
+BUILT_SOURCES += tests/test_video_window_geometry.moc
+CLEANFILES += tests/test_video_window_geometry.moc
+test_video_window_geometry_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_video_window_geometry_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_video_window_geometry_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_video_window_geometry_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_video_window_geometry
+TESTS += test_video_window_geometry
 
 # test_tray_notification_policy
 

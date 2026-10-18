@@ -535,6 +535,7 @@ qt_plugin_sources = files(
     'util/vlchotkeyconverter.hpp',
     'util/postprocessing_preferences.hpp',
     'util/file_log_preferences.hpp',
+    'util/video_window_geometry.hpp',
     'util/shared_input_item.hpp',
     'util/fast_gaussian_blur_template.h',
     'util/effects_image_provider.cpp',
@@ -1792,6 +1793,16 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_video_window_geometry',
+            'sources': files('tests/test_video_window_geometry.cpp'),
+            'moc_sources': files('tests/test_video_window_geometry.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
         }
 
         vlc_tests += {

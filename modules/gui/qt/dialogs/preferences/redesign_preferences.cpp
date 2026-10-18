@@ -1192,7 +1192,7 @@ QVariant RedesignPreferences::value(const QString& name) const
 
     const auto it = m_edits.constFind(name);
     if (it != m_edits.cend()) return *it;
-    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose")))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("qt-video-autoresize")))
         return var_InheritBool(m_ctx->getIntf(), name.toUtf8().constData());
     if (m_ctx && name == QLatin1String("qt-system-tray"))
         return m_ctx->systrayRequested();
@@ -1768,6 +1768,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         result.insert(QStringLiteral("help"), qtr("Change the opacity of the control backgrounds in fullscreen. The text and icons stay clear."));
     if (name == QLatin1String("qt-fs-sensitivity"))
         result.insert(QStringLiteral("help"), qtr("Minimum pointer movement in pixels before fullscreen controls appear near an edge. A smaller value increases sensitivity."));
+    if (name == QLatin1String("qt-video-autoresize"))
+        result.insert(QStringLiteral("help"), qtr("Select Never to keep the window size. Select Always to resize the window when a video opens. Fullscreen and maximized windows keep their size. Audio visualizers do not change the window size."));
     if (name == QLatin1String("qt-minimal-view"))
         result.insert(QStringLiteral("help"), qtr("Start VLC in compact mode. Restart VLC after a change. Launch options can override this setting."));
     if (name == QLatin1String("qt-verbose"))
@@ -2203,7 +2205,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
-    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose")))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("qt-video-autoresize")))
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("qt-system-tray"))
         applyToPlayer = normalized.toBool() != value(name).toBool();
@@ -2330,7 +2332,7 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray", "qt-video-autoresize"}) {
         if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -2642,7 +2644,7 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray", "qt-video-autoresize"}) {
         if (var_Type(intf, option) == 0)
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));

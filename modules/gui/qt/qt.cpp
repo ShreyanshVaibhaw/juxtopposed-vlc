@@ -159,10 +159,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                "your taskbar." )
 
 #define KEEPSIZE_TEXT N_( "Resize interface to the native video size" )
-#define KEEPSIZE_LONGTEXT N_( "You have two choices:\n" \
-            " - The interface will resize to the native video size\n" \
-            " - The video will fit to the interface size\n " \
-            "By default, interface resize to the native video size." )
+#define KEEPSIZE_LONGTEXT N_( "Keep the window size or resize it to fit each video. " \
+            "Audio visualizations do not change the window size." )
 
 #define TITLE_TEXT N_( "Show playing item name in window title" )
 #define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
@@ -401,7 +399,7 @@ vlc_module_begin ()
                           nullptr )
         change_volatile()
 
-    add_bool( "qt-video-autoresize", true, KEEPSIZE_TEXT,
+    add_bool( "qt-video-autoresize", false, KEEPSIZE_TEXT,
               KEEPSIZE_LONGTEXT )
     add_bool( "qt-name-in-title", true, TITLE_TEXT,
               TITLE_LONGTEXT )
