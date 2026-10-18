@@ -28,6 +28,9 @@
 #import "main/VLCMain.h"
 #import "windows/addons/VLCAddonListItem.h"
 
+/* Keep manual interface loading available outside the add-on catalog. */
+static const BOOL showInterfaceAddons = NO;
+
 @interface VLCAddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
     addons_manager_t *_manager;
@@ -106,8 +109,10 @@ static void addonChangedCallback( addons_manager_t *manager,
     [[_typeSwitcher lastItem] setTag:ADDON_PLAYLIST_PARSER];
     [_typeSwitcher addItemWithTitle:_NS("Service Discovery")];
     [[_typeSwitcher lastItem] setTag:ADDON_SERVICE_DISCOVERY];
-    [_typeSwitcher addItemWithTitle:_NS("Interfaces")];
-    [[_typeSwitcher lastItem] setTag:ADDON_INTERFACE];
+    if (showInterfaceAddons) {
+        [_typeSwitcher addItemWithTitle:_NS("Interfaces")];
+        [[_typeSwitcher lastItem] setTag:ADDON_INTERFACE];
+    }
     [_typeSwitcher addItemWithTitle:_NS("Art and meta fetchers")];
     [[_typeSwitcher lastItem] setTag:ADDON_META];
     [_typeSwitcher addItemWithTitle:_NS("Extensions")];
@@ -251,7 +256,8 @@ static void addonChangedCallback( addons_manager_t *manager,
 - (void)addAddon:(VLCAddonListItem *)entry
 {
     /* no skin support on OS X so far */
-    if ([entry type] != ADDON_SKIN2)
+    if ([entry type] != ADDON_SKIN2
+        && ([entry type] != ADDON_INTERFACE || showInterfaceAddons))
         [_addons addObject:entry];
 }
 
