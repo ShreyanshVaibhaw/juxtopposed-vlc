@@ -338,6 +338,19 @@ TestCase {
         resizeRow.presentation = previous
         store.providedHelp = ""; verify(!icon.visible)
     }
+    function test_resetTooltipDoesNotOverlapSettingHelp() {
+        store.providedHelp = "Help for this setting."
+        const help = findChild(resizeRow, "redesignToolTip")
+        const reset = findChild(resizeRow, "preferenceResetButton")
+        const resetHelp = findChild(reset, "redesignToolTip")
+        mouseMove(resizeRow, 40, 20); tryCompare(help, "visible", true)
+        mouseMove(reset, reset.width / 2, reset.height / 2); wait(50)
+        verify(!help.visible); tryCompare(resetHelp, "visible", true)
+        reset.forceActiveFocus(Qt.TabFocusReason)
+        mouseMove(resizeRow, 40, 20); wait(50)
+        verify(reset.visualFocus); verify(!help.visible); verify(resetHelp.visible)
+        testCase.forceActiveFocus(); mouseMove(testCase, 899, 599)
+    }
     function test_advancedAudioSeparatesQualityFromResampler() {
         const section = catalog.advancedSections.audio[0]
         compare(section.title, "")

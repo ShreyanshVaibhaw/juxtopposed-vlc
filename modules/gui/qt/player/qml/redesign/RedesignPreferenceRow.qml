@@ -77,8 +77,9 @@ ColumnLayout {
                 x: labelText.width + theme.dp(8); anchors.verticalCenter: parent.verticalCenter
                 visible: root.helpText.length > 0 && !root.compact && !root.presentation.hideHelp
             }
-            RedesignToolTip { theme: root.theme; text: root.helpText; visible: rowHover.hovered && text.length > 0; delay: 500 }
+            RedesignToolTip { theme: root.theme; text: root.helpText; visible: rowHover.hovered && !resetButton.hovered && !resetButton.visualFocus && text.length > 0; delay: 500 }
             RedesignButton {
+                id: resetButton
                 objectName: "preferenceResetButton"
                 anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
