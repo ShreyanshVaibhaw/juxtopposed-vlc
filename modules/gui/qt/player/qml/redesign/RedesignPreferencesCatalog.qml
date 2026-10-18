@@ -194,7 +194,13 @@ QtObject {
                 {label: qsTr("Automatic"), value: 2}, {label: qsTr("Left to right"), value: 0},
                 {label: qsTr("Right to left"), value: 1}]}],
             ["freetype-monofont", qsTr("Monospace font"), {placeholder: qsTr("System monospace")}] ] } ],
-        performance: [ {title: qsTr("Developer"), rows: [ ["encoder", qsTr("Encoder")], ["decoder", qsTr("Decoder")], ["clock-synchro", qsTr("Clock synchronisation")], ["clock-jitter", qsTr("Clock jitter (ms)")], ["clock-average", qsTr("Clock reference averaging")] ] } ],
+        performance: [ {title: qsTr("Developer"), rows: [
+            ["sout-transcode-venc", qsTr("Video encoder"), {dynamicChoices: true, emptyChoiceValue: "none"}],
+            ["sout-transcode-aenc", qsTr("Audio encoder"), {dynamicChoices: true, emptyChoiceValue: "none"}],
+            ["sout-transcode-senc", qsTr("Subtitle encoder"), {dynamicChoices: true, emptyChoiceValue: "none"}],
+            ["codec", qsTr("Decoder"), {dynamicChoices: true, emptyChoiceValue: "any"}],
+            ["clock-synchro", qsTr("Clock synchronisation")], ["clock-jitter", qsTr("Clock jitter"), {suffix: " ms"}],
+            ["cr-average", qsTr("Clock reference averaging")] ] } ],
         library: [ {title: "", rows: [ ["ignore-filetypes", qsTr("Ignore file types")], ["auto-preparse", qsTr("Read file metadata automatically"), {dynamicChoices: true}] ] } ],
         network: [ {title: "", rows: [ ["http-reconnect", qsTr("Reconnect automatically")], ["http-user-agent", qsTr("User agent")], ["ipv4-timeout", qsTr("Connection timeout (ms)")] ] } ]
     })

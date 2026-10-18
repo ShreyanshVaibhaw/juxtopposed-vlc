@@ -25,6 +25,7 @@
 #include <QKeyEvent>
 #include <QRegularExpression>
 #include <QCollator>
+#include <QMap>
 #include <QDir>
 #include <QFileInfo>
 #include <QSettings>
@@ -42,6 +43,34 @@
 
 namespace {
 const QString presetOption = QStringLiteral("qt-player-presets");
+
+QVariantList moduleChoices(const QStringList& capabilities)
+{
+    QMap<QString, QStringList> labels;
+    size_t count = 0;
+    auto** modules = module_list_get(&count);
+    for (size_t i = 0; i < count; ++i) {
+        auto* module = modules[i];
+        if (!capabilities.contains(qfu(module_get_capability(module)))) continue;
+        const auto id = qfu(module_get_object(module));
+        if (id == QLatin1String("unnamed") || id == QLatin1String("any") || id == QLatin1String("none")) continue;
+        auto& names = labels[id];
+        const auto label = qtr(module_GetLongName(module));
+        if (!names.contains(label)) names.append(label);
+    }
+    module_list_free(modules);
+    QVariantList choices;
+    for (auto it = labels.cbegin(); it != labels.cend(); ++it)
+        choices.append(QVariantMap{{QStringLiteral("value"), it.key()},
+            {QStringLiteral("label"), QStringLiteral("%1 (%2)").arg(it.value().join(QStringLiteral(" / ")), it.key())}});
+    QCollator collator;
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+    std::sort(choices.begin(), choices.end(), [&](const auto& a, const auto& b) {
+        return collator.compare(a.toMap().value(QStringLiteral("label")).toString(),
+            b.toMap().value(QStringLiteral("label")).toString()) < 0;
+    });
+    return choices;
+}
 
 vlc_playlist_preparsing directoryDepth(const QString& value)
 {
@@ -1571,6 +1600,31 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         }
     }
     result.insert(QStringLiteral("editor"), editor);
+    if (name == QLatin1String("codec") || name == QLatin1String("sout-transcode-venc")
+        || name == QLatin1String("sout-transcode-aenc") || name == QLatin1String("sout-transcode-senc")) {
+        const bool decoder = name == QLatin1String("codec");
+        const auto capabilities = decoder
+            ? QStringList{QStringLiteral("video decoder"), QStringLiteral("audio decoder"), QStringLiteral("spu decoder")}
+            : QStringList{name == QLatin1String("sout-transcode-venc") ? QStringLiteral("video encoder")
+                : name == QLatin1String("sout-transcode-aenc") ? QStringLiteral("audio encoder") : QStringLiteral("spu encoder")};
+        choices = moduleChoices(capabilities);
+        const auto current = value(name).toString();
+        const auto automatic = decoder || current == QLatin1String("any") ? QStringLiteral("any") : QStringLiteral("none");
+        choices.prepend(QVariantMap{{QStringLiteral("label"), qtr("Automatic")}, {QStringLiteral("value"), automatic}});
+        if (!current.isEmpty() && std::none_of(choices.cbegin(), choices.cend(), [&](const auto& row) {
+            return row.toMap().value(QStringLiteral("value")).toString() == current;
+        })) choices.append(QVariantMap{{QStringLiteral("label"), decoder ? qtr("Saved list (%1)").arg(current)
+            : qtr("Saved encoder (%1)").arg(current)}, {QStringLiteral("value"), current}});
+        result.insert(QStringLiteral("help"), decoder
+            ? qtr("Select the decoder to try first. Automatic lets VLC select it. Open the file again after a change.")
+            : qtr("VLC uses this encoder for conversion and streaming. It must support the output format. An output profile can override this choice."));
+    }
+    if (name == QLatin1String("clock-synchro"))
+        result.insert(QStringLiteral("help"), qtr("Control input clock synchronization for live streams. Default uses the source settings. Open the stream again after a change."));
+    if (name == QLatin1String("clock-jitter"))
+        result.insert(QStringLiteral("help"), qtr("Set the maximum variation in input delay that VLC can correct, in milliseconds. Open the file or stream again after a change."));
+    if (name == QLatin1String("cr-average"))
+        result.insert(QStringLiteral("help"), qtr("Set the number of clock samples used to smooth timing changes. Higher values give a slower response. The input buffer also affects this value. Open the file or stream again after a change."));
     if (name == QLatin1String("media-library-startup")) {
         const bool supported = module_exists("medialibrary");
         result.insert(QStringLiteral("supported"), supported);
