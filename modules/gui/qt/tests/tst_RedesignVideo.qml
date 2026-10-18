@@ -348,11 +348,13 @@ TestCase {
         choice.currentIndex = 3
         choice.activated(3)
         video.width = 240
+        verify(waitForRendering(video))
         tryCompare(choice.contentItem, "truncated", true)
         const point = choice.mapToItem(row, choice.width, 0)
         verify(point.x <= row.width + 1)
         const tooltip = findChild(choice, "redesignToolTip")
         video.y = 200 - choice.mapToItem(testCase, 0, 0).y
+        verify(waitForRendering(video))
         mouseMove(choice)
         tryCompare(choice, "hovered", true)
         tryCompare(tooltip, "visible", true)
