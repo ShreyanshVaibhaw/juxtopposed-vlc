@@ -241,6 +241,12 @@ void SoutDialog::updateChain()
     else
         chain.append( " :no-sout-all" );
 
+    for( const char *option : { "sout-audio", "sout-video", "sout-spu" } )
+    {
+        chain.append( var_InheritBool( p_intf, option ) ? " :" : " :no-" );
+        chain.append( qfu(option) );
+    }
+
     chain.append( " :sout-keep" );
 
     ui.mrlEdit->setPlainText( chain );
