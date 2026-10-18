@@ -204,6 +204,11 @@ preparser_task_ExecCallback(struct preparser_task *task, int status)
             assert(task->cbs.parser != NULL);
             if (task->cbs.parser->on_subtree_added != NULL
                     && res_msg->res.subtree != NULL) {
+                /* IPC creates a new root item. Keep the original identity so
+                 * listeners can find the media in the queue or media tree. */
+                input_item_t *root = input_item_Hold(task->item);
+                input_item_Release(res_msg->res.subtree->p_item);
+                res_msg->res.subtree->p_item = root;
                 task->cbs.parser->on_subtree_added(&task->req,
                                                    res_msg->res.subtree,
                                                    task->cbs_userdata);

@@ -148,6 +148,14 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_preparser_subtree_identity',
+    'sources' : files('preparser/subtree_identity.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['demux_mock'],
+}
+
+vlc_tests += {
     'name' : 'test_src_preparser_fetcher_shutdown',
     'sources' : files('preparser/fetcher_shutdown.c',
         '../../src/preparser/art.c', '../../src/misc/interrupt.c',

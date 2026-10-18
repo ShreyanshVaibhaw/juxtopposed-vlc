@@ -94,6 +94,7 @@ struct vlc_preparser_cbs
      *
      * @param req request handle returned by vlc_preparser_req_NewParse()
      * @param subtree sub items of the current item (the listener gets the ownership)
+     * The root item is the same item returned by vlc_preparser_req_GetItem().
      * @param data opaque pointer passed by vlc_preparser_req_NewParse()
      */
     void (*on_subtree_added)(vlc_preparser_req *req, input_item_node_t *subtree,
