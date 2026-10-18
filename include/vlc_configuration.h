@@ -61,6 +61,16 @@ VLC_API void config_FreeStartupOptions(char **args);
 /** Validate quoted arguments using native option metadata, without applying them. */
 VLC_API int config_ValidateStartupOptions(vlc_object_t *parent, const char *text);
 
+/** Get the standalone interface language (caller frees the result).
+ * CLI, profile, legacy platform preference and system fallback are considered.
+ * This getter does not modify the process locale or environment.
+ */
+VLC_API char *config_GetInterfaceLanguage(int argc, const char *const argv[]);
+/** Apply the standalone language before any threads or LibVLC instances start.
+ * Embedded clients must not call this while their process is multithreaded.
+ */
+VLC_API int config_ApplyInterfaceLanguage(int argc, const char *const argv[]);
+
 typedef union
 {
     char       *psz;

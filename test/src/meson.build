@@ -32,6 +32,13 @@ if host_system == 'windows'
 endif
 
 vlc_tests += {
+    'name': 'test_src_config_language',
+    'sources': files('config/language.c'),
+    'suite': ['src', 'test_src'],
+    'link_with': [libvlc, libvlccore],
+}
+
+vlc_tests += {
     'name': 'test_src_config_startup',
     'sources': files('config/startup.c'),
     'suite': ['src', 'test_src'],

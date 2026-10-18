@@ -56,6 +56,7 @@ check_PROGRAMS = \
 	test_src_audio_output_dec \
 	test_src_config_chain \
 	test_src_config_startup \
+	test_src_config_language \
 	test_src_clock_clock \
 	test_src_clock_start \
 	test_src_misc_ancillary \
@@ -803,3 +804,6 @@ vlc_window_LDADD = ../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
 if HAVE_DYNAMIC_PLUGINS
 noinst_PROGRAMS += vlc-window
 endif
+
+test_src_config_language_SOURCES = src/config/language.c
+test_src_config_language_LDADD = $(LIBVLC) $(LIBVLCCORE)

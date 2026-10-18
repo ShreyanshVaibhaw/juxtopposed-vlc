@@ -228,23 +228,6 @@ int main(int i_argc, const char *ppsz_argv[])
     argv[argc++] = "--media-library-default";
     argv[argc++] = "--single-instance-default";
 
-    /* Overwrite system language */
-    CFPropertyListRef lang_pref = CFPreferencesCopyAppValue(CFSTR("language"),
-        kCFPreferencesCurrentApplication);
-
-    if (lang_pref) {
-        if (CFGetTypeID(lang_pref) == CFStringGetTypeID()) {
-            char *lang = FromCFString(lang_pref, kCFStringEncodingUTF8);
-            if (strncmp(lang, "auto", 4)) {
-                char tmp[11];
-                snprintf(tmp, 11, "LANG=%s", lang);
-                putenv(tmp);
-            }
-            free(lang);
-        }
-        CFRelease(lang_pref);
-    }
-
     ppsz_argv++; i_argc--; /* skip executable path */
 
     /* When VLC.app is run by double clicking in Mac OS X < 10.9, the 2nd arg
@@ -279,7 +262,7 @@ int main(int i_argc, const char *ppsz_argv[])
     dispatch_async(intf_queue, ^{
         /* Initialize libvlc */
         vlc = context.vlc
-            = libvlc_new(argc, argv);
+            = libvlc_new_standalone(argc, argv);
         if (vlc == NULL)
         {
             dispatch_sync(dispatch_get_main_queue(), ^{
@@ -293,6 +276,19 @@ int main(int i_argc, const char *ppsz_argv[])
         libvlc_set_app_id(vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
         libvlc_set_user_agent(vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
+
+        /* Use the language of the loaded catalog, rather than stale RTL
+         * flags from a previous profile. These overrides last one launch. */
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+            NSMutableDictionary *arguments = [[defaults volatileDomainForName:NSArgumentDomain] mutableCopy];
+            if (!arguments) arguments = [NSMutableDictionary dictionary];
+            NSString *language = [NSString stringWithUTF8String:vlc_gettext("C")];
+            BOOL rightToLeft = [NSLocale characterDirectionForLanguage:language] == NSLocaleLanguageDirectionRightToLeft;
+            arguments[@"NSForceRightToLeftWritingDirection"] = @(rightToLeft);
+            arguments[@"AppleTextDirection"] = @(rightToLeft);
+            [defaults setVolatileDomain:arguments forName:NSArgumentDomain];
+        });
 
         if (libvlc_InternalAddIntf(vlc->p_libvlc_int, NULL)) {
             fprintf(stderr, "VLC cannot start any interface. Exiting.\n");

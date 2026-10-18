@@ -93,6 +93,9 @@ VLC_API void libvlc_SetExitHandler( libvlc_int_t *libvlcint, void (*cb) (void *)
  * Opaque structures for libvlc API
  ***************************************************************************/
 
+/* Standalone launchers own the process locale; normal libvlc_new does not. */
+LIBVLC_API libvlc_instance_t *libvlc_new_standalone(int argc, const char *const *argv);
+
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;

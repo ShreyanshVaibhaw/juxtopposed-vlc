@@ -77,9 +77,9 @@ void config_FreeStartupOptions(char **args)
     }
 }
 
-/* Read only this core setting before plugin/thread setup. Loading an instance
+/* Read a core setting before plugin/thread setup. Loading an instance
  * just to read its arguments would initialize the application twice. */
-static char *read_options(const char *filename)
+char *config_ReadStartupSetting(const char *filename, const char *name)
 {
     char *allocated = NULL;
     if (filename == NULL)
@@ -102,9 +102,9 @@ static char *read_options(const char *filename)
         char *p = line;
         if (first_line && !strncmp(p, "\xef\xbb\xbf", 3)) p += 3;
         first_line = false;
-        const char key[] = "startup-options=";
-        if (strncmp(p, key, sizeof(key) - 1)) continue;
-        p += sizeof(key) - 1;
+        const size_t key_length = strlen(name);
+        if (strncmp(p, name, key_length) || p[key_length] != '=') continue;
+        p += key_length + 1;
         p[strcspn(p, "\r\n")] = '\0';
         char *next = strdup(p);
         free(value); value = next;
@@ -114,32 +114,40 @@ static char *read_options(const char *filename)
     return value;
 }
 
-int config_ExpandStartupOptions(int argc, const char *const argv[], char ***expanded)
+struct config_startup_settings config_GetStartupSettings(int argc, const char *const argv[])
 {
-    *expanded = NULL;
-    bool enabled = false, ignore = false, reset = false;
-    const char *filename = NULL, *override = NULL;
+    struct config_startup_settings settings = {0};
     for (int i = 0; i < argc; ++i)
     {
         const char *arg = argv[i];
         if (!strcmp(arg, "--")) break;
-        if (!strcmp(arg, "--load-startup-options")) enabled = true;
-        else if (!strcmp(arg, "--no-load-startup-options") || !strcmp(arg, "--noload-startup-options")) enabled = false;
-        else if (!strcmp(arg, "--ignore-config")) ignore = true;
-        else if (!strcmp(arg, "--no-ignore-config") || !strcmp(arg, "--noignore-config")) ignore = false;
-        else if (!strcmp(arg, "--reset-config")) reset = true;
-        else if (!strcmp(arg, "--no-reset-config") || !strcmp(arg, "--noreset-config")) reset = false;
-        else if (!strncmp(arg, "--config=", 9)) filename = arg + 9;
-        else if (!strncmp(arg, "--startup-options=", 18)) override = arg + 18;
-        else if ((!strcmp(arg, "--config") || !strcmp(arg, "--startup-options")) && i + 1 < argc)
+        if (!strcmp(arg, "--load-startup-options")) settings.enabled = true;
+        else if (!strcmp(arg, "--no-load-startup-options") || !strcmp(arg, "--noload-startup-options")) settings.enabled = false;
+        else if (!strcmp(arg, "--ignore-config")) settings.ignore = true;
+        else if (!strcmp(arg, "--no-ignore-config") || !strcmp(arg, "--noignore-config")) settings.ignore = false;
+        else if (!strcmp(arg, "--reset-config")) settings.reset = true;
+        else if (!strcmp(arg, "--no-reset-config") || !strcmp(arg, "--noreset-config")) settings.reset = false;
+        else if (!strncmp(arg, "--config=", 9)) settings.filename = arg + 9;
+        else if (!strncmp(arg, "--startup-options=", 18)) settings.options = arg + 18;
+        else if (!strncmp(arg, "--language=", 11)) settings.language = arg + 11;
+        else if ((!strcmp(arg, "--config") || !strcmp(arg, "--startup-options") || !strcmp(arg, "--language")) && i + 1 < argc)
         {
             const char *value = argv[++i];
-            if (!strcmp(arg, "--config")) filename = value;
-            else override = value;
+            if (!strcmp(arg, "--config")) settings.filename = value;
+            else if (!strcmp(arg, "--language")) settings.language = value;
+            else settings.options = value;
         }
     }
-    if (!enabled || ignore || reset) return argc;
-    char *saved = override == NULL ? read_options(filename) : strdup(override);
+    return settings;
+}
+
+int config_ExpandStartupOptions(int argc, const char *const argv[], char ***expanded)
+{
+    *expanded = NULL;
+    const struct config_startup_settings settings = config_GetStartupSettings(argc, argv);
+    if (!settings.enabled || settings.ignore || settings.reset) return argc;
+    char *saved = settings.options == NULL
+               ? config_ReadStartupSetting(settings.filename, "startup-options") : strdup(settings.options);
     if (saved == NULL) return argc;
     startup_args_t args = VLC_VECTOR_INITIALIZER;
     int ret = split_options(saved, &args);

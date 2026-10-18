@@ -176,7 +176,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
     {
         if( var_InheritBool( p_libvlc, "reset-config" ) )
+        {
+            /* An explicit System choice also clears a migrated platform
+             * language preference on the next standalone launch. */
+            config_PutPsz("language", "auto");
             config_SaveConfigFile( p_libvlc ); /* Save default config */
+        }
         else
             config_LoadConfigFile( p_libvlc );
     }

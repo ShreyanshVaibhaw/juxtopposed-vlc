@@ -106,6 +106,7 @@ libvlccore_sources_base = files(
     'config/intf.c',
     'config/cmdline.c',
     'config/startup.c',
+    'config/language.c',
     'config/getopt.c',
     'config/vlc_getopt.h',
     'config/jaro_winkler.c',

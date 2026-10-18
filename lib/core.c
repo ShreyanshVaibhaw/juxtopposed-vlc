@@ -33,6 +33,7 @@
 
 #include <stdarg.h>
 #include <limits.h>
+#include <locale.h>
 #include <assert.h>
 
 static_assert(LIBVLC_VERSION_MAJOR    == PACKAGE_VERSION_MAJOR, "Major VLC version mismatch");
@@ -88,23 +89,93 @@ error:
     return NULL;
 }
 
-libvlc_instance_t *libvlc_new(int argc, const char *const *argv)
+struct interface_locale_state
+{
+    char *lang, *language;
+#ifndef _WIN32
+    char *messages;
+#endif
+};
+
+static bool interface_locale_save(struct interface_locale_state *state)
+{
+    const char *lang = getenv("LANG"), *language = getenv("LANGUAGE");
+    state->lang = lang ? strdup(lang) : NULL;
+    state->language = language ? strdup(language) : NULL;
+    bool valid = (!lang || state->lang) && (!language || state->language);
+#ifndef _WIN32
+    const char *messages = setlocale(LC_MESSAGES, NULL);
+    state->messages = messages ? strdup(messages) : NULL;
+    valid = valid && (!messages || state->messages);
+#endif
+    return valid;
+}
+
+static void interface_locale_restore(const struct interface_locale_state *state)
+{
+    if (state->lang) setenv("LANG", state->lang, 1); else unsetenv("LANG");
+    if (state->language) setenv("LANGUAGE", state->language, 1); else unsetenv("LANGUAGE");
+#ifndef _WIN32
+    if (state->messages) {
+        setlocale(LC_MESSAGES, "C");
+        setlocale(LC_MESSAGES, state->messages);
+    }
+#endif
+}
+
+static void interface_locale_clear(struct interface_locale_state *state)
+{
+    free(state->lang);free(state->language);
+#ifndef _WIN32
+    free(state->messages);
+#endif
+}
+
+static libvlc_instance_t *libvlc_new_with_settings(int argc, const char *const *argv, bool standalone)
 {
     char **expanded = NULL;
     int count = config_ExpandStartupOptions(argc, argv, &expanded);
     if (count < 0)
         fprintf(stderr, "VLC could not read the saved startup options. Starting without them.\n");
+    struct interface_locale_state previous = {0};
+    if (standalone) {
+        if (!interface_locale_save(&previous)) {
+            interface_locale_clear(&previous);
+            config_FreeStartupOptions(expanded);
+            return NULL;
+        }
+        if (config_ApplyInterfaceLanguage(expanded ? count : argc,
+                expanded ? (const char *const *)expanded : argv) != VLC_SUCCESS)
+            fprintf(stderr, "VLC cannot use this interface language. VLC will use the system language.\n");
+    }
     libvlc_instance_t *instance = libvlc_new_inner(expanded != NULL ? count : argc,
         expanded != NULL ? (const char *const *)expanded : argv);
     if (instance == NULL && expanded != NULL)
     {
         /* A removed plugin can invalidate a previously valid saved option.
-         * Keep the standalone player reachable so the user can correct it. */
+         * Restore the original locale before retrying without those options. */
         fprintf(stderr, "VLC could not use the saved startup options. Starting without them.\n");
+        if (standalone) {
+            interface_locale_restore(&previous);
+            config_ApplyInterfaceLanguage(argc, argv);
+        }
         instance = libvlc_new_inner(argc, argv);
     }
+    if (standalone) interface_locale_clear(&previous);
     config_FreeStartupOptions(expanded);
     return instance;
+}
+
+libvlc_instance_t *libvlc_new(int argc, const char *const *argv)
+{
+    return libvlc_new_with_settings(argc, argv, false);
+}
+
+/* Private launcher entry: an embedding client must never change its host's
+ * language merely by creating a LibVLC instance. */
+libvlc_instance_t *libvlc_new_standalone(int argc, const char *const *argv)
+{
+    return libvlc_new_with_settings(argc, argv, true);
 }
 
 libvlc_instance_t *libvlc_retain( libvlc_instance_t *p_instance )

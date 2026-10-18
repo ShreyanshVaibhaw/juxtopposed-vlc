@@ -239,7 +239,7 @@ int main(int argc, const char *argv[])
     vlc_enable_override ();
 
     /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new(count, args);
+    libvlc_instance_t *vlc = libvlc_new_standalone(count, args);
     if (vlc == NULL)
         return 1;
 

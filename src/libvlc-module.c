@@ -2253,6 +2253,10 @@ vlc_module_begin ()
     add_bool( "dbus", false, DBUS_TEXT, DBUS_LONGTEXT )
 #endif
     add_bool( "media-library", false, ML_TEXT, ML_LONGTEXT )
+    /* Empty preserves a pre-existing platform preference. Explicit auto is
+     * persisted so System can override a legacy Windows/macOS selection. */
+    add_string("language", "", N_("Interface language"),
+               N_("Choose a language for the interface. Restart VLC after a change."))
     add_string("startup-options", "", N_("Additional command line options"),
                N_("Use these options when VLC starts. The launch command takes priority. Restart VLC after a change."))
     add_bool("load-startup-options", false, NULL, NULL)

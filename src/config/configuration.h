@@ -56,6 +56,14 @@ int  config_AutoSaveConfigFile( libvlc_int_t * );
 
 void config_Free(struct vlc_param *, size_t);
 
+struct config_startup_settings
+{
+    bool enabled, ignore, reset;
+    const char *filename, *options, *language;
+};
+struct config_startup_settings config_GetStartupSettings(int, const char *const []);
+char *config_ReadStartupSetting(const char *filename, const char *name);
+
 void config_CmdLineEarlyScan( libvlc_int_t *, int, const char *[] );
 
 int config_LoadCmdLine   ( libvlc_int_t *, int, const char *[], int * );
