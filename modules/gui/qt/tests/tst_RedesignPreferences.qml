@@ -67,6 +67,116 @@ TestCase {
         visible: false
     }
     RedesignPreferencesCatalog { id: catalog }
+    QtObject {
+        id: sizeStore
+        property int revision: 0
+        property var values: ({"sub-text-size-mode": 0, "sub-text-scale": 125, "sub-text-size-pixels": 37})
+        function value(name) {
+            return values[name === "redesign-subtitle-font-size"
+                ? values["sub-text-size-mode"] === 1 ? "sub-text-size-pixels" : "sub-text-scale" : name]
+        }
+        function describe(name) {
+            if (name === "sub-text-size-mode") return {kind: "integer", defaultValue: 0, choices: [{label: "Relative", value: 0}, {label: "Pixels", value: 1}]}
+            const pixels = values["sub-text-size-mode"] === 1
+            return {name: pixels ? "sub-text-size-pixels" : "sub-text-scale", kind: "integer", editor: "number-choice", minimum: pixels ? 1 : 10, maximum: 500,
+                defaultValue: pixels ? 30 : 100, choices: [{label: pixels ? "30 px" : "Automatic", value: pixels ? 30 : 100}, {label: value(name) + (pixels ? " px" : " %"), value: value(name)}]}
+        }
+        function stage(name, number) {
+            const nativeName = name === "redesign-subtitle-font-size"
+                ? values["sub-text-size-mode"] === 1 ? "sub-text-size-pixels" : "sub-text-scale" : name
+            const data = describe(name)
+            if (!Number.isInteger(number) || (name !== "sub-text-size-mode" && (number < data.minimum || number > data.maximum))) return false
+            const next = Object.assign({}, values); next[nativeName] = number; values = next; revision++
+            return true
+        }
+        function reset(name) { stage(name, describe(name).defaultValue) }
+    }
+    Column {
+        id: sizeControls
+        width: 784; y: 350; z: 20; visible: false
+        RedesignPreferenceRow {
+            id: sizeModeRow
+            width: parent.width; backend: sizeStore; optionName: "sub-text-size-mode"; label: "Size values"
+            presentation: ({editor: "segmented"})
+        }
+        RedesignPreferenceRow {
+            id: fontSizeRow
+            width: parent.width; backend: sizeStore; optionName: "redesign-subtitle-font-size"; label: "Font size"
+            presentation: ({dynamicChoices: true})
+        }
+    }
+    function beginCustomSize() {
+        const choice = findChild(fontSizeRow, "preferenceChoiceEditor")
+        mouseClick(choice); keyClick(Qt.Key_End); keyClick(Qt.Key_Return)
+        const field = findChild(fontSizeRow, "preferenceNumberChoiceField")
+        tryCompare(field, "visible", true)
+        verify(field.activeFocus)
+        return field
+    }
+    function test_sizeValuesSwitchKeepsBothSavedSizes() {
+        const rows = catalog.sections.subtitles.find(section => section.title === "Appearance").rows
+        compare(rows[0][0], "freetype-font"); compare(rows[1][0], "sub-text-size-mode")
+        compare(rows[1][2].editor, "segmented"); compare(rows[2][0], "redesign-subtitle-font-size")
+        sizeControls.visible = true
+        const choice = findChild(fontSizeRow, "preferenceChoiceEditor")
+        compare(choice.currentText, "125 %")
+        wait(0)
+        verify(Math.abs(findChild(sizeModeRow, "preferenceSegment_0").width - findChild(sizeModeRow, "preferenceSegment_1").width) < 1)
+        mouseClick(findChild(sizeModeRow, "preferenceSegment_1"))
+        compare(sizeStore.value("sub-text-size-mode"), 1); compare(choice.currentText, "37 px")
+        compare(sizeStore.value("sub-text-scale"), 125)
+        const relative = findChild(sizeModeRow, "preferenceSegment_0")
+        relative.forceActiveFocus(); keyClick(Qt.Key_Space)
+        compare(choice.currentText, "125 %"); compare(sizeStore.value("sub-text-size-pixels"), 37)
+    }
+    function test_customFontSizeValidatesAndSavesInSelectedMode() {
+        sizeControls.visible = true
+        const field = beginCustomSize()
+        for (const text of ["", "0", "501", "12.5", "text"]) {
+            field.text = text; keyClick(Qt.Key_Return)
+            verify(field.invalid); compare(sizeStore.value("sub-text-scale"), 125)
+        }
+        field.text = "160"; keyClick(Qt.Key_Return)
+        tryCompare(field, "visible", false)
+        compare(sizeStore.value("sub-text-scale"), 160)
+        compare(sizeStore.value("sub-text-size-mode"), 0)
+        mouseClick(findChild(sizeModeRow, "preferenceSegment_1"))
+        const pixelField = beginCustomSize(); pixelField.text = "1"; keyClick(Qt.Key_Return)
+        compare(sizeStore.value("sub-text-size-pixels"), 1)
+        compare(sizeStore.value("sub-text-scale"), 160)
+    }
+    function test_customFontSizeCancelAndModeSwitchDiscardDraft() {
+        sizeControls.visible = true
+        let field = beginCustomSize(); field.text = "220"; keyClick(Qt.Key_Escape)
+        compare(sizeStore.value("sub-text-scale"), 125); verify(!field.visible)
+        compare(findChild(fontSizeRow, "preferenceChoiceEditor").currentText, "125 %")
+        field = beginCustomSize(); field.text = "240"
+        mouseClick(findChild(fontSizeRow, "preferenceNumberChoiceCancel"))
+        compare(sizeStore.value("sub-text-scale"), 125); verify(!field.visible)
+        compare(findChild(fontSizeRow, "preferenceChoiceEditor").currentText, "125 %")
+        field = beginCustomSize(); field.text = "260"
+        mouseClick(findChild(sizeModeRow, "preferenceSegment_1"))
+        verify(!field.visible); compare(sizeStore.value("sub-text-size-pixels"), 37)
+    }
+    function test_fontSizeResetUsesCurrentUnitDefault() {
+        sizeControls.visible = true
+        sizeStore.stage("sub-text-size-mode", 1)
+        const reset = findChild(fontSizeRow, "preferenceResetButton")
+        reset.forceActiveFocus(); keyClick(Qt.Key_Space)
+        compare(sizeStore.value("sub-text-size-mode"), 1)
+        compare(sizeStore.value("sub-text-size-pixels"), 30)
+        compare(sizeStore.value("sub-text-scale"), 125)
+        compare(findChild(fontSizeRow, "preferenceChoiceEditor").currentText, "30 px")
+    }
+    function test_customFontSizeDraftClosesWithSettings() {
+        sizeControls.visible = true
+        const field = beginCustomSize(); field.text = "220"
+        sizeControls.visible = false; sizeControls.visible = true
+        verify(!field.visible)
+        verify(findChild(fontSizeRow, "preferenceChoiceEditor").visible)
+        compare(findChild(fontSizeRow, "preferenceChoiceEditor").currentText, "125 %")
+        compare(sizeStore.value("sub-text-scale"), 125)
+    }
     function test_searchUsesPageControlsWithoutNativeDuplicates() {
         const results = catalog.searchResults("background", [
             {name: "freetype-background-mode", title: "Text background"},
@@ -271,6 +381,8 @@ TestCase {
     SignalSpy { id: confirmationAccepted; target: confirmation; signalName: "accepted" }
     SignalSpy { id: confirmationRejected; target: confirmation; signalName: "rejected" }
     function init() {
+        sizeControls.visible = false
+        sizeStore.values = {"sub-text-size-mode": 0, "sub-text-scale": 125, "sub-text-size-pixels": 37}; sizeStore.revision++
         passthroughTestActive = false
         passthroughStore.driver = "mmdevice"; passthroughStore.currentValue = false; passthroughStore.revision++
         store.providedHelp = ""

@@ -48,6 +48,7 @@ ColumnLayout {
         text: root.editor === "language" ? (root.choices.find(row => row.value === root.currentValue)?.label || "") : ""
     }
     readonly property Component editorComponent: editor === "action" ? actionEditor : editor === "toggle" ? toggleEditor : editor === "startup-volume" ? startupVolumeEditor : editor === "slider" ? sliderEditor
+        : editor === "segmented" ? segmentedEditor : editor === "number-choice" ? numberChoiceEditor
         : editor === "track" ? trackEditor : editor === "language" ? languageEditor
         : description.kind === "bool" && !choices.length ? toggleEditor
         : editor === "color" ? colorEditor
@@ -127,6 +128,113 @@ ColumnLayout {
         sourceComponent: RedesignSpatializer {
             backend: root.backend
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+        }
+    }
+    Component {
+        id: segmentedEditor
+        Rectangle {
+            implicitHeight: theme.dp(34)
+            radius: theme.dp(4); color: theme.field
+            RowLayout {
+                anchors.fill: parent; spacing: theme.dp(2)
+                Repeater {
+                    model: root.choices
+                    RedesignButton {
+                        required property var modelData
+                        required property int index
+                        objectName: "preferenceSegment_" + index
+                        Layout.fillWidth: true; Layout.fillHeight: true; Layout.preferredWidth: 1
+                        scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                        caption: modelData.label; text: caption
+                        selected: root.displayedValue === modelData.value
+                        background: Rectangle {
+                            radius: theme.dp(4)
+                            color: parent.selected ? theme.progress : parent.hovered ? theme.hover : theme.background
+                            border.width: parent.visualFocus ? 1 : 0; border.color: theme.accent
+                        }
+                        onClicked: root.commit(modelData.value)
+                    }
+                }
+            }
+        }
+    }
+    Component {
+        id: numberChoiceEditor
+        Item {
+            id: numberControl
+            implicitHeight: theme.dp(34)
+            property bool custom: false
+            readonly property string nativeOption: root.description.name || ""
+            onNativeOptionChanged: if (custom) cancel()
+            onVisibleChanged: if (!visible) custom = false
+            Connections {
+                target: root
+                function onEditorResetRequested() { if (numberControl.custom) numberControl.cancel() }
+            }
+            function cancel() {
+                custom = false
+                numberCombo.forceActiveFocus()
+            }
+            function save() {
+                if (!custom) return
+                const number = Number(numberField.text)
+                numberField.invalid = !numberField.text.trim().length || !Number.isInteger(number)
+                    || number < root.description.minimum || number > root.description.maximum
+                    || !root.commit(number)
+                if (!numberField.invalid) cancel()
+            }
+            RedesignComboBox {
+                id: numberCombo
+                objectName: "preferenceChoiceEditor"
+                anchors.fill: parent; visible: !numberControl.custom
+                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                Accessible.name: root.label || root.description.title
+                model: root.choices.concat([{label: qsTr("Custom…"), value: "__custom__"}])
+                textRole: "label"; valueRole: "value"
+                Binding on currentIndex {
+                    when: !numberControl.custom
+                    restoreMode: Binding.RestoreNone
+                    value: root.choices.findIndex(row => row.value === root.displayedValue)
+                }
+                onActivated: {
+                    if (currentValue !== "__custom__") { root.commit(currentValue); return }
+                    numberField.text = String(root.currentValue)
+                    numberField.invalid = false
+                    numberControl.custom = true
+                    numberField.forceActiveFocus(); numberField.selectAll()
+                }
+            }
+            RowLayout {
+                anchors.fill: parent; spacing: theme.dp(4)
+                visible: numberControl.custom
+                C.TextField {
+                    id: numberField
+                    objectName: "preferenceNumberChoiceField"
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    property bool invalid: false
+                    selectByMouse: true
+                    inputMethodHints: Qt.ImhDigitsOnly
+                    font.pixelSize: theme.dp(14); color: invalid ? theme.danger : theme.foreground
+                    Accessible.name: root.label || root.description.title
+                    background: Rectangle { radius: theme.dp(4); color: theme.field; border.color: numberField.invalid ? theme.danger : numberField.activeFocus ? theme.accent : theme.border }
+                    onAccepted: numberControl.save()
+                    Keys.onEscapePressed: numberControl.cancel()
+                }
+                RedesignButton {
+                    objectName: "preferenceNumberChoiceSave"
+                    Layout.preferredWidth: theme.dp(26); Layout.fillHeight: true
+                    scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    iconName: "check"; text: qsTr("Use this value")
+                    onClicked: numberControl.save()
+                }
+                RedesignButton {
+                    objectName: "preferenceNumberChoiceCancel"
+                    Layout.preferredWidth: theme.dp(26); Layout.fillHeight: true
+                    scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    iconName: "close"; text: qsTr("Cancel")
+                    onClicked: numberControl.cancel()
+                }
+            }
         }
     }
     Component {

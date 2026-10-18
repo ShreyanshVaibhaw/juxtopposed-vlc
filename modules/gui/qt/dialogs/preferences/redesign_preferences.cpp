@@ -864,8 +864,9 @@ QVariant RedesignPreferences::value(const QString& name) const
     }
     if (name == QLatin1String("redesign-subtitle-background-opacity"))
         return value(QStringLiteral("freetype-background-opacity"));
-    if (name == QLatin1String("redesign-subtitle-relative-size"))
-        return value(QStringLiteral("sub-text-scale"));
+    if (name == QLatin1String("redesign-subtitle-font-size"))
+        return value(value(QStringLiteral("sub-text-size-mode")).toInt() == 1
+            ? QStringLiteral("sub-text-size-pixels") : QStringLiteral("sub-text-scale"));
     if (name == QLatin1String("redesign-subtitle-duration"))
         return value(QStringLiteral("filter:sub-filter:subsdelay")).toBool() ? value(QStringLiteral("subsdelay-factor")) : QVariant(0.0);
     if (name == QLatin1String("redesign-subtitle-delay"))
@@ -963,8 +964,9 @@ bool RedesignPreferences::isStaged(const QString& name) const
             if (m_edits.contains(qfu(quality.option))) return true;
         return false;
     }
-    if (name == QLatin1String("redesign-subtitle-relative-size"))
-        return m_edits.contains(QStringLiteral("sub-text-scale")) || m_edits.contains(QStringLiteral("sub-text-size-mode"));
+    if (name == QLatin1String("redesign-subtitle-font-size"))
+        return m_edits.contains(QStringLiteral("sub-text-scale")) || m_edits.contains(QStringLiteral("sub-text-size-pixels"))
+            || m_edits.contains(QStringLiteral("sub-text-size-mode"));
     if (name == QLatin1String("redesign-subtitle-delay"))
         return m_edits.contains(QStringLiteral("sub-delay")) || m_edits.contains(QStringLiteral("sub-delay-ms"));
     return m_edits.contains(name);
@@ -1052,10 +1054,24 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
             {QStringLiteral("supported"), resamplingQuality(value(QStringLiteral("audio-resampler")).toString()) != nullptr},
             {QStringLiteral("help"), qtr("Set the quality for audio sample rate conversion. Higher quality uses more processing power. Some resamplers do not have a quality control.")}};
     }
-    if (name == QLatin1String("redesign-subtitle-relative-size")) {
-        auto description = describe(QStringLiteral("sub-text-scale"));
+    if (name == QLatin1String("redesign-subtitle-font-size")) {
+        const bool pixels = value(QStringLiteral("sub-text-size-mode")).toInt() == 1;
+        auto description = describe(pixels ? QStringLiteral("sub-text-size-pixels") : QStringLiteral("sub-text-scale"));
         description.insert(QStringLiteral("value"), value(name));
-        description.insert(QStringLiteral("help"), qtr("Set the relative subtitle font size. This setting uses relative values."));
+        description.insert(QStringLiteral("editor"), QStringLiteral("number-choice"));
+        const QList<int> sizes = pixels ? QList<int>{16, 20, 24, 30, 36, 48, 64} : QList<int>{100, 50, 75, 150, 200};
+        const QStringList labels = pixels ? QStringList{} : QStringList{qtr("Automatic"), qtr("Very small"), qtr("Small"), qtr("Large"), qtr("Very large")};
+        QVariantList choices;
+        for (qsizetype i = 0; i < sizes.size(); ++i)
+            choices.append(QVariantMap{{QStringLiteral("value"), sizes[i]},
+                {QStringLiteral("label"), pixels ? QString::number(sizes[i]) + QStringLiteral(" px") : labels[i]}});
+        const int current = value(name).toInt();
+        if (!sizes.contains(current)) {
+            const QString label = QString::number(current) + (pixels ? QStringLiteral(" px") : QStringLiteral(" %"));
+            choices.append(QVariantMap{{QStringLiteral("value"), current},
+                {QStringLiteral("label"), label}});
+        }
+        description.insert(QStringLiteral("choices"), choices);
         return description;
     }
     if (name == QLatin1String("redesign-subtitle-duration")) {
@@ -1334,10 +1350,9 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         return stage(QStringLiteral("freetype-background-mode"), value(QStringLiteral("redesign-subtitle-background")))
             && stage(QStringLiteral("freetype-background-opacity"), opacity);
     }
-    if (name == QLatin1String("redesign-subtitle-relative-size")) {
-        if (!stage(QStringLiteral("sub-text-scale"), proposed)) return false;
-        return stage(QStringLiteral("sub-text-size-mode"), 0);
-    }
+    if (name == QLatin1String("redesign-subtitle-font-size"))
+        return stage(value(QStringLiteral("sub-text-size-mode")).toInt() == 1
+            ? QStringLiteral("sub-text-size-pixels") : QStringLiteral("sub-text-scale"), proposed);
     if (name == QLatin1String("redesign-subtitle-duration")) {
         if (!module_exists("subsdelay") || !stage(QStringLiteral("subsdelay-factor"), proposed)) return false;
         if (proposed.toDouble() > 0) stage(QStringLiteral("subsdelay-mode"), 1);
