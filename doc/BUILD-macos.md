@@ -42,16 +42,18 @@ export PKG_CONFIG_PATH="$(brew --prefix qt)/lib/pkgconfig:$(brew --prefix)/lib/p
 
 git clone https://github.com/dsojevic/juxtopposed-vlc.git
 cd juxtopposed-vlc
-meson setup build -Dqt=enabled -Dtests=disabled -Dbuildtype=release
+meson setup build --prefix="$HOME/.local/vlc-dev" \
+    -Dqt=enabled -Dtests=disabled -Dbuildtype=release
 ninja -C build
 ```
 
 `-Dtests=disabled` is currently needed because the test registration
 requires the `medialibrary` plugin, which is not built here.
 
-The default install prefix is the Homebrew prefix (`/opt/homebrew`). Do not
-run `meson install` without passing `--prefix` to a private directory, or it
-will install over Homebrew's tree.
+Set `--prefix` during `meson setup`, not `meson install`. For an existing
+build, change it with `meson configure build --prefix=...` before installing.
+Keep a private prefix: Homebrew's Meson otherwise defaults to the Homebrew
+tree (`/opt/homebrew` on Apple Silicon, `/usr/local` on Intel).
 
 ## Running from the build tree
 

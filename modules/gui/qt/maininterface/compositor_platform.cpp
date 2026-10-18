@@ -80,7 +80,7 @@ bool CompositorPlatform::makeMainInterface(MainCtx *mainCtx, std::function<void 
 
     m_videoWindow = new QWindow(m_rootWindow.get());
 
-#ifdef __APPLE__
+#ifdef Q_OS_MACOS
     {
         // The root window is transparent for the UI layer, so give the video
         // view an opaque black background for the letterbox areas around the
