@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "systray.hpp"
+#include "notification_policy.hpp"
 
 #include <QImageReader>
 
@@ -36,8 +37,6 @@ VLCSystray::VLCSystray(MainCtx* ctx, QObject* parent)
 {
     assert(ctx);
     assert(m_intf);
-
-    m_notificationSetting = var_InheritInteger(m_intf, "qt-notification");
 
     QIcon iconVLC;
     if( m_ctx->useXmasCone() )
@@ -68,12 +67,20 @@ VLCSystray::VLCSystray(MainCtx* ctx, QObject* parent)
 VLCSystray::~VLCSystray()
 {}
 
+bool VLCSystray::isAvailableAndVisible() const
+{
+    return isVisible() && isSystemTrayAvailable();
+}
+
 /**
  * Updates the VLCSystray Icon's menu and toggle the main interface
  */
 void VLCSystray::toggleUpdateMenu()
 {
-    m_ctx->toggleWindowVisibility(true);
+    if (!isAvailableAndVisible() && m_ctx->interfaceVisibility() != QWindow::Hidden)
+        emit m_ctx->requestInterfaceMinimized();
+    else
+        emit m_ctx->toggleWindowVisibility(true);
     update();
 }
 
@@ -87,7 +94,10 @@ void VLCSystray::showUpdateMenu()
 /* First Item of the systray menu */
 void VLCSystray::hideUpdateMenu()
 {
-    m_ctx->setInterfaceVisibible(false);
+    if (isAvailableAndVisible())
+        emit m_ctx->setInterfaceVisibible(false);
+    else
+        emit m_ctx->requestInterfaceMinimized();
     update();
 }
 
@@ -123,9 +133,9 @@ void VLCSystray::updateTooltipName( const QString& name )
     else
     {
         setToolTip( name );
-        const auto windowVisiblity = m_ctx->interfaceVisibility();
-        if( ( m_notificationSetting == NOTIFICATION_ALWAYS ) ||
-            ( m_notificationSetting == NOTIFICATION_MINIMIZED && (windowVisiblity == QWindow::Hidden || windowVisiblity == QWindow::Minimized)))
+        const auto visibility = m_ctx->interfaceVisibility();
+        const auto notificationSetting = var_InheritInteger(m_intf, "qt-notification");
+        if (vlc::systray::shouldNotify(notificationSetting, visibility))
         {
             const auto showMessageTemplate = [this, &name](const auto &icon) {
                 showMessage(qtr("VLC media player"), name, icon, var_InheritInteger(m_intf, "qt-notification-timeout"));

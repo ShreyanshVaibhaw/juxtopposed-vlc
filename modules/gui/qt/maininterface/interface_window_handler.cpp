@@ -433,7 +433,8 @@ void InterfaceWindowHandler::setRaise()
 void InterfaceWindowHandler::setBoss()
 {
     THEMPL->pause();
-    if( m_mainCtx->getSysTray() )
+    const auto *tray = m_mainCtx->getSysTray();
+    if (tray && tray->isAvailableAndVisible())
     {
         setInterfaceHiden();
     }

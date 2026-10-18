@@ -297,6 +297,7 @@ qt_plugin_sources = files(
     'dialogs/sout/sout_widgets.cpp',
     'dialogs/sout/sout_widgets.hpp',
     'dialogs/systray/systray.cpp',
+    'dialogs/systray/notification_policy.hpp',
     'dialogs/systray/systray.hpp',
     'dialogs/toolbar/controlbar_profile.hpp',
     'dialogs/toolbar/controlbar_profile.cpp',
@@ -1791,6 +1792,16 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_tray_notification_policy',
+            'sources': files('tests/test_tray_notification_policy.cpp'),
+            'moc_sources': files('tests/test_tray_notification_policy.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
         }
 
         vlc_tests += {

@@ -170,6 +170,7 @@ libqt_plugin_la_SOURCES = \
 	dialogs/sout/sout_widgets.cpp \
 	dialogs/sout/sout_widgets.hpp \
 	dialogs/systray/systray.cpp \
+	dialogs/systray/notification_policy.hpp \
 	dialogs/systray/systray.hpp \
 	dialogs/toolbar/controlbar_profile.hpp \
 	dialogs/toolbar/controlbar_profile.cpp \
@@ -2152,6 +2153,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_tray_notification_policy
+
+test_tray_notification_policy_SOURCES = tests/test_tray_notification_policy.cpp dialogs/systray/notification_policy.hpp
+nodist_test_tray_notification_policy_SOURCES = tests/test_tray_notification_policy.moc
+BUILT_SOURCES += tests/test_tray_notification_policy.moc
+CLEANFILES += tests/test_tray_notification_policy.moc
+test_tray_notification_policy_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_tray_notification_policy_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_tray_notification_policy_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_tray_notification_policy_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_tray_notification_policy
+TESTS += test_tray_notification_policy
 
 # test_file_log_preferences
 

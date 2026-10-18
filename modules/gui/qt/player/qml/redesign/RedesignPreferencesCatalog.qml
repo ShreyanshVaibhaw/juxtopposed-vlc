@@ -41,8 +41,8 @@ QtObject {
             { title: qsTr("Notifications and System Tray"), rows: [
                 ["qt-system-tray", qsTr("Show a system tray icon")],
                 ["qt-start-minimized", qsTr("Start minimized to the tray")],
-                ["qt-notification", qsTr("Show a popup when the track changes")],
-                ["qt-notification-timeout", qsTr("Popup duration"), {editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s"}] ] },
+                ["qt-notification", qsTr("Show a popup when the track changes"), {enabledWhen: "qt-system-tray"}],
+                ["qt-notification-timeout", qsTr("Popup duration"), {enabledWhen: "qt-system-tray", editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s"}] ] },
             { title: qsTr("Playlist"), rows: [ ["playlist-tree", qsTr("Show the playlist as a tree")] ] } ],
         privacy: [
             { title: qsTr("History"), rows: [

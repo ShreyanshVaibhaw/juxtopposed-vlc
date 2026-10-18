@@ -183,6 +183,8 @@ public:
     bool smoothScroll() const { return m_smoothScroll; }
 
     VLCSystray* getSysTray() { return m_systray.get(); }
+    bool systrayRequested() const { return bool(m_systray); }
+    void refreshSystray();
 
     enum
     {
@@ -429,6 +431,7 @@ public:
 protected:
     /* Systray */
     void initSystray();
+    void setSystrayVisible(bool visible);
 
     qt_intf_t* p_intf = nullptr;
     vlc_preparser_t *m_network_preparser = nullptr;

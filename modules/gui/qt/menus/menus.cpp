@@ -231,7 +231,7 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     action->setChecked( THEMPL->getMediaStopAction() ==  PlaylistController::MEDIA_STOPPED_EXIT);
 
     VLCSystray* systray = mi ? mi->getSysTray() : nullptr;
-    if( systray )
+    if (systray && systray->isAvailableAndVisible())
     {
         action = menu->addAction( qtr( "Close to systray"), systray,
                                  &VLCSystray::toggleUpdateMenu );

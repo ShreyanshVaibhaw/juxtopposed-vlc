@@ -693,8 +693,28 @@ inline void MainCtx::initSystray()
             msg_Err( p_intf, "cannot start minimized without system tray bar" );
     }
 
-    if( b_systrayAvailable && b_systrayWanted )
-        m_systray = std::make_unique<VLCSystray>(this);
+    setSystrayVisible(b_systrayWanted);
+}
+
+void MainCtx::refreshSystray()
+{
+    setSystrayVisible(var_InheritBool(p_intf, "qt-system-tray"));
+}
+
+void MainCtx::setSystrayVisible(bool visible)
+{
+    if (visible)
+    {
+        // Qt also adds a visible icon if the system tray becomes available later.
+        if (!m_systray)
+            m_systray = std::make_unique<VLCSystray>(this);
+    }
+    else if (m_systray)
+    {
+        if (m_windowVisibility == QWindow::Hidden || m_windowVisibility == QWindow::Minimized)
+            emit setInterfaceVisibible(true, true);
+        m_systray.reset();
+    }
 }
 
 ThreadRunner* MainCtx::threadRunner() const

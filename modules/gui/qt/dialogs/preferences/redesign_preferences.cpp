@@ -1164,6 +1164,10 @@ QVariant RedesignPreferences::value(const QString& name) const
     if (it != m_edits.cend()) return *it;
     if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose")))
         return var_InheritBool(m_ctx->getIntf(), name.toUtf8().constData());
+    if (m_ctx && name == QLatin1String("qt-system-tray"))
+        return m_ctx->systrayRequested();
+    if (m_ctx && (name == QLatin1String("qt-notification") || name == QLatin1String("qt-notification-timeout")))
+        return QVariant::fromValue<qlonglong>(var_InheritInteger(m_ctx->getIntf(), name.toUtf8().constData()));
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
@@ -1708,6 +1712,14 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         result.insert(QStringLiteral("help"), qtr("Choose plain text or HTML for the log file. Restart VLC after a change."));
     if (name == QLatin1String("verbose"))
         result.insert(QStringLiteral("help"), qtr("Choose the VLC log level. File logs can use this level or a separate file log level. Restart VLC after a change."));
+    if (name == QLatin1String("qt-system-tray"))
+        result.insert(QStringLiteral("help"), qtr("Show the VLC icon in the system tray."));
+    if (name == QLatin1String("qt-start-minimized"))
+        result.insert(QStringLiteral("help"), qtr("Start VLC in the system tray. This turns on the tray icon. Restart VLC after a change."));
+    if (name == QLatin1String("qt-notification"))
+        result.insert(QStringLiteral("help"), qtr("Show a track message always, only when VLC is hidden or minimized, or never."));
+    if (name == QLatin1String("qt-notification-timeout"))
+        result.insert(QStringLiteral("help"), qtr("Choose how long the track popup is shown. The system can change this time."));
     if (name == QLatin1String("qt-minimal-view"))
         result.insert(QStringLiteral("help"), qtr("Start VLC in compact mode. Restart VLC after a change. Launch options can override this setting."));
     if (name == QLatin1String("qt-verbose"))
@@ -1792,6 +1804,14 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("qt-start-minimized") && proposed.toBool()
+        && !value(QStringLiteral("qt-system-tray")).toBool()) {
+        if (!stage(QStringLiteral("qt-system-tray"), true)) return false;
+    }
+    if (name == QLatin1String("qt-system-tray") && !proposed.toBool()
+        && value(QStringLiteral("qt-start-minimized")).toBool()) {
+        if (!stage(QStringLiteral("qt-start-minimized"), false)) return false;
+    }
     if (name == QLatin1String("redesign-log-details")) {
         if (proposed.metaType().id() != QMetaType::QString) return false;
         const auto selection = proposed.toString();
@@ -2131,6 +2151,10 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         && normalized.toBool() != m_ctx->backdropBlurRequested();
     if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose")))
         applyToPlayer = normalized.toBool() != value(name).toBool();
+    if (m_ctx && name == QLatin1String("qt-system-tray"))
+        applyToPlayer = normalized.toBool() != value(name).toBool();
+    if (m_ctx && (name == QLatin1String("qt-notification") || name == QLatin1String("qt-notification-timeout")))
+        applyToPlayer = normalized.toLongLong() != value(name).toLongLong();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
@@ -2248,7 +2272,7 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray"}) {
         if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -2256,6 +2280,14 @@ bool RedesignPreferences::save()
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));
     }
+    for (const auto *option : {"qt-notification", "qt-notification-timeout"}) {
+        if (!previous.contains(QLatin1String(option))) continue;
+        auto *intf = m_ctx->getIntf();
+        if (var_Type(intf, option) == 0) var_Create(intf, option, VLC_VAR_INTEGER);
+        var_SetInteger(intf, option, config_GetInt(option));
+    }
+    if (previous.contains(QStringLiteral("qt-system-tray")))
+        m_ctx->refreshSystray();
     if (previous.contains(QStringLiteral("qt-verbose")))
         updateVlcQtMessageHandler(var_InheritBool(m_ctx->getIntf(), "qt-verbose"));
     if (previous.contains(QStringLiteral("qt-error-dialogs")) || previous.contains(QStringLiteral("qt-minor-warnings")))
@@ -2548,11 +2580,16 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray"}) {
         if (var_Type(intf, option) == 0)
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));
     }
+    for (const auto *option : {"qt-notification", "qt-notification-timeout"}) {
+        if (var_Type(intf, option) == 0) var_Create(intf, option, VLC_VAR_INTEGER);
+        var_SetInteger(intf, option, config_GetInt(option));
+    }
+    m_ctx->refreshSystray();
     updateVlcQtMessageHandler(var_InheritBool(intf, "qt-verbose"));
     if (auto* errors = DialogErrorModel::getInstance<false>())
         errors->refreshNotificationPreference();
