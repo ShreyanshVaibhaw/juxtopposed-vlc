@@ -32,6 +32,7 @@
 #include <QJSEngine>
 
 #include "mainctx.hpp"
+#include "window_fullscreen.hpp"
 #include "mainctx_submodels.hpp"
 #include "medialibrary/mlhelper.hpp"
 
@@ -1224,7 +1225,7 @@ bool WindowStateHolder::holdFullscreen(QWindow *window, Source source, bool hold
 
     if( newflags != oldflags )
     {
-        window->setWindowStates( newflags );
+        setWindowStatesPreservingGeometry(window, newflags);
     }
 
     return fullscreenCounter != 0;

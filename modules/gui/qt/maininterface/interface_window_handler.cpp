@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "interface_window_handler.hpp"
+#include "window_fullscreen.hpp"
 #include "mainctx.hpp"
 #include "compositor.hpp"
 #include <player/player_controller.hpp>
@@ -38,7 +39,7 @@ void setWindowState(QWindow *window, Qt::WindowState state)
     // so that our window handling code works.
     // see issue #28071
     const auto original = window->windowStates();
-    window->setWindowStates(original | state);
+    setWindowStatesPreservingGeometry(window, original | state);
 }
 
 }
@@ -490,7 +491,8 @@ void InterfaceWindowHandler::setInterfaceMaximized()
 
 void InterfaceWindowHandler::setInterfaceNormal()
 {
-    m_window->showNormal();
+    setWindowStatesPreservingGeometry(m_window, Qt::WindowNoState);
+    m_window->setVisible(true);
 }
 
 

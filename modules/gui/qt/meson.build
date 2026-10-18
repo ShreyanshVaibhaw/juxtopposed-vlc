@@ -1483,6 +1483,15 @@ if qt6_dep.found()
     if qtest_qt6_dep.found()
         if host_system == 'windows'
             vlc_tests += {
+                'name': 'test_qt_window_fullscreen',
+                'sources': files('tests/test_window_fullscreen.cpp', 'util/win32_emutls.cpp'),
+                'moc_sources': files('tests/test_window_fullscreen.cpp'),
+                'suite': ['qt'],
+                'include_directories': qt_include_dir,
+                'dependencies': [qt6_dep, qtest_qt6_dep, qt_extra_deps],
+                'link_args': qt_link_args,
+            }
+            vlc_tests += {
                 'name': 'test_qt_dcomp_backdrop',
                 'sources': files('tests/test_dcomp_backdrop.cpp', 'maininterface/compositor_dcomp_backdrop.cpp'),
                 'moc_sources': files('tests/test_dcomp_backdrop.cpp'),
