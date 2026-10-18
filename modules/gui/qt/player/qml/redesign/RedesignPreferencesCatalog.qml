@@ -197,4 +197,48 @@ QtObject {
         }
         return found
     }
+    // Several design controls combine native options or use different units.
+    // Search uses the same controls as the settings pages. The expert list,
+    // and an exact search for a hyphenated native name, retain the native option.
+    readonly property var searchAliases: ({
+        "freetype-background-mode": "redesign-subtitle-background",
+        "freetype-background-opacity": "redesign-subtitle-background-opacity",
+        "sub-text-scale": "redesign-subtitle-relative-size",
+        "zoom": "redesign-video-zoom",
+        "fit": "redesign-video-zoom",
+        "snapshot-width": "redesign-snapshot-size",
+        "snapshot-height": "redesign-snapshot-size",
+        "equalizer-preset": "redesign-equalizer-preset",
+        "audio-device-default": "redesign-audio-device",
+        "audio-startup-volume": "volume-save",
+        "repeat": "redesign-repeat",
+        "loop": "redesign-repeat",
+        "play-and-exit": "redesign-after-playback",
+        "play-and-pause": "redesign-after-playback"
+    })
+    function searchResults(query, nativeMatches) {
+        const curated = {}
+        for (const row of find("")) curated[row.name] = row
+        let matches = find(query)
+        const names = new Set(matches.map(row => row.name))
+        const needle = query.toLocaleLowerCase()
+        for (const entry of nativeMatches) {
+            const alias = searchAliases[entry.name]
+            if (alias && entry.name.includes("-") && entry.name.toLocaleLowerCase() === needle) {
+                matches = matches.filter(row => row.name !== alias)
+                names.delete(alias)
+                if (!names.has(entry.name)) {
+                    matches.push(entry)
+                    names.add(entry.name)
+                }
+                continue
+            }
+            const row = curated[alias || entry.name] || entry
+            if (!names.has(row.name)) {
+                matches.push(row)
+                names.add(row.name)
+            }
+        }
+        return matches
+    }
 }

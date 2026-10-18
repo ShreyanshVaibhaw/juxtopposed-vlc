@@ -19,6 +19,7 @@ RedesignSettingsDialog {
     property bool advanced: false
     property bool expert: false
     property string search: ""
+    onSearchChanged: scroll.contentItem.contentY = 0
     property string actionMessage: ""
     property bool actionMessageIsError: true
     property bool resetFailed: false
@@ -124,6 +125,7 @@ RedesignSettingsDialog {
             }
             C.TextField {
                 id: searchField
+                objectName: "settingsSearch"
                 anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                 anchors.margins: theme.dp(8); height: theme.dp(34)
                 leftPadding: theme.dp(42)
@@ -132,8 +134,14 @@ RedesignSettingsDialog {
                 font.pixelSize: theme.dp(14); selectByMouse: true
                 background: Rectangle { color: theme.background; radius: theme.dp(4); border.color: searchField.activeFocus ? theme.accent : theme.border }
                 RedesignIcon { x: theme.dp(10); anchors.verticalCenter: parent.verticalCenter; width: theme.dp(20); height: width; name: "search"; color: theme.foreground }
-                onTextEdited: root.search = text
-                onTextChanged: if (!text.length) root.search = ""
+                onTextEdited: searchDelay.restart()
+                onTextChanged: if (!text.length) { searchDelay.stop(); root.search = "" }
+                onAccepted: { searchDelay.stop(); root.search = text }
+                Timer {
+                    id: searchDelay
+                    interval: 200
+                    onTriggered: root.search = searchField.text
+                }
             }
             C.ScrollView {
                 anchors.top: searchField.bottom; anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
@@ -406,10 +414,7 @@ RedesignSettingsDialog {
                 Repeater {
                     model: {
                         if (root.search.length) {
-                            const matches = specification.find(root.search)
-                            for (const entry of preferenceStore.catalog("", root.search))
-                                if (!matches.some(row => row.name === entry.name)) matches.push(entry)
-                            return matches
+                            return specification.searchResults(root.search, preferenceStore.catalog("", root.search))
                         }
                         return root.expert ? preferenceStore.catalog(root.category, "") : []
                     }

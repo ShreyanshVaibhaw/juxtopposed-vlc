@@ -67,6 +67,54 @@ TestCase {
         visible: false
     }
     RedesignPreferencesCatalog { id: catalog }
+    function test_searchUsesPageControlsWithoutNativeDuplicates() {
+        const results = catalog.searchResults("background", [
+            {name: "freetype-background-mode", title: "Text background"},
+            {name: "freetype-background-color", title: "Background color"},
+            {name: "freetype-background-opacity", title: "Background opacity"},
+            {name: "freetype-background-opacity", title: "Background opacity"},
+            {name: "test-background", title: "Other module background"}
+        ])
+        compare(results.filter(row => row.name === "redesign-subtitle-background").length, 1)
+        compare(results.filter(row => row.name === "redesign-subtitle-background-opacity").length, 1)
+        verify(!results.some(row => row.name === "freetype-background-mode" || row.name === "freetype-background-opacity"))
+        const opacity = results.find(row => row.name === "redesign-subtitle-background-opacity")
+        compare(opacity.presentation.editor, "slider")
+        compare(opacity.presentation.factor, 100 / 255)
+        compare(opacity.presentation.to, 100)
+        compare(results.find(row => row.name === "test-background").title, "Other module background")
+    }
+    function test_nativeTitleSearchKeepsDesignLabelsAndUnits() {
+        const results = catalog.searchResults("native text", [
+            {name: "freetype-background-opacity", title: "Native text background opacity"},
+            {name: "video-title-timeout", title: "Native text title timeout"}
+        ])
+        compare(results.length, 2)
+        compare(results[0].title, "Background opacity")
+        compare(results[0].presentation.suffix, "%")
+        compare(results[1].title, "Show filename for")
+        compare(results[1].presentation.factor, 0.001)
+        compare(results[1].presentation.suffix, " s")
+    }
+    function test_exactNativeAliasSearchRetainsExpertControl() {
+        for (const name of ["freetype-background-mode", "freetype-background-opacity", "snapshot-width"]) {
+            const results = catalog.searchResults(name.toUpperCase(), [{name: name, title: "Native option"}])
+            compare(results.length, 1)
+            compare(results[0].name, name)
+            compare(results[0].title, "Native option")
+            verify(!results[0].presentation)
+        }
+    }
+    function test_searchCombinesRepeatOptionsAndKeepsOtherOptions() {
+        const results = catalog.searchResults("repeat", [
+            {name: "repeat", title: "Repeat current item"},
+            {name: "loop", title: "Repeat all items"},
+            {name: "input-repeat", title: "Input repeat count"}
+        ])
+        compare(results.filter(row => row.name === "redesign-repeat").length, 1)
+        verify(!results.some(row => row.name === "repeat" || row.name === "loop"))
+        verify(results.some(row => row.name === "input-repeat"))
+    }
     QtObject {
         id: subtitleService
         property bool configured: true
