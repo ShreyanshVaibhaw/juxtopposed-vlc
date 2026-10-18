@@ -68,6 +68,41 @@ TestCase {
     }
     RedesignPreferencesCatalog { id: catalog }
     QtObject {
+        id: startupStore
+        property int revision: 0
+        property bool restartRequired: false
+        property bool savedValue: true
+        function value(name) { return savedValue }
+        function describe(name) { return {kind: "bool", restartRequired: restartRequired} }
+        function stage(name, number) { savedValue = number; revision++; return true }
+    }
+    RedesignPreferenceRow {
+        id: startupRow
+        width: 784; y: 350; z: 30; visible: false
+        backend: startupStore; optionName: "media-library-startup"; label: "Use the media library"
+        presentation: ({dynamicChoices: true})
+    }
+    function test_restartNoteFollowsRuntimeMetadataAcrossSaveRefresh() {
+        startupRow.visible = true; wait(0)
+        const note = findChild(startupRow, "preferenceRestartNote")
+        verify(!note.visible)
+        const height = startupRow.implicitHeight
+        startupStore.restartRequired = true; startupStore.revision++
+        tryCompare(note, "visible", true); compare(note.text, "Restart VLC to use this change.")
+        tryVerify(() => startupRow.implicitHeight > height)
+        startupStore.revision++
+        verify(note.visible)
+        startupStore.restartRequired = false; startupStore.revision++
+        tryCompare(note, "visible", false)
+    }
+    function test_librarySearchUsesApplicationSettingAndKeepsExpertAccess() {
+        const nativeOptions = [{name: "media-library", title: "Use media library"}, {name: "media-library-startup", title: "Use the media library when VLC starts"}]
+        const result = catalog.searchResults("media library", nativeOptions)
+        compare(result.length, 1); compare(result[0].name, "media-library-startup")
+        const expert = catalog.searchResults("media-library", [nativeOptions[0]])
+        verify(expert.some(row => row.name === "media-library"))
+    }
+    QtObject {
         id: cacheStore
         property int revision: 0
         property int mode: 300
@@ -450,6 +485,8 @@ TestCase {
     SignalSpy { id: confirmationAccepted; target: confirmation; signalName: "accepted" }
     SignalSpy { id: confirmationRejected; target: confirmation; signalName: "rejected" }
     function init() {
+        startupRow.visible = false
+        startupStore.restartRequired = false; startupStore.savedValue = true; startupStore.revision++
         cacheControls.visible = false
         cacheStore.mode = 300; cacheStore.values = {"file-caching": 1000, "disc-caching": 300, "network-caching": 1000, "live-caching": 300}
         cacheStore.writes = []; cacheStore.revision++

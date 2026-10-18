@@ -214,7 +214,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
 
-    if( var_InheritBool( p_libvlc, "media-library") )
+    bool media_library = var_InheritBool(p_libvlc, "media-library");
+    /* Standalone launchers supply a default, not an explicit user choice.
+     * Keep libVLC's default and explicit command-line overrides independent. */
+    if (var_Type(p_libvlc, "media-library") == 0 &&
+        var_InheritBool(p_libvlc, "media-library-default"))
+        media_library = var_InheritBool(p_libvlc, "media-library-startup");
+    if (media_library)
     {
         priv->p_media_library = libvlc_MlCreate( p_libvlc );
         if ( priv->p_media_library == NULL )

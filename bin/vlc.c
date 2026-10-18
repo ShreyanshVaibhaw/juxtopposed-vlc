@@ -216,7 +216,7 @@ int main(int argc, const char *argv[])
     int count = 0;
 
     args[count++] = "--no-ignore-config";
-    args[count++] = "--media-library";
+    args[count++] = "--media-library-default";
 #ifdef HAVE_DBUS
     args[count++] = "--dbus";
 #endif

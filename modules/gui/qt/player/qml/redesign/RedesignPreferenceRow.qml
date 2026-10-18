@@ -134,6 +134,13 @@ ColumnLayout {
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
         }
     }
+    Text {
+        objectName: "preferenceRestartNote"
+        Layout.fillWidth: true
+        visible: !!root.description.restartRequired
+        text: qsTr("Restart VLC to use this change.")
+        color: theme.foreground; font.pixelSize: theme.dp(12); wrapMode: Text.WordWrap
+    }
     Component {
         id: segmentedEditor
         Rectangle {

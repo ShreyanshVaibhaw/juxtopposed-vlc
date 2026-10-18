@@ -224,7 +224,7 @@ int main(int i_argc, const char *ppsz_argv[])
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
-    argv[argc++] = "--media-library";
+    argv[argc++] = "--media-library-default";
 
     /* Overwrite system language */
     CFPropertyListRef lang_pref = CFPreferencesCopyAppValue(CFSTR("language"),

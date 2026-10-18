@@ -142,7 +142,7 @@ QtObject {
                 ["one-instance-when-started-from-file", qsTr("Apply to files opened from the file manager")],
                 ["playlist-enqueue", qsTr("Add to the playlist instead of replacing it")],
                 ["recursive", qsTr("When opening a folder")], ["show-hiddenfiles", qsTr("Show hidden files")] ] },
-            { title: qsTr("Metadata & Artwork"), rows: [ ["metadata-network-access", qsTr("Fetch titles and artwork"), {choices: [{label: qsTr("From the file only"), value: false}, {label: qsTr("From the file and the internet"), value: true}]}], ["media-library", qsTr("Use the media library")] ] } ],
+            { title: qsTr("Metadata & Artwork"), rows: [ ["metadata-network-access", qsTr("Fetch titles and artwork"), {choices: [{label: qsTr("From the file only"), value: false}, {label: qsTr("From the file and the internet"), value: true}]}], ["media-library-startup", qsTr("Use the media library"), {dynamicChoices: true}] ] } ],
         network: [
             { title: qsTr("Buffering"), rows: [ ["redesign-buffering", qsTr("Buffering")],
                 ["file-caching", qsTr("Local files"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}],
@@ -206,6 +206,7 @@ QtObject {
     // Search uses the same controls as the settings pages. The expert list,
     // and an exact search for a hyphenated native name, retain the native option.
     readonly property var searchAliases: ({
+        "media-library": "media-library-startup",
         "qt-buffering-custom": "redesign-buffering",
         "freetype-background-mode": "redesign-subtitle-background",
         "freetype-background-opacity": "redesign-subtitle-background-opacity",

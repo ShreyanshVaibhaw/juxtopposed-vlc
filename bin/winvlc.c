@@ -135,7 +135,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int j = 0;
     WCHAR *lang = NULL;
 
-    argv[j++] = strdup("--media-library");
+    argv[j++] = strdup("--media-library-default");
     argv[j++] = strdup("--no-ignore-config");
     for (int i = 1; i < argc; i++)
     {

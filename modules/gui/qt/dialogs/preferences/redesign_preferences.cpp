@@ -1323,6 +1323,14 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         }
     }
     result.insert(QStringLiteral("editor"), editor);
+    if (name == QLatin1String("media-library-startup")) {
+        const bool supported = module_exists("medialibrary");
+        result.insert(QStringLiteral("supported"), supported);
+        result.insert(QStringLiteral("restartRequired"), supported && m_ctx && m_libraryStartupEdited
+            && value(name).toBool() != m_ctx->hasMediaLibrary());
+        if (!supported)
+            result.insert(QStringLiteral("help"), qtr("The media library is not available in this build."));
+    }
     result.insert(QStringLiteral("kind"), kind);
     result.insert(QStringLiteral("choices"), choices);
     return result;
@@ -1581,6 +1589,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         ++m_revision; emit changed(); return false;
     }
     m_invalid.remove(name);
+    if (name == QLatin1String("media-library-startup")) m_libraryStartupEdited = true;
     if (isBufferingOption(name) && !value(QStringLiteral("qt-buffering-custom")).toBool())
         stage(QStringLiteral("qt-buffering-custom"), true);
     if (QStringList{QStringLiteral("hue"), QStringLiteral("brightness"), QStringLiteral("contrast"), QStringLiteral("saturation"), QStringLiteral("gamma")}.contains(name))

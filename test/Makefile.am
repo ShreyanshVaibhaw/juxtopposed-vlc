@@ -33,6 +33,7 @@ player_programs = \
 
 noinst_PROGRAMS =
 check_PROGRAMS = \
+    test_src_misc_media_library_startup \
 	test_src_misc_iso_language \
 	test_libvlc_core \
 	test_libvlc_downloader \
@@ -315,6 +316,8 @@ test_src_player_delays_SOURCES = src/player/common.h src/player/modules.c \
 test_src_player_delays_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_input_subtitle_style_SOURCES = src/input/subtitle_style.c
 test_src_input_subtitle_style_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_media_library_startup_SOURCES = src/misc/media_library_startup.c
+test_src_misc_media_library_startup_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_input_overlay_opacity_SOURCES = src/input/overlay_opacity.c
 test_src_input_overlay_opacity_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_input_subtitle_duration_SOURCES = src/input/subtitle_duration.c

@@ -2241,6 +2241,10 @@ vlc_module_begin ()
     add_bool( "dbus", false, DBUS_TEXT, DBUS_LONGTEXT )
 #endif
     add_bool( "media-library", false, ML_TEXT, ML_LONGTEXT )
+    add_bool( "media-library-default", false, NULL, NULL )
+        change_volatile()
+    add_bool( "media-library-startup", true, N_("Use the media library when VLC starts"),
+              N_("Use the media library when VLC starts. Restart VLC after a change. The command line can set a different value.") )
     add_bool( "playlist-tree", false, PLTREE_TEXT, PLTREE_LONGTEXT )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT )

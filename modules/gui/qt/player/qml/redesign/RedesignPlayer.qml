@@ -384,7 +384,7 @@ FocusScope {
                     visible: !MainCtx.mediaLibraryAvailable
                     expanded: view.libraryExpanded
                     scaleFactor: view.scaleFactor; lightTheme: view.lightTheme; accentColor: view.accentColor
-                    emptyText: qsTr("This VLC build has no media library. Open files or a folder to add them to the queue.")
+                    emptyText: qsTr("The media library is not available. Open files or a folder to add them to the queue.")
                     onAddRequested: DialogsProvider.simpleOpenDialog()
                     onCategoryRequested: category => category === 3 ? DialogsProvider.openNetDialog() : DialogsProvider.simpleOpenDialog()
                 }

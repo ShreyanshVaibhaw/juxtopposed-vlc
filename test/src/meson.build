@@ -306,6 +306,14 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_misc_media_library_startup',
+    'sources' : files('misc/media_library_startup.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['medialibrary'],
+}
+
+vlc_tests += {
     'name' : 'test_src_player_lifecycle',
     'sources' : files(
         'player/common.h',
