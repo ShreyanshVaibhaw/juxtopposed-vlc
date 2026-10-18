@@ -129,6 +129,13 @@ TestCase {
         relative.forceActiveFocus(); keyClick(Qt.Key_Space)
         compare(choice.currentText, "125 %"); compare(sizeStore.value("sub-text-size-pixels"), 37)
     }
+    function test_verticalPositionFollowsTheBackgroundControls() {
+        const rows = catalog.sections.subtitles.find(section => section.title === "Appearance").rows
+        compare(rows[rows.length - 2][0], "redesign-subtitle-background-opacity")
+        compare(rows[rows.length - 1][0], "sub-text-vertical-position")
+        const result = catalog.searchResults("vertical position", [{name: "sub-text-vertical-position", title: "Subtitle vertical position"}])
+        compare(result.length, 1); compare(result[0].title, "Vertical position")
+    }
     function test_customFontSizeValidatesAndSavesInSelectedMode() {
         sizeControls.visible = true
         const field = beginCustomSize()

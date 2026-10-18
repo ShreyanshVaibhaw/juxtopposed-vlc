@@ -39,6 +39,7 @@ enum substext_updater_region_flags_e
     UPDT_REGION_IGNORE_BACKGROUND      = 1 << 4,
     UPDT_REGION_USES_GRID_COORDINATES  = 1 << 5,
     UPDT_REGION_USES_16_9_GRID         = 1 << 6,
+    UPDT_REGION_DEFAULT_POSITION      = 1 << 7,
     UPDT_REGION_FIXED_DONE             = 1 << 31,
 };
 
@@ -292,6 +293,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->b_in_window = update_region->b_in_window;
         r->i_align = update_region->align;
         r->text_flags |= update_region->inner_align & SUBPICTURE_ALIGN_MASK;
+        if (update_region->flags & UPDT_REGION_DEFAULT_POSITION)
+            r->text_flags |= VLC_SUBPIC_TEXT_FLAG_DEFAULT_POSITION;
         /* Manual styles draw their own background under each text segment.
          * Do not blend a second region background over the same pixels. */
         if (!use_embedded_style || (update_region->flags & UPDT_REGION_IGNORE_BACKGROUND))

@@ -62,6 +62,8 @@ static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff", "webp" };
 static const int subtitle_size_modes[] = {0, 1};
 static const char *const subtitle_size_mode_names[] = {N_("Relative"), N_("Pixels")};
+static const int subtitle_vertical_positions[] = {SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP};
+static const char *const subtitle_vertical_position_names[] = {N_("Bottom"), N_("Center"), N_("Top")};
 
 /*****************************************************************************
  * Configuration options for the core module. Each module will also separately
@@ -1888,6 +1890,9 @@ vlc_module_begin ()
         change_integer_list( subtitle_size_modes, subtitle_size_mode_names )
     add_integer_with_range( "sub-text-size-pixels", 30, 1, 500, N_("Subtitle font size (px)"),
                             N_("Set the subtitle font size in pixels.") )
+    add_integer( "sub-text-vertical-position", SUBPICTURE_ALIGN_BOTTOM, N_("Subtitle vertical position"),
+                 N_("Set the position of text subtitles on the primary track. Subtitles with a position in the file keep that position.") )
+        change_integer_list( subtitle_vertical_positions, subtitle_vertical_position_names )
     set_section( N_( "Overlays" ) , NULL )
     add_module_list("sub-source", "sub source", NULL,
                     SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT)

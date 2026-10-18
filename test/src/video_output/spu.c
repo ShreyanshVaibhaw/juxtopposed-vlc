@@ -98,11 +98,7 @@ static const es_format_t dec_fmt_in =
     .i_cat = SPU_ES,
 };
 
-static decoder_t dec_subpicture =
-{
-    .fmt_in = &dec_fmt_in,
-    .cbs = &dec_subpicture_cbs,
-};
+static decoder_t *dec_subpicture;
 
 static subpicture_t *create_subtitle(unsigned w, unsigned h, int nb_regions)
 {
@@ -110,7 +106,7 @@ static subpicture_t *create_subtitle(unsigned w, unsigned h, int nb_regions)
     video_format_Init(&fmt, 0);
     video_format_Setup(&fmt, VLC_CODEC_RGBA, w, h, w, h, 1, 1);
 
-    subpicture_t *sub = decoder_NewSubpicture(&dec_subpicture, NULL);
+    subpicture_t *sub = decoder_NewSubpicture(dec_subpicture, NULL);
     if(!sub)
         return NULL;
 
@@ -144,7 +140,7 @@ static subpicture_t *create_text_subtitle(int nb_regions)
     video_format_t fmt;
     video_format_Init(&fmt, VLC_CODEC_TEXT);
 
-    subpicture_t *sub = decoder_NewSubpictureText(&dec_subpicture);
+    subpicture_t *sub = decoder_NewSubpictureText(dec_subpicture);
     if(!sub)
         return NULL;
 
@@ -1007,6 +1003,67 @@ failed:
     return 1;
 }
 
+static int test_default_text_position(spu_t *spu)
+{
+    video_format_t fmt;
+    video_format_Init(&fmt, VLC_CODEC_RGBA);
+    video_format_Setup(&fmt, VLC_CODEC_RGBA, 1920, 1080, 1920, 1080, 1, 1);
+    const int positions[] = {SUBPICTURE_ALIGN_BOTTOM, SUBPICTURE_ALIGN_TOP, 0,
+                             SUBPICTURE_ALIGN_TOP, SUBPICTURE_ALIGN_BOTTOM};
+    for (unsigned kind = 0; kind < 4; ++kind)
+    {
+        subpicture_t *sub = kind == 3 ? create_subtitle(100, 100, 1) : create_text_subtitle(1);
+        EXPECT(sub != NULL);
+        sub->i_start = VLC_TICK_0;
+        sub->i_stop = VLC_TICK_0 + VLC_TICK_FROM_SEC(10);
+        if (kind != 3)
+        {
+            subtext_updater_sys_t *sys = sub->updater.sys;
+            sys->margin_ratio = .04f;
+            sys->region.b_absolute = false;
+            sys->region.align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+            if (kind != 1)
+                sys->region.flags |= UPDT_REGION_DEFAULT_POSITION;
+            if (kind == 2)
+                sub->b_subtitle = false;
+        }
+        else
+        {
+            subpicture_region_t *region = vlc_spu_regions_first_or_null(&sub->regions);
+            region->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+            region->i_y = 43;
+        }
+        spu_PutSubpicture(spu, sub);
+        for (unsigned index = 0; index < ARRAY_SIZE(positions); ++index)
+        {
+            config_PutInt("sub-text-vertical-position", positions[index]);
+            const int expected_y = kind != 0 || positions[index] == SUBPICTURE_ALIGN_BOTTOM ? 937
+                : positions[index] == SUBPICTURE_ALIGN_TOP ? 43 : 490;
+            // Repeated renders exercise cached positions as well as live changes.
+            for (unsigned frame = 0; frame < 3; ++frame)
+            {
+                vlc_render_subpicture *output = spu_Render(spu, chroma_list, &fmt, &fmt,
+                    false, NULL, VLC_TICK_0, VLC_TICK_0, false);
+                EXPECT(output != NULL);
+                const bool valid = output->regions.size == 1
+                    && output->regions.data[0]->place.y == expected_y
+                    && output->regions.data[0]->place.x == (kind == 3 ? 0 : 76);
+                if (!valid)
+                    fprintf(stderr, "Default position kind=%u position=%d frame=%u got y=%d expected=%d\n",
+                        kind, positions[index], frame, output->regions.size ? output->regions.data[0]->place.y : -1, expected_y);
+                vlc_render_subpicture_Delete(output);
+                EXPECT(valid);
+            }
+        }
+        test_reset_SPU(spu);
+    }
+    config_PutInt("sub-text-vertical-position", SUBPICTURE_ALIGN_BOTTOM);
+    return 0;
+failed:
+    config_PutInt("sub-text-vertical-position", SUBPICTURE_ALIGN_BOTTOM);
+    return 1;
+}
+
 int main(int argc, char **argv)
 {
     test_init();
@@ -1015,6 +1072,11 @@ int main(int argc, char **argv)
 
     libvlc_instance_t *libvlc = libvlc_new(ARRAY_SIZE(libvlc_argv), libvlc_argv);
     assert(libvlc);
+
+    dec_subpicture = vlc_object_create(&libvlc->p_libvlc_int->obj, sizeof(*dec_subpicture));
+    assert(dec_subpicture != NULL);
+    dec_subpicture->fmt_in = &dec_fmt_in;
+    dec_subpicture->cbs = &dec_subpicture_cbs;
 
     spu_t *spu = spu_Create(&libvlc->p_libvlc_int->obj, NULL);
     assert(spu);
@@ -1051,7 +1113,11 @@ int main(int argc, char **argv)
 
     ret |= test_spu_crop(spu);
 
+    test_reset_SPU(spu);
+    ret |= test_default_text_position(spu);
+
     spu_Destroy(spu);
+    vlc_object_delete(dec_subpicture);
 
     libvlc_release(libvlc);
 

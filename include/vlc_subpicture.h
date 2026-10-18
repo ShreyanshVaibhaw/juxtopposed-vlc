@@ -60,6 +60,8 @@ typedef struct filter_t vlc_blender_t;
 #define VLC_SUBPIC_TEXT_FLAG_IS_TEXT           (1 << 7)
 /** Use the text style's pixel size without relative text scaling. */
 #define VLC_SUBPIC_TEXT_FLAG_PIXEL_SIZE        (1 << 8)
+/** The text has no position set by its subtitle file. */
+#define VLC_SUBPIC_TEXT_FLAG_DEFAULT_POSITION  (1 << 9)
 
 /** Invalidate cached text subtitle styles after changing appearance settings. */
 VLC_API void vlc_subpicture_InvalidateTextStyle(void);

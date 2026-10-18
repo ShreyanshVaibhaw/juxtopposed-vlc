@@ -417,6 +417,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     p_spu_sys->region.b_absolute = false; p_spu_sys->region.b_in_window = false;
     p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
+    p_spu_sys->region.flags |= UPDT_REGION_DEFAULT_POSITION;
 
     text_style_Merge( p_spu_sys->p_default_style, p_root_style, true );
     FontSizeConvert( p_root_style, p_spu_sys->p_default_style );
