@@ -26,6 +26,7 @@
 #endif
 
 #include "mainctx_win32.hpp"
+#include "window_csd_geometry.hpp"
 
 #include "maininterface/compositor.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -207,49 +208,9 @@ public:
                 return true;
             }
 
-
-            bool nonClientAreaExists = false;
             const auto clientRect = &(reinterpret_cast<LPNCCALCSIZE_PARAMS>(msg->lParam)->rgrc[0]);
-            // We don't need this correction when we're fullscreen. We will
-            // have the WS_POPUP size, so we don't have to worry about
-            // borders, and the default frame will be fine.
-            if (IsZoomed(msg->hwnd) && (m_window->windowState() != Qt::WindowFullScreen))
-            {
-                // Windows automatically adds a standard width border to all
-                // sides when a window is maximized. We have to remove it
-                // otherwise the content of our window will be cut-off from
-                // the screen.
-                // The value of border width and border height should be
-                // identical in most cases, when the scale factor is 1.0, it
-                // should be eight pixels.
-                const int rbh = resizeBorderHeight(m_window);
-                clientRect->top += rbh;
-                clientRect->bottom -= rbh;
-
-                const int rbw = resizeBorderWidth(m_window);
-                clientRect->left += rbw;
-                clientRect->right -= rbw;
-                nonClientAreaExists = true;
-            }
-            else if (m_platformHandlesResize && !IsZoomed(msg->hwnd))
-            {
-                // Resize outside client area:
-
-                // Before entering to fullscreen, Windows sends a WM_NCCALCSIZE message to determine
-                // the window geometry for fullscreen. In this case, we should not make an adjustment
-                // so that the window gets placed appropriately. At the same time, when getting
-                // restored from full screen, we should make this adjustment (state is still fullscreen):
-                if (m_window->property("__windowFullScreen").toInt() == 0) // not about to enter full screen OR about to restore from full screen OR stateless window
-                {
-                    // Do not adjust top, top is resized within the caption area. This is the behavior of SSD as well.
-                    const int resizeWidth = resizeBorderWidth(m_window);
-                    clientRect->left += resizeWidth;
-                    clientRect->right -= resizeWidth;
-                    clientRect->bottom -= resizeBorderHeight(m_window);
-                    nonClientAreaExists = true;
-                }
-            }
-
+            const bool nonClientAreaExists = adjustCSDClientRect(m_window, m_platformHandlesResize,
+                resizeBorderWidth(m_window), resizeBorderHeight(m_window), clientRect);
             *result = nonClientAreaExists ? 0 : WVR_REDRAW;
             return true;
         }

@@ -192,6 +192,7 @@ libqt_plugin_la_SOURCES = \
 	maininterface/mainctx.cpp \
 	maininterface/mainctx.hpp \
 	maininterface/window_fullscreen.hpp \
+	maininterface/window_csd_geometry.hpp \
 	maininterface/mainctx_submodels.cpp maininterface/mainctx_submodels.hpp \
 	maininterface/mainui.cpp \
 	maininterface/mainui.hpp \
@@ -1916,7 +1917,7 @@ QT_QTEST_COMMON_ldadd = $(QT_LIBS) $(LIBS_qt) $(QT_QTEST_LIBS) $(LIBVLCCORE) $(L
 QT_QTEST_COMMON_ldflags = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
 
 if HAVE_WIN32
-test_window_fullscreen_SOURCES = tests/test_window_fullscreen.cpp maininterface/window_fullscreen.hpp util/win32_emutls.cpp
+test_window_fullscreen_SOURCES = tests/test_window_fullscreen.cpp maininterface/window_fullscreen.hpp maininterface/window_csd_geometry.hpp util/win32_emutls.cpp
 nodist_test_window_fullscreen_SOURCES = tests/test_window_fullscreen.moc
 BUILT_SOURCES += tests/test_window_fullscreen.moc
 CLEANFILES += tests/test_window_fullscreen.moc
