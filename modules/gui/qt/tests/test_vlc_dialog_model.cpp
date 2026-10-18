@@ -20,6 +20,8 @@
 #include <QTest>
 #include <QSignalSpy>
 #include <QThreadPool>
+#include <QGuiApplication>
+#include <vlc_variables.h>
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include <vlc_cxx_helpers.hpp>
 
@@ -49,6 +51,8 @@ private slots:
     }
 
     void init() {
+        var_Create(m_intf, "qt-error-dialogs", VLC_VAR_BOOL);
+        var_SetBool(m_intf, "qt-error-dialogs", true);
         VLCDialogModel::getInstance(m_intf);
         m_dialog = new VLCDialog();
         m_loginSpy = std::make_unique<QSignalSpy>(m_dialog, &VLCDialog::login);
@@ -70,21 +74,26 @@ private slots:
             VLCDialogModel::killInstance();
         }
         delete m_dialog;
+        var_Destroy(m_intf, "qt-error-dialogs");
     }
 
     void testLogin_data() {
         QTest::addColumn<UserAnswer>("userReply");
         QTest::addColumn<int>("expectedReply");
+        QTest::addColumn<bool>("notificationsEnabled");
 
-        QTest::newRow("login") << PostLogin << 1;
-        QTest::newRow("dismiss") << Dismiss << 0;
-        QTest::newRow("wrongAnswer") << PostAction1 << VLC_EGENERIC;
+        QTest::newRow("login") << PostLogin << 1 << true;
+        QTest::newRow("dismiss") << Dismiss << 0 << true;
+        QTest::newRow("wrongAnswer") << PostAction1 << VLC_EGENERIC << true;
+        QTest::newRow("loginWithNotificationsOff") << PostLogin << 1 << false;
     }
 
     //failed state when no renderer manager is found
     void testLogin() {
         QFETCH(UserAnswer, userReply);
         QFETCH(int, expectedReply);
+        QFETCH(bool, notificationsEnabled);
+        var_SetBool(m_intf, "qt-error-dialogs", notificationsEnabled);
 
         QObject::connect(m_dialog, &VLCDialog::login, this, [&](
             DialogId dialogId, const QString & title,
@@ -151,6 +160,62 @@ private slots:
         QCOMPARE(m_progressSpy->count(), 0);
         QCOMPARE(m_progressUpdatedSpy->count(), 0);
         QCOMPARE(m_canceledSpy->count(), 0);
+    }
+
+    void testSuppressedQuestions_data() {
+        QTest::addColumn<int>("type");
+        QTest::newRow("normal") << int(VLC_DIALOG_QUESTION_NORMAL);
+        QTest::newRow("warning") << int(VLC_DIALOG_QUESTION_WARNING);
+    }
+
+    void testSuppressedQuestions() {
+        QFETCH(int, type);
+        var_SetBool(m_intf, "qt-error-dialogs", false);
+        // No provider is installed: suppression must return without waiting
+        // for the UI or accepting either action.
+        int reply = vlc_dialog_wait_question(m_intf, vlc_dialog_question_type(type),
+            "Cancel", "Continue", "Other", "Question", "Test question");
+        QCOMPARE(reply, 0);
+        QCOMPARE(m_questionSpy->count(), 0);
+    }
+
+    void testCriticalQuestionWithNotificationsOff() {
+        var_SetBool(m_intf, "qt-error-dialogs", false);
+        QObject::connect(m_dialog, &VLCDialog::question, this,
+            [this](DialogId id, const QString &, const QString &, VLCDialog::QuestionType type,
+                   const QString &, const QString &, const QString &) {
+                QCOMPARE(type, VLCDialog::QUESTION_CRITICAL);
+                m_dialog->post_action1(id);
+            });
+        VLCDialogModel::getInstance<false>()->setProvider(m_dialog);
+        int reply = vlc_dialog_wait_question(m_intf, VLC_DIALOG_QUESTION_CRITICAL,
+            "Cancel", "Continue", nullptr, "Critical question", "Test question");
+        QCOMPARE(reply, 1);
+        QCOMPARE(m_questionSpy->count(), 1);
+    }
+
+    void testErrorHistoryWithNotificationsOff() {
+        DialogErrorModel errors(m_intf);
+        QSignalSpy preferences(&errors, &DialogErrorModel::notificationsEnabledChanged);
+        var_SetBool(m_intf, "qt-error-dialogs", false);
+        errors.refreshNotificationPreference();
+        QVERIFY(!errors.notificationsEnabled());
+        vlc_dialog_display_error(m_intf, "Hidden error", "Error details");
+        QTRY_COMPARE(errors.count(), 1);
+        QCOMPARE(errors.data(errors.index(0), DialogErrorModel::DIALOG_TITLE).toString(), "Hidden error");
+        QCOMPARE(errors.repeatedMessageCount(), 0);
+        QVERIFY(errors.notificationText().isEmpty());
+        var_SetBool(m_intf, "qt-error-dialogs", true);
+        errors.refreshNotificationPreference();
+        vlc_dialog_display_error(m_intf, "Visible error", "Error details");
+        QTRY_COMPARE(errors.count(), 2);
+        QCOMPARE(errors.repeatedMessageCount(), 1);
+        QCOMPARE(errors.notificationText(), "Visible error");
+        var_SetBool(m_intf, "qt-error-dialogs", false);
+        errors.refreshNotificationPreference();
+        QCOMPARE(errors.repeatedMessageCount(), 0);
+        QCOMPARE(errors.count(), 2);
+        QCOMPARE(preferences.count(), 3);
     }
 
     void testQuestion_data() {
@@ -220,7 +285,15 @@ private slots:
     }
 
     //failed state when no renderer manager is found
+    void testProgress_data() {
+        QTest::addColumn<bool>("notificationsEnabled");
+        QTest::newRow("enabled") << true;
+        QTest::newRow("disabled") << false;
+    }
+
     void testProgress() {
+        QFETCH(bool, notificationsEnabled);
+        var_SetBool(m_intf, "qt-error-dialogs", notificationsEnabled);
         QObject::connect(m_dialog, &VLCDialog::progress, this,
                          [&](DialogId, const QString& title, const QString& text,
                                 bool b_indeterminate, float f_position, const QString& cancel){
@@ -366,5 +439,5 @@ private:
     std::unique_ptr<QSignalSpy> m_canceledSpy;
 };
 
-QTEST_GUILESS_MAIN(TestVLCDialogModel)
+QTEST_MAIN(TestVLCDialogModel)
 #include "test_vlc_dialog_model.moc"

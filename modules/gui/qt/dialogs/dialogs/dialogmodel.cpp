@@ -22,6 +22,7 @@
 
 // VLC includes
 #include <vlc_dialog.h>
+#include <vlc_variables.h>
 #include "qt.hpp"
 #include <QThread>
 
@@ -123,6 +124,14 @@ void DialogErrorModel::pushError(const DialogError & error)
 
     endInsertRows();
 
+    if (!notificationsEnabled())
+    {
+        // Keep the error in history and in the log without showing a popup.
+        msg_Err(m_intf, "%s: %s", qtu(error.title), qtu(error.text));
+        emit countChanged();
+        return;
+    }
+
     if (lastNotificationText == error.title)
         repeatedNotificationCount += 1;
     else{
@@ -149,6 +158,18 @@ void DialogErrorModel::pushError(const DialogError & error)
 //-------------------------------------------------------------------------------------------------
 // Properties
 //-------------------------------------------------------------------------------------------------
+
+bool DialogErrorModel::notificationsEnabled() const
+{
+    return var_InheritBool(m_intf, "qt-error-dialogs");
+}
+
+void DialogErrorModel::refreshNotificationPreference()
+{
+    if (!notificationsEnabled())
+        resetRepeatedMessageCount();
+    emit notificationsEnabledChanged();
+}
 
 int DialogErrorModel::count() const
 {
@@ -203,6 +224,12 @@ void onDialogQuestion(void * p_data, vlc_dialog_id * dialogId,
                                           const char * psz_action2)
 {
     auto model = static_cast<VLCDialogModel *>(p_data);
+    if (!model->shouldShowQuestion(i_type))
+    {
+        // Suppression must never accept an action on the user's behalf.
+        vlc_dialog_id_dismiss(dialogId);
+        return;
+    }
     model->dialogCallback(dialogId, [=](VLCDialog* provider){
         emit provider->question(
             dialogId, psz_title, psz_text,
@@ -265,6 +292,11 @@ VLCDialogModel::~VLCDialogModel()
         while (m_pendingDialog > 0)
             m_pendingDialogCond.wait(&m_lock);
     }
+}
+
+bool VLCDialogModel::shouldShowQuestion(vlc_dialog_question_type type) const
+{
+    return type == VLC_DIALOG_QUESTION_CRITICAL || var_InheritBool(m_intf, "qt-error-dialogs");
 }
 
 VLCDialog* VLCDialogModel::getProvider() const

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "redesign_preferences.hpp"
+#include "dialogs/dialogs/dialogmodel.hpp"
 #include "player/stereo_test_player.hpp"
 #include "player/player_controller.hpp"
 #include "util/renderer_manager.hpp"
@@ -1154,6 +1155,8 @@ QVariant RedesignPreferences::value(const QString& name) const
 
     const auto it = m_edits.constFind(name);
     if (it != m_edits.cend()) return *it;
+    if (m_ctx && name == QLatin1String("qt-error-dialogs"))
+        return var_InheritBool(m_ctx->getIntf(), "qt-error-dialogs");
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
@@ -1663,6 +1666,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         }
     }
     result.insert(QStringLiteral("editor"), editor);
+    if (name == QLatin1String("qt-error-dialogs"))
+        result.insert(QStringLiteral("help"), qtr("Show error messages and confirmation questions. When this is off, VLC cancels normal and warning questions. Errors stay in the error history. Login, progress and critical questions stay on."));
     if (name == QLatin1String("language")) {
         choices = installedInterfaceLanguages();
         choices.prepend(QVariantMap{{QStringLiteral("label"), qtr("System language")}, {QStringLiteral("value"), QStringLiteral("auto")}});
@@ -2062,6 +2067,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
+    if (m_ctx && name == QLatin1String("qt-error-dialogs"))
+        applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
@@ -2179,7 +2186,7 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs"}) {
         if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -2187,6 +2194,9 @@ bool RedesignPreferences::save()
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));
     }
+    if (previous.contains(QStringLiteral("qt-error-dialogs")))
+        if (auto* errors = DialogErrorModel::getInstance<false>())
+            errors->refreshNotificationPreference();
     if (previous.contains(QStringLiteral("qt-discover-cast-devices")))
         m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
             bool(config_GetInt("qt-discover-cast-devices")));
@@ -2474,11 +2484,13 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs"}) {
         if (var_Type(intf, option) == 0)
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));
     }
+    if (auto* errors = DialogErrorModel::getInstance<false>())
+        errors->refreshNotificationPreference();
     intf->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
         bool(config_GetInt("qt-discover-cast-devices")));
     vlc_playlist_Lock(intf->p_playlist);

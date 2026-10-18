@@ -62,6 +62,7 @@ class DialogErrorModel : public QAbstractListModel, public Singleton<DialogError
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool notificationsEnabled READ notificationsEnabled NOTIFY notificationsEnabledChanged FINAL)
     Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
     Q_PROPERTY(QString notificationText READ notificationText NOTIFY countChanged FINAL)
     Q_PROPERTY(int repeatedMessageCount READ repeatedMessageCount NOTIFY countChanged FINAL)
@@ -108,8 +109,11 @@ signals:
     void modelChanged();
 
     void countChanged();
+    void notificationsEnabledChanged();
 
 public: // Properties
+    bool notificationsEnabled() const;
+    void refreshNotificationPreference();
     int count() const;
     QString notificationText() const;
     int repeatedMessageCount() const;
@@ -184,6 +188,8 @@ public:
     void setProvider(VLCDialog*);
 
 public:
+    bool shouldShowQuestion(vlc_dialog_question_type type) const;
+
     //block dialog until m_provider is available the call the callback on it
     void dialogCallback(vlc_dialog_id*, std::function<void(VLCDialog* provider)>);
 

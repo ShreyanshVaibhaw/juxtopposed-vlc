@@ -44,7 +44,7 @@ Item {
     // Events
     //---------------------------------------------------------------------------------------------
 
-    Component.onCompleted: if (DialogErrorModel.repeatedMessageCount){
+    Component.onCompleted: if (DialogErrorModel.notificationsEnabled && DialogErrorModel.repeatedMessageCount){
                                hideErrorPopupTimer.restart()
                                errorPopup.state = "visible"
                            }
@@ -144,7 +144,15 @@ Item {
     {
         target: DialogErrorModel
 
+        function onNotificationsEnabledChanged() {
+            if (!DialogErrorModel.notificationsEnabled) {
+                hideErrorPopupTimer.stop()
+                errorPopup.state = "hidden"
+            }
+        }
+
         function onCountChanged() {
+            if (!DialogErrorModel.notificationsEnabled) return
             hideErrorPopupTimer.restart()
             errorPopup.state = "visible"
         }
@@ -156,6 +164,7 @@ Item {
 
     Widgets.DrawerExt {
         id: errorPopup
+        objectName: "errorNotificationPopup"
 
         property string messageText
         property int repeatedMessageCount: 0
