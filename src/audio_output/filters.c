@@ -400,36 +400,6 @@ struct aout_filters
         (e.g. equalization) and their conversions */
 };
 
-/** Callback for visualization selection */
-static int VisualizationCallback (vlc_object_t *obj, const char *var,
-                                  vlc_value_t oldval, vlc_value_t newval,
-                                  void *data)
-{
-    const char *mode = newval.psz_string;
-
-    if (!*mode)
-        mode = "none";
-    /* FIXME: This ugly hack enforced by visual effect-list, as is the need for
-     * separate "visual" (external) and "audio-visual" (internal) variables...
-     * The visual plugin should have one submodule per effect instead. */
-    static const char *const effects[] = {
-        "dummy", "scope", "spectrometer", "spectrum", "vuMeter",
-    };
-    for (size_t i = 0; i < ARRAY_SIZE(effects); i++)
-        if (!strcasecmp (mode, effects[i]))
-        {
-            var_Create (obj, "effect-list", VLC_VAR_STRING);
-            var_SetString (obj, "effect-list", mode);
-            mode = "visual";
-            break;
-        }
-
-    var_SetString (obj, "audio-visual", mode);
-    aout_InputRequestRestart ((audio_output_t *)obj);
-    (void) var; (void) oldval; (void) data;
-    return VLC_SUCCESS;
-}
-
 struct filter_owner_sys
 {
     vlc_clock_t *clock_source;
@@ -620,9 +590,6 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, vlc_clock_t *clock,
     audio_sample_format_t input_format = *infmt;
     audio_sample_format_t output_format = *outfmt;
 
-    /* Callbacks (before reading values and also before return statement) */
-    var_AddCallback (obj, "visual", VisualizationCallback, NULL);
-
     if (!AOUT_FMT_LINEAR(outfmt))
     {   /* Non-linear output: just convert formats, no filters/visu */
         if (!AOUT_FMTS_IDENTICAL(infmt, outfmt))
@@ -746,7 +713,6 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, vlc_clock_t *clock,
 
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    var_DelCallback(obj, "visual", VisualizationCallback, NULL);
     free (filters);
     return NULL;
 }
@@ -818,10 +784,10 @@ aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
  */
 void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
 {
+    (void) obj;
     if (filters->resampler.f != NULL)
         aout_FiltersPipelineDestroy(&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    var_DelCallback(obj, "visual", VisualizationCallback, NULL);
     free (filters);
 }
 

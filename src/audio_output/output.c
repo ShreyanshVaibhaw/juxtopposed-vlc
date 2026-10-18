@@ -209,6 +209,40 @@ static const struct vlc_audio_output_events aout_events = {
     aout_GainNotify,
 };
 
+/** Callback for visualization selection */
+static int VisualizationCallback (vlc_object_t *obj, const char *var,
+                                  vlc_value_t oldval, vlc_value_t newval,
+                                  void *data)
+{
+    const char *mode = newval.psz_string;
+
+    if (!*mode)
+        mode = "none";
+    /* FIXME: This ugly hack enforced by visual effect-list, as is the need for
+     * separate "visual" (external) and "audio-visual" (internal) variables...
+     * The visual plugin should have one submodule per effect instead. */
+    static const char *const effects[] = {
+        "dummy", "scope", "spectrometer", "spectrum", "vuMeter",
+    };
+    for (size_t i = 0; i < ARRAY_SIZE(effects); i++)
+        if (!strcasecmp (mode, effects[i]))
+        {
+            var_Create (obj, "effect-list", VLC_VAR_STRING);
+            var_SetString (obj, "effect-list", mode);
+            mode = "visual";
+            break;
+        }
+
+    var_SetString (obj, "audio-visual", mode);
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_owner_t *owner = aout_owner(aout);
+    vlc_mutex_lock(&owner->lock);
+    aout_InputRequestRestart(aout);
+    vlc_mutex_unlock(&owner->lock);
+    (void) var; (void) oldval; (void) data;
+    return VLC_SUCCESS;
+}
+
 static int FilterCallback (vlc_object_t *obj, const char *var,
                            vlc_value_t prev, vlc_value_t cur, void *data)
 {
@@ -383,6 +417,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
     }
     free (str);
 
+    /* Keep idle choices in sync before a stream creates its filters. */
+    var_AddCallback(aout, "visual", VisualizationCallback, NULL);
+
     var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_AddCallback (aout, "audio-filter", FilterCallback, NULL);
     var_Change(aout, "audio-filter", VLC_VAR_SETTEXT, _("Audio filters"));
@@ -477,6 +514,8 @@ audio_output_t *aout_Hold(audio_output_t *aout)
 static void aout_Destroy (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
+
+    var_DelCallback(aout, "visual", VisualizationCallback, NULL);
 
     vlc_mutex_lock(&owner->lock);
     module_unneed (aout, owner->module);

@@ -123,6 +123,9 @@ void *vout_Create(void *obj) { (void) obj; return NULL; }
 int vout_Request(const void *cfg, void *vctx, void *input);
 int vout_Request(const void *cfg, void *vctx, void *input)
 { (void) cfg; (void) vctx; (void) input; return -1; }
+int vout_ChangeVisualizationFormat(vout_thread_t *vout, const video_format_t *fmt);
+int vout_ChangeVisualizationFormat(vout_thread_t *vout, const video_format_t *fmt)
+{ (void) vout; (void) fmt; return VLC_EGENERIC; }
 bool config_IsSafe(const char *name);
 bool config_IsSafe(const char *name) { (void) name; return false; }
 
@@ -150,6 +153,57 @@ static void start_output(vlc_clock_t *clock, vlc_tick_t system_ts,
     vlc_clock_Lock(clock);
     vlc_clock_Start(clock, system_ts, ts);
     vlc_clock_Unlock(clock);
+}
+
+static void check_visualization(audio_output_t *aout, const char *selection,
+                                const char *module, const char *effect)
+{
+    assert(var_SetString(aout, "visual", selection) == VLC_SUCCESS);
+    char *value = var_GetString(aout, "audio-visual");
+    assert(value != NULL && !strcmp(value, module));
+    free(value);
+    value = var_InheritString(aout, "effect-list");
+    assert(value != NULL && !strcmp(value, effect));
+    free(value);
+}
+
+static void test_idle_visualization(libvlc_int_t *vlc)
+{
+    var_Create(vlc, "aout", VLC_VAR_STRING);
+    var_SetString(vlc, "aout", MODULE_STRING);
+    var_Create(vlc, "audio-visual", VLC_VAR_STRING);
+    var_SetString(vlc, "audio-visual", "none");
+    var_Create(vlc, "effect-list", VLC_VAR_STRING);
+    var_SetString(vlc, "effect-list", "spectrum");
+
+    audio_output_t *aout = aout_New(vlc);
+    assert(aout != NULL);
+    check_visualization(aout, "spectrum", "visual", "spectrum");
+    check_visualization(aout, "scope", "visual", "scope");
+    check_visualization(aout, "glspectrum", "glspectrum", "scope");
+    check_visualization(aout, "", "none", "scope");
+    check_visualization(aout, "visual", "visual", "scope");
+    check_visualization(aout, "", "none", "scope");
+    aout_Release(aout);
+}
+
+struct visualization_race
+{
+    audio_output_t *aout;
+    vlc_sem_t start;
+    vlc_sem_t done;
+};
+
+static void *change_visualization_during_teardown(void *opaque)
+{
+    struct visualization_race *race = opaque;
+    for (unsigned i = 0; i < 32; ++i)
+    {
+        vlc_sem_wait(&race->start);
+        assert(var_SetString(race->aout, "visual", i % 2 ? "" : "none") == VLC_SUCCESS);
+        vlc_sem_post(&race->done);
+    }
+    return NULL;
 }
 
 static void test_flush_stops_resampling(libvlc_int_t *vlc)
@@ -234,8 +288,30 @@ static void test_flush_stops_resampling(libvlc_int_t *vlc)
     vlc_aout_stream_Play(stream, make_frame(&fmt, stream1));
     assert(resampling == 0);
 
+    check_visualization(aout, "none", "none", "spectrum");
+    check_visualization(aout, "", "none", "spectrum");
+    vlc_aout_stream_Play(stream, make_frame(&fmt, stream1 + frame_len));
     vlc_aout_stream_Delete(stream);
 
+    check_visualization(aout, "scope", "visual", "scope");
+    check_visualization(aout, "", "none", "scope");
+
+    struct visualization_race race = { .aout = aout };
+    vlc_sem_init(&race.start, 0);
+    vlc_sem_init(&race.done, 0);
+    vlc_thread_t changer;
+    assert(vlc_clone(&changer, change_visualization_during_teardown, &race) == 0);
+    for (unsigned i = 0; i < 32; ++i)
+    {
+        stream = vlc_aout_stream_New(aout, &cfg);
+        assert(stream != NULL);
+        vlc_sem_post(&race.start);
+        vlc_aout_stream_Delete(stream);
+        vlc_sem_wait(&race.done);
+    }
+    vlc_join(changer, NULL);
+    check_visualization(aout, "scope", "visual", "scope");
+    check_visualization(aout, "", "none", "scope");
     aout_Release(aout);
 
     vlc_clock_Delete(aout_clock);
@@ -247,9 +323,14 @@ int main(void)
 {
     test_init();
 
-    libvlc_instance_t *vlc = libvlc_new(0, NULL);
+    const char *args[] = {
+        "--ignore-config", "--no-media-library",
+        "--no-metadata-network-access", "--no-plugins-cache", "--no-plugins-scan",
+    };
+    libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(args), args);
     assert(vlc != NULL);
 
+    test_idle_visualization(vlc->p_libvlc_int);
     test_flush_stops_resampling(vlc->p_libvlc_int);
 
     libvlc_release(vlc);
