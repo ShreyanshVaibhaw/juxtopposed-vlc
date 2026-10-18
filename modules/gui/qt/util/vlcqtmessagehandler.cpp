@@ -25,11 +25,13 @@
 #include <QtGlobal>
 #include <QString>
 #include <QLoggingCategory>
+#include <atomic>
+#include <cstdio>
 
 #include <vlc_common.h>
 
 static vlc_object_t* g_intf = nullptr;
-static bool g_logQtMessages = false;
+static std::atomic_bool g_logQtMessages{false};
 static QtMessageHandler g_defaultMessageHandler = nullptr;
 
 static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -39,7 +41,7 @@ static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &contex
     //"default" is for qDebug(), most of our code logs using msg_Dbg but some parts will use qDebug,
     //usually when they don't have access to the vlc_object. Qt itself uses categorised logger so it
     //should be safe to assume that the default logger is only used by us.
-    if (g_logQtMessages
+    if (g_logQtMessages.load(std::memory_order_relaxed)
         || qstrcmp(context.category, "default") == 0
         || qstrcmp(context.category, "qml") == 0
         || qstrcmp(context.category, "js") == 0
@@ -72,7 +74,10 @@ static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &contex
     }
     else
     {
-        g_defaultMessageHandler(type, context, msg);
+        if (g_defaultMessageHandler)
+            g_defaultMessageHandler(type, context, msg);
+        else
+            std::fprintf(stderr, "%s\n", qFormatLogMessage(type, context, msg).toUtf8().constData());
     }
 };
 
@@ -82,16 +87,22 @@ void setupVlcQtMessageHandler(vlc_object_t* p_intf)
     assert(p_intf != nullptr);
 
     g_intf = p_intf;
-    g_logQtMessages = var_InheritBool(p_intf, "qt-verbose");
-
     g_defaultMessageHandler = qInstallMessageHandler(vlcQtMessageHandler);
     qSetMessagePattern("[qt] (%{category}) %{message}");
+    updateVlcQtMessageHandler(var_InheritBool(p_intf, "qt-verbose"));
+}
+
+void updateVlcQtMessageHandler(bool enabled)
+{
+    assert(g_intf != nullptr);
+    // Qt can emit messages from other threads while settings are saved.
+    g_logQtMessages.store(enabled, std::memory_order_relaxed);
 
     QString filterRules;
 
-    if (g_logQtMessages)
+    if (enabled)
     {
-        filterRules = QStringLiteral("*=true\n"
+        filterRules = QStringLiteral("qt.*=true\n"
                                     "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
                                     "qt.rhi.general=true\n" /* Qt RHI general messages are not verbose */
                                     "qt.widgets.painting=false\n" /* Not necessary */);
@@ -108,7 +119,8 @@ void cleanupVlcQtMessageHandler()
 {
     assert(g_intf != nullptr);
 
-    qInstallMessageHandler(nullptr);
+    qInstallMessageHandler(g_defaultMessageHandler);
+    g_logQtMessages.store(false, std::memory_order_relaxed);
     g_defaultMessageHandler = nullptr;
     g_intf = nullptr;
 }

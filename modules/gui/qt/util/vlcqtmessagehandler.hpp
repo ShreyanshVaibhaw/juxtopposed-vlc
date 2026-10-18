@@ -25,6 +25,8 @@ typedef struct vlc_object_t vlc_object_t ;
 
 void setupVlcQtMessageHandler(vlc_object_t* p_intf);
 void cleanupVlcQtMessageHandler();
+// Call on the interface thread after a saved Developer mode change.
+void updateVlcQtMessageHandler(bool enabled);
 
 //(un)register qt message handler using RAII
 class VlcQtMessageHandlerRegisterer

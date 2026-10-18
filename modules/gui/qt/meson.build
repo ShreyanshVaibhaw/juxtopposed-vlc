@@ -1782,6 +1782,17 @@ if qt6_dep.found()
 
 
         vlc_tests += {
+            'name': 'test_qt_message_handler',
+            'sources': files('tests/test_vlcqtmessagehandler.cpp', 'util/vlcqtmessagehandler.cpp'),
+            'moc_sources': files('tests/test_vlcqtmessagehandler.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_with': [libvlccore, libvlc],
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
             'name': 'test_qt_dialog_model',
             'sources': files(
                 'tests/vlc_stub_modules.cpp',

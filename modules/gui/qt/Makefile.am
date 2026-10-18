@@ -2139,6 +2139,19 @@ test_thread_runner_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_thread_runner
 TESTS += test_thread_runner
 
+# test_vlcqtmessagehandler
+
+test_vlcqtmessagehandler_SOURCES = tests/test_vlcqtmessagehandler.cpp util/vlcqtmessagehandler.cpp
+nodist_test_vlcqtmessagehandler_SOURCES = tests/test_vlcqtmessagehandler.moc
+BUILT_SOURCES += tests/test_vlcqtmessagehandler.moc
+CLEANFILES += tests/test_vlcqtmessagehandler.moc
+test_vlcqtmessagehandler_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_vlcqtmessagehandler_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_vlcqtmessagehandler
+TESTS += test_vlcqtmessagehandler
+
 # test_vlc_dialog_model
 
 test_vlc_dialog_model_SOURCES = \

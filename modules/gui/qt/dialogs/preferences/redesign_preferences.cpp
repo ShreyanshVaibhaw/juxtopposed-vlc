@@ -4,6 +4,7 @@
 #include "player/stereo_test_player.hpp"
 #include "player/player_controller.hpp"
 #include "util/renderer_manager.hpp"
+#include "util/vlcqtmessagehandler.hpp"
 #include <vlc_configuration.h>
 #include <vlc_modules.h>
 #include <vlc_interface.h>
@@ -1155,8 +1156,8 @@ QVariant RedesignPreferences::value(const QString& name) const
 
     const auto it = m_edits.constFind(name);
     if (it != m_edits.cend()) return *it;
-    if (m_ctx && name == QLatin1String("qt-error-dialogs"))
-        return var_InheritBool(m_ctx->getIntf(), "qt-error-dialogs");
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-verbose")))
+        return var_InheritBool(m_ctx->getIntf(), name.toUtf8().constData());
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
@@ -1666,6 +1667,16 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         }
     }
     result.insert(QStringLiteral("editor"), editor);
+    if (name == QLatin1String("file-logging"))
+        result.insert(QStringLiteral("help"), qtr("Save messages to a file. Restart VLC after a change."));
+    if (name == QLatin1String("logfile"))
+        result.insert(QStringLiteral("help"), qtr("Choose the log file. VLC adds new messages to the end of this file. Restart VLC after a change."));
+    if (name == QLatin1String("logmode"))
+        result.insert(QStringLiteral("help"), qtr("Choose plain text or HTML for the log file. Restart VLC after a change."));
+    if (name == QLatin1String("verbose"))
+        result.insert(QStringLiteral("help"), qtr("Choose the messages to save in the log. Restart VLC after a change."));
+    if (name == QLatin1String("qt-verbose"))
+        result.insert(QStringLiteral("help"), qtr("Add internal interface information, warnings and errors to the VLC log. Use Log details to choose which messages to save."));
     if (name == QLatin1String("qt-error-dialogs"))
         result.insert(QStringLiteral("help"), qtr("Show error messages and confirmation questions. When this is off, VLC cancels normal and warning questions. Errors stay in the error history. Login, progress and critical questions stay on."));
     if (name == QLatin1String("language")) {
@@ -2067,7 +2078,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
-    if (m_ctx && name == QLatin1String("qt-error-dialogs"))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-verbose")))
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
@@ -2186,7 +2197,7 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-verbose"}) {
         if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -2194,6 +2205,8 @@ bool RedesignPreferences::save()
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));
     }
+    if (previous.contains(QStringLiteral("qt-verbose")))
+        updateVlcQtMessageHandler(var_InheritBool(m_ctx->getIntf(), "qt-verbose"));
     if (previous.contains(QStringLiteral("qt-error-dialogs")))
         if (auto* errors = DialogErrorModel::getInstance<false>())
             errors->refreshNotificationPreference();
@@ -2484,11 +2497,12 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-verbose"}) {
         if (var_Type(intf, option) == 0)
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));
     }
+    updateVlcQtMessageHandler(var_InheritBool(intf, "qt-verbose"));
     if (auto* errors = DialogErrorModel::getInstance<false>())
         errors->refreshNotificationPreference();
     intf->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
