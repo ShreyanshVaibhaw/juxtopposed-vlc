@@ -77,7 +77,17 @@ static void Configuration(libvlc_instance_t *instance)
 {
     const char *name = "test-cast-conversion-quality";
     const auto *config = config_FindConfig(name);
-    assert(config && config->orig.i == -1);
+    // PE dynamic builds do not discover builtin test modules. Use the real
+    // casting module there when it is available.
+    if (!config) {
+        name = "sout-chromecast-conversion-quality";
+        config = config_FindConfig(name);
+    }
+    if (!config) {
+        fputs("Casting option unavailable; running the profile checks only\n", stderr);
+        return;
+    }
+    assert(config->orig.i == -1);
     assert(config_GetInt(name) == -1);
     int64_t *values = nullptr;
     char **labels = nullptr;
@@ -94,6 +104,7 @@ static void Configuration(libvlc_instance_t *instance)
     free(values);
     free(labels);
     config_PutInt(name, -1);
+    printf("Cast quality configuration: %s default=-1 values=-1,0,1,2,3\n", name);
 }
 
 int main(void)
