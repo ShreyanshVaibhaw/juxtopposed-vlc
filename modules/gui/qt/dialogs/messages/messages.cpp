@@ -41,6 +41,7 @@
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include <vlc_log_observer.h>
+#include "maininterface/mainctx.hpp"
 #include <vlc_input_item.h>
 
 
@@ -88,6 +89,18 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     /* Error messages */
     DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
     connect( errors, &DialogErrorModel::countChanged, this, &MessagesDialog::errorsCountChanged );
+    ui.mainTab->setTabText(1, qtr("Errors and warnings"));
+    connect(errors, &QAbstractItemModel::rowsAboutToBeRemoved, this,
+        [this](const QModelIndex &, int first, int last) {
+            int offset = 0, length = 0;
+            for (int row = 0; row < first; ++row) offset += m_errorRowLengths.at(row);
+            for (int row = first; row <= last; ++row) length += m_errorRowLengths.at(row);
+            QTextCursor cursor(ui.errors->document());
+            cursor.setPosition(offset);
+            cursor.setPosition(offset + length, QTextCursor::KeepAnchor);
+            cursor.removeSelectedText();
+            m_errorRowLengths.remove(first, last - first + 1);
+        });
     for(int i=0; i<errors->count(); i++)
         addError(i);
 
@@ -169,39 +182,28 @@ void MessagesDialog::updateConfig()
     getSettings()->setValue( "Messages/messages-filter", ui.filterEdit->text() );
 }
 
-void MessagesDialog::addError(int row){
-    DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
-
-    QPlainTextEdit * errorsList = ui.errors;
-
-    bool b_autoscroll = ( errorsList->verticalScrollBar()->value()
-                          + errorsList->verticalScrollBar()->pageStep()
-                          >= errorsList->verticalScrollBar()->maximum() );
-
-    /* Copy selected text to the clipboard */
-    if( errorsList->textCursor().hasSelection() )
-        errorsList->copy();
-
-    /* Fix selected text bug */
-    if( !errorsList->textCursor().atEnd() ||
-         errorsList->textCursor().anchor() != errorsList->textCursor().position() )
-         errorsList->moveCursor( QTextCursor::End );
-
-    /* Start a new logic block */
-    if( !errorsList->document()->isEmpty() )
-        errorsList->textCursor().insertBlock();
-
+void MessagesDialog::addError(int row)
+{
+    auto *errors = DialogErrorModel::getInstance<false>();
+    auto *view = ui.errors;
+    const bool autoscroll = view->verticalScrollBar()->value() + view->verticalScrollBar()->pageStep()
+        >= view->verticalScrollBar()->maximum();
+    const int before = view->document()->characterCount();
+    QTextCursor cursor(view->document());
+    cursor.movePosition(QTextCursor::End);
     QTextCharFormat format;
-
-    format.setProperty( QTextFormat::FontItalic, true );
-    format.setForeground( Qt::darkRed );
-    errorsList->textCursor().insertText( errors->data(errors->index(row, 0), DialogErrorModel::DIALOG_TITLE).toString()+": ", format );
-
-    format.setProperty( QTextFormat::FontItalic, false );
-    format.setForeground( errorsList->palette().windowText() );
-    errorsList->textCursor().insertText( errors->data(errors->index(row, 0), DialogErrorModel::DIALOG_TEXT).toString(), format );
-
-    if ( b_autoscroll ) errorsList->ensureCursorVisible();
+    format.setFontItalic(true);
+    const bool dark = view->palette().color(QPalette::Base).lightness() < 128;
+    const bool warning = errors->data(errors->index(row), DialogErrorModel::DIALOG_WARNING).toBool();
+    format.setForeground(warning ? QColor(dark ? "#d69c38" : "#775100")
+                                : QColor(dark ? "#ff7373" : "#a31b1b"));
+    cursor.insertText(errors->data(errors->index(row), DialogErrorModel::DIALOG_TITLE).toString() + ": ", format);
+    format.setFontItalic(false);
+    format.setForeground(view->palette().color(QPalette::Text));
+    cursor.insertText(errors->data(errors->index(row), DialogErrorModel::DIALOG_TEXT).toString(), format);
+    cursor.insertBlock();
+    m_errorRowLengths.append(view->document()->characterCount() - before);
+    if (autoscroll) view->verticalScrollBar()->setValue(view->verticalScrollBar()->maximum());
 }
 
 void MessagesDialog::errorsCountChanged(){
@@ -265,36 +267,39 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
         messages->textCursor().insertBlock();
 
     /* Insert the prefix */
+    const bool dark = messages->palette().color(QPalette::Base).lightness() < 128;
+    const QColor accent = p_intf->p_mi ? p_intf->p_mi->redesignAccent() : palette().color(QPalette::Link);
+    const QColor sourceColor = dark ? accent : accent.darker(200);
     QTextCharFormat format;
     format.setProperty( QTextFormat::FontItalic, true );
-    format.setForeground( Qt::darkBlue );
+    format.setForeground(sourceColor);
 
     messages->textCursor().insertText( msg->module, format );
 
     switch ( msg->priority )
     {
         case VLC_MSG_INFO:
-            format.setForeground( Qt::darkBlue );
+            format.setForeground(sourceColor);
             messages->textCursor().insertText( " info: ", format );
             break;
         case VLC_MSG_ERR:
-            format.setForeground( Qt::darkRed );
+            format.setForeground(QColor(dark ? "#ff7373" : "#a31b1b"));
             messages->textCursor().insertText( " error: ", format );
             break;
         case VLC_MSG_WARN:
-            format.setForeground( Qt::darkGreen );
+            format.setForeground(QColor(dark ? "#d69c38" : "#775100"));
             messages->textCursor().insertText( " warning: ", format );
             break;
         case VLC_MSG_DBG:
         default:
-            format.setForeground( Qt::darkGray );
+            format.setForeground(messages->palette().color(QPalette::WindowText));
             messages->textCursor().insertText( " debug: ", format );
             break;
     }
 
     /* Insert the message */
     format.setProperty( QTextFormat::FontItalic, false );
-    format.setForeground( messages->palette().windowText() );
+    format.setForeground(messages->palette().color(QPalette::Text));
     messages->textCursor().insertText( msg->text, format );
 
     /* Pass the new message thru the filter */
@@ -397,7 +402,10 @@ void MessagesDialog::updateOrClear()
     else if( ui.mainTab->currentIndex() == 0 )
         ui.messages->clear();
     else if( ui.mainTab->currentIndex() == 1 )
+    {
         ui.errors->clear();
+        m_errorRowLengths.fill(0);
+    }
 #ifndef NDEBUG
     else
         updatePLTree();
@@ -409,7 +417,7 @@ void MessagesDialog::tabChanged( int i )
     updateButton->setIcon( i > 1 ? QIcon(":/menu/update.svg") : QIcon(":/menu/clear.svg") );
     updateButton->setToolTip( i > 1 ? qtr("Update the tree")
                                      : i == 0 ? qtr("Clear the messages")
-                                              : qtr("Clear the errors"));
+                                              : qtr("Clear errors and warnings"));
 }
 
 void MessagesDialog::showTab( int i )

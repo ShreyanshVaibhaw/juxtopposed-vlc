@@ -1156,7 +1156,7 @@ QVariant RedesignPreferences::value(const QString& name) const
 
     const auto it = m_edits.constFind(name);
     if (it != m_edits.cend()) return *it;
-    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-verbose")))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose")))
         return var_InheritBool(m_ctx->getIntf(), name.toUtf8().constData());
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
@@ -2078,7 +2078,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
-    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-verbose")))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose")))
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
@@ -2197,7 +2197,7 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-verbose"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose"}) {
         if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -2207,7 +2207,7 @@ bool RedesignPreferences::save()
     }
     if (previous.contains(QStringLiteral("qt-verbose")))
         updateVlcQtMessageHandler(var_InheritBool(m_ctx->getIntf(), "qt-verbose"));
-    if (previous.contains(QStringLiteral("qt-error-dialogs")))
+    if (previous.contains(QStringLiteral("qt-error-dialogs")) || previous.contains(QStringLiteral("qt-minor-warnings")))
         if (auto* errors = DialogErrorModel::getInstance<false>())
             errors->refreshNotificationPreference();
     if (previous.contains(QStringLiteral("qt-discover-cast-devices")))
@@ -2497,7 +2497,7 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-verbose"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose"}) {
         if (var_Type(intf, option) == 0)
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));

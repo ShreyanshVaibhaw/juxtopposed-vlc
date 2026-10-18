@@ -1793,6 +1793,16 @@ if qt6_dep.found()
         }
 
         vlc_tests += {
+            'name': 'test_qt_warning_log_buffer',
+            'sources': files('tests/test_warning_log_buffer.cpp'),
+            'moc_sources': files('tests/test_warning_log_buffer.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
             'name': 'test_qt_dialog_model',
             'sources': files(
                 'tests/vlc_stub_modules.cpp',

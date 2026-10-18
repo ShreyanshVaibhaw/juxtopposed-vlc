@@ -2152,6 +2152,19 @@ test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
 
+# test_warning_log_buffer
+
+test_warning_log_buffer_SOURCES = tests/test_warning_log_buffer.cpp util/warning_log_buffer.hpp
+nodist_test_warning_log_buffer_SOURCES = tests/test_warning_log_buffer.moc
+BUILT_SOURCES += tests/test_warning_log_buffer.moc
+CLEANFILES += tests/test_warning_log_buffer.moc
+test_warning_log_buffer_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_warning_log_buffer_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_warning_log_buffer_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_warning_log_buffer_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_warning_log_buffer
+TESTS += test_warning_log_buffer
+
 # test_vlc_dialog_model
 
 test_vlc_dialog_model_SOURCES = \

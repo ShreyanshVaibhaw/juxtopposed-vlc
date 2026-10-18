@@ -451,6 +451,8 @@ vlc_module_begin ()
         change_integer_list( initial_prefs_view_list, initial_prefs_view_list_texts )
     add_bool( "qt-error-dialogs", true, ERROR_TEXT,
               nullptr )
+    add_bool( "qt-minor-warnings", false, N_("Show minor warnings"),
+              N_("Show short notices for warnings in VLC's log. Warnings that arrive together share a notice.") )
 
     add_obsolete_string( "qt-slider-colours")
 

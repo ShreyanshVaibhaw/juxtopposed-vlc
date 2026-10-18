@@ -22,6 +22,7 @@
 #include <QThreadPool>
 #include <QGuiApplication>
 #include <QtPlugin>
+#include <thread>
 #if defined(QT_STATIC) && defined(Q_OS_WIN)
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
@@ -57,6 +58,8 @@ private slots:
     void init() {
         var_Create(m_intf, "qt-error-dialogs", VLC_VAR_BOOL);
         var_SetBool(m_intf, "qt-error-dialogs", true);
+        var_Create(m_intf, "qt-minor-warnings", VLC_VAR_BOOL);
+        var_SetBool(m_intf, "qt-minor-warnings", false);
         VLCDialogModel::getInstance(m_intf);
         m_dialog = new VLCDialog();
         m_loginSpy = std::make_unique<QSignalSpy>(m_dialog, &VLCDialog::login);
@@ -79,6 +82,7 @@ private slots:
         }
         delete m_dialog;
         var_Destroy(m_intf, "qt-error-dialogs");
+        var_Destroy(m_intf, "qt-minor-warnings");
     }
 
     void testLogin_data() {
@@ -196,6 +200,95 @@ private slots:
             "Cancel", "Continue", nullptr, "Critical question", "Test question");
         QCOMPARE(reply, 1);
         QCOMPARE(m_questionSpy->count(), 1);
+    }
+
+    void testWarningsOffByDefault() {
+        DialogErrorModel errors(m_intf);
+        QSignalSpy notices(&errors, &DialogErrorModel::notificationRequested);
+        msg_Warn(m_intf, "Hidden minor warning");
+        QTest::qWait(300);
+        QCOMPARE(errors.count(), 0);
+        QCOMPARE(notices.count(), 0);
+        QVERIFY(!errors.warningNotificationsEnabled());
+    }
+
+    void testWarningBatchAndIndependentPreference() {
+        var_SetBool(m_intf, "qt-minor-warnings", true);
+        var_SetBool(m_intf, "qt-error-dialogs", false);
+        DialogErrorModel errors(m_intf);
+        QSignalSpy notices(&errors, &DialogErrorModel::notificationRequested);
+        for (int i = 0; i < 3000; ++i) msg_Warn(m_intf, "Late frame %d", i);
+        QCOMPARE(errors.count(), 0);
+        QTRY_COMPARE(notices.count(), 1);
+        QCOMPARE(errors.count(), 1);
+        QCOMPARE(errors.repeatedMessageCount(), 3000);
+        QVERIFY(errors.notificationIsWarning());
+        QVERIFY(errors.notificationAllowed());
+        QVERIFY(errors.data(errors.index(0), DialogErrorModel::DIALOG_TEXT).toString().contains("3000 warnings"));
+        errors.refreshNotificationPreference();
+        QCOMPARE(errors.repeatedMessageCount(), 3000); // Error toggle must not dismiss a warning.
+        var_SetBool(m_intf, "qt-minor-warnings", false);
+        errors.refreshNotificationPreference();
+        QCOMPARE(errors.repeatedMessageCount(), 0);
+        QVERIFY(!errors.notificationAllowed());
+        msg_Warn(m_intf, "Disabled warning");
+        QTest::qWait(300);
+        QCOMPARE(notices.count(), 1);
+    }
+
+    void testWarningPriorityAndHistory() {
+        var_SetBool(m_intf, "qt-minor-warnings", true);
+        DialogErrorModel errors(m_intf);
+        QSignalSpy notices(&errors, &DialogErrorModel::notificationRequested);
+        errors.pushError("Cannot open media", "Error details");
+        QCOMPARE(notices.count(), 1);
+        for (int i = 0; i < 205; ++i) {
+            msg_Warn(m_intf, "Warning %d", i);
+            QVERIFY(QMetaObject::invokeMethod(&errors, "flushWarnings"));
+        }
+        QCOMPARE(errors.count(), 201);
+        QCOMPARE(errors.notificationText(), "Cannot open media");
+        QVERIFY(!errors.notificationIsWarning());
+        QCOMPARE(notices.count(), 1);
+        QCOMPARE(errors.data(errors.index(0), DialogErrorModel::DIALOG_TEXT).toString(), "Error details");
+        QVERIFY(errors.data(errors.index(1), DialogErrorModel::DIALOG_TEXT).toString().contains("Warning 5"));
+        errors.resetRepeatedMessageCount();
+        msg_Warn(m_intf, "New notice");
+        QVERIFY(QMetaObject::invokeMethod(&errors, "flushWarnings"));
+        QCOMPARE(notices.count(), 2);
+        QVERIFY(errors.notificationIsWarning());
+    }
+
+    void testWarningDisableDropsPendingBatch() {
+        DialogErrorModel errors(m_intf);
+        var_SetBool(m_intf, "qt-minor-warnings", true);
+        errors.refreshNotificationPreference();
+        msg_Warn(m_intf, "Pending warning");
+        var_SetBool(m_intf, "qt-minor-warnings", false);
+        errors.refreshNotificationPreference();
+        var_SetBool(m_intf, "qt-minor-warnings", true);
+        errors.refreshNotificationPreference();
+        QVERIFY(QMetaObject::invokeMethod(&errors, "flushWarnings"));
+        QCOMPARE(errors.count(), 0);
+        msg_Info(m_intf, "Info is not a warning");
+        msg_Err(m_intf, "A raw error is not a minor warning");
+        QVERIFY(QMetaObject::invokeMethod(&errors, "flushWarnings"));
+        QCOMPARE(errors.count(), 0);
+        msg_Warn(m_intf, "New warning");
+        QTRY_COMPARE(errors.count(), 1);
+    }
+
+    void testWarningObserverShutdownDuringLogging() {
+        var_SetBool(m_intf, "qt-minor-warnings", true);
+        auto errors = std::make_unique<DialogErrorModel>(m_intf);
+        std::atomic<bool> running{true};
+        auto producer = std::thread([&] {
+            while (running.load()) msg_Warn(m_intf, "Shutdown warning");
+        });
+        QTest::qWait(10);
+        errors.reset();
+        running.store(false);
+        producer.join();
     }
 
     void testErrorHistoryWithNotificationsOff() {

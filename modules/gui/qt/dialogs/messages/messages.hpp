@@ -69,6 +69,7 @@ private:
 
     QToolButton *updateButton;
     QMutex messageLocker;
+    QList<int> m_errorRowLengths;
     vlc_log_subscription *m_logSubscription = nullptr;
 #ifndef NDEBUG
     QTreeWidget *pldebugTree;
