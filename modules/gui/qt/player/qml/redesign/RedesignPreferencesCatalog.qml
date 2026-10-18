@@ -142,7 +142,7 @@ QtObject {
                 ["one-instance-when-started-from-file", qsTr("Apply to files opened from the file manager")],
                 ["playlist-enqueue", qsTr("Add to the playlist instead of replacing it")],
                 ["recursive", qsTr("When opening a folder")], ["show-hiddenfiles", qsTr("Show hidden files")] ] },
-            { title: qsTr("Metadata & Artwork"), rows: [ ["metadata-network-access", qsTr("Fetch titles and artwork from the internet")], ["media-library", qsTr("Use the media library")] ] } ],
+            { title: qsTr("Metadata & Artwork"), rows: [ ["metadata-network-access", qsTr("Fetch titles and artwork"), {choices: [{label: qsTr("From the file only"), value: false}, {label: qsTr("From the file and the internet"), value: true}]}], ["media-library", qsTr("Use the media library")] ] } ],
         network: [
             { title: qsTr("Buffering"), rows: [ ["redesign-buffering", qsTr("Buffering")],
                 ["file-caching", qsTr("Local files"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}],
@@ -150,7 +150,7 @@ QtObject {
                 ["network-caching", qsTr("Network streams"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}],
                 ["live-caching", qsTr("Live capture"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}] ] },
             { title: qsTr("Proxy"), rows: [ ["http-proxy", qsTr("HTTP proxy")], ["http-proxy-pwd", qsTr("HTTP proxy password")] ] },
-            { title: qsTr("Security"), rows: [ ["gnutls-system-trust", qsTr("Verify certificates against the system trust store")], ["gnutls-priorities", qsTr("Cipher preference")] ] } ],
+            { title: qsTr("Security"), rows: [ ["gnutls-system-trust", qsTr("Verify certificates against the system trust store")], ["gnutls-priorities", qsTr("Cipher preference"), {choiceLabels: {NORMAL: qsTr("Balanced")}}] ] } ],
         performance: [
             { title: qsTr("Decoding"), rows: [ ["avcodec-hw", qsTr("Hardware-accelerated decoding")], ["postproc-q", qsTr("Video post-processing")],
                 ["avcodec-skiploopfilter", qsTr("Skip the H.264 loop filter")], ["avcodec-threads", qsTr("Decoding threads")] ] },
