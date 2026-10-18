@@ -604,9 +604,12 @@ static void RenderCharAXYZ( filter_t *p_filter,
                             draw );
         }
 
+        /* A transparent fill is still a mask in knockout mode. */
+        const bool b_knockout_mask = g == 2 &&
+            ch->p_style->e_blending_mode == STYLE_BLENDING_TRANSPARENT;
         /* Don't render if invisible or not wanted */
         if(
-           i_a == STYLE_ALPHA_TRANSPARENT ||
+           (i_a == STYLE_ALPHA_TRANSPARENT && !b_knockout_mask) ||
            (g == 0 && 0 == (ch->p_style->i_style_flags & STYLE_SHADOW) ) ||
            (g == 1 && 0 == (ch->p_style->i_style_flags & STYLE_OUTLINE) )
           )

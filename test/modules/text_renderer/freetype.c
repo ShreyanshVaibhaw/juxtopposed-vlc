@@ -6,9 +6,10 @@
 #include <vlc_modules.h>
 #include <vlc_subpicture.h>
 
-static void Render(filter_t *filter, vlc_fourcc_t chroma, uint8_t font_alpha,
-                   uint8_t shadow_alpha)
+static size_t Render(filter_t *filter, vlc_fourcc_t chroma, uint8_t font_alpha,
+                     uint8_t shadow_alpha, bool knockout)
 {
+    config_PutInt("freetype-outline-thickness", knockout ? 4 : 0);
     subpicture_region_t *input = subpicture_region_NewText();
     assert(input != NULL);
     input->p_text = text_segment_New("Background sample");
@@ -17,10 +18,11 @@ static void Render(filter_t *filter, vlc_fourcc_t chroma, uint8_t font_alpha,
     assert(style != NULL);
     style->i_font_size = 48;
     style->i_font_alpha = font_alpha;
-    style->i_outline_alpha = 0;
+    style->i_outline_alpha = knockout ? 255 : 0;
     style->i_shadow_alpha = shadow_alpha;
     style->i_shadow_color = 0;
     style->i_background_alpha = 0;
+    style->e_blending_mode = knockout ? STYLE_BLENDING_TRANSPARENT : STYLE_BLENDING_DEFAULT;
     style->i_style_flags = STYLE_OUTLINE | STYLE_SHADOW;
     input->text_flags |= VLC_SUBPIC_TEXT_FLAG_PIXEL_SIZE;
     const vlc_fourcc_t chromas[] = {chroma, 0};
@@ -37,9 +39,10 @@ static void Render(filter_t *filter, vlc_fourcc_t chroma, uint8_t font_alpha,
             if (pixel[alpha] == 0) continue;
             visible++;
         }
-    assert((visible > 0) == (font_alpha > 0));
+    assert((visible > 0) == (font_alpha > 0 || knockout));
     subpicture_region_Delete(output);
     subpicture_region_Delete(input);
+    return visible;
 }
 
 int main(void)
@@ -59,16 +62,24 @@ int main(void)
     es_format_Init(&filter->fmt_in, VIDEO_ES, 0);
     es_format_Init(&filter->fmt_out, VIDEO_ES, 0);
     video_format_Setup(&filter->fmt_out.video, VLC_CODEC_RGBA, 1280, 720, 1280, 720, 1, 1);
-    filter->p_module = vlc_filter_LoadModule(filter, "text renderer", "freetype", true);
-    assert(filter->p_module != NULL);
     const vlc_fourcc_t chromas[] = {VLC_CODEC_RGBA, VLC_CODEC_ARGB, VLC_CODEC_YUVA};
-    for (size_t i = 0; i < ARRAY_SIZE(chromas); ++i) {
-        /* A zero-alpha shadow has no bitmap or space in the layout bounds. */
-        Render(filter, chromas[i], 255, 0);
-        Render(filter, chromas[i], 255, 128);
-        Render(filter, chromas[i], 0, 0);
+    for (int mode = 0; mode <= 1; ++mode) {
+        config_PutInt("freetype-blending-mode", mode);
+        filter->p_module = vlc_filter_LoadModule(filter, "text renderer", "freetype", true);
+        assert(filter->p_module != NULL);
+        for (size_t i = 0; i < ARRAY_SIZE(chromas); ++i) {
+            /* A zero-alpha shadow has no bitmap or space in the layout bounds. */
+            Render(filter, chromas[i], 255, 0, false);
+            Render(filter, chromas[i], 255, 128, false);
+            Render(filter, chromas[i], 0, 0, false);
+            if (mode == 1) {
+                const size_t filled = Render(filter, chromas[i], 255, 0, true);
+                const size_t hollow = Render(filter, chromas[i], 0, 0, true);
+                assert(hollow < filled);
+            }
+        }
+        vlc_filter_UnloadModule(filter);
     }
-    vlc_filter_UnloadModule(filter);
     es_format_Clean(&filter->fmt_in);
     es_format_Clean(&filter->fmt_out);
     vlc_object_delete(filter);
