@@ -169,8 +169,8 @@ RedesignSettingsDialog {
                             width: navigation.width
                             Text {
                                 visible: !!modelData.group
-                                height: visible ? theme.dp(47) : 0
-                                leftPadding: theme.dp(24); topPadding: theme.dp(16)
+                                height: visible ? theme.dp(modelData.key === "general" ? 47 : 41) : 0
+                                leftPadding: theme.dp(24); topPadding: theme.dp(modelData.key === "general" ? 16 : 10)
                                 text: modelData.group || ""; color: theme.foreground; font.pixelSize: theme.dp(14)
                             }
                             Item {
@@ -212,7 +212,7 @@ RedesignSettingsDialog {
         }
         C.ScrollView {
             id: scroll
-            anchors.top: parent.top; anchors.topMargin: theme.dp(68)
+            anchors.top: parent.top; anchors.topMargin: theme.dp(72)
             anchors.left: navigation.right; anchors.right: parent.right; anchors.bottom: footer.top
             anchors.leftMargin: theme.dp(32); anchors.rightMargin: theme.dp(24)
             clip: true
@@ -357,21 +357,25 @@ RedesignSettingsDialog {
                     sourceService: SubtitleSources
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 }
-                RedesignButton {
+                Item {
                     visible: !root.search.length
-                    width: parent.width; height: theme.dp(root.category === "extensions" ? 38 : 40)
-                    scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                    caption: root.advanced ? qsTr("Hide Advanced Options") : qsTr("Advanced Options")
-                    text: caption
-                    contentItem: Item {
-                        Row {
-                            anchors.centerIn: parent; spacing: theme.dp(10)
-                            Text { text: qsTr("Advanced Options"); color: theme.foreground; font.pixelSize: theme.dp(14); anchors.verticalCenter: parent.verticalCenter }
-                            RedesignIcon { name: root.advanced ? "chevron-down" : "chevron-right"; color: theme.foreground; width: theme.dp(20); height: width }
+                    width: parent.width; height: theme.dp(root.category === "extensions" ? 38 : 50)
+                    RedesignButton {
+                        anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+                        height: theme.dp(38)
+                        scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                        caption: root.advanced ? qsTr("Hide Advanced Options") : qsTr("Advanced Options")
+                        text: caption
+                        contentItem: Item {
+                            Row {
+                                anchors.centerIn: parent; spacing: theme.dp(10)
+                                Text { text: qsTr("Advanced Options"); color: theme.foreground; font.pixelSize: theme.dp(14); anchors.verticalCenter: parent.verticalCenter }
+                                RedesignIcon { name: root.advanced ? "chevron-down" : "chevron-right"; color: theme.foreground; width: theme.dp(20); height: width }
+                            }
                         }
+                        background: Rectangle { color: parent.hovered ? theme.hover : theme.background; radius: theme.dp(2) }
+                        onClicked: root.advanced = !root.advanced
                     }
-                    background: Rectangle { color: parent.hovered ? theme.hover : theme.background; radius: theme.dp(2) }
-                    onClicked: root.advanced = !root.advanced
                 }
                 Repeater {
                     model: root.advanced && !root.search.length ? specification.advancedSections[root.category] || [] : []

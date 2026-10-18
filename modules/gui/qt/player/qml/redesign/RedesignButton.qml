@@ -14,6 +14,7 @@ T.Button {
     property string caption
     property bool leftAligned: false
     property bool accent: false
+    property bool filled: false
     property bool selected: false
     property color foreground: theme.foreground
     property color selectedForeground: theme.accent
@@ -22,6 +23,7 @@ T.Button {
     property real iconReveal: 0
     property var iconDetailColor
     property real captionFontSize: 14
+    property int captionFontWeight: Font.Normal
     property real captionSpacing: 6
     property real captionMaximumWidth: Infinity
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
@@ -43,7 +45,7 @@ T.Button {
 
     background: Rectangle {
         radius: theme.dp(6)
-        color: root.accent ? theme.accent : (root.down || root.selected) ? theme.selected : root.hovered ? theme.hover : "transparent"
+        color: root.accent ? theme.accent : (root.down || root.selected) ? theme.selected : root.hovered ? theme.hover : root.filled ? theme.background : "transparent"
         border.width: root.visualFocus ? theme.dp(2) : 0
         border.color: theme.accent
         opacity: root.enabled ? 1 : 0.35
@@ -77,6 +79,7 @@ T.Button {
             text: root.caption
             color: root.iconName === "cone" ? theme.accent : root.accent ? "#161616" : root.selected ? root.selectedForeground : root.foreground
             font.pixelSize: theme.dp(root.captionFontSize)
+            font.weight: root.captionFontWeight
             opacity: root.enabled ? 1 : 0.35
         }
     }

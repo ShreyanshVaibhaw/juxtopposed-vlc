@@ -655,7 +655,10 @@ ColumnLayout {
             }
             RedesignButton {
                 visible: root.editor === "file" || root.editor === "directory"
+                Layout.preferredWidth: root.compact ? implicitWidth : theme.dp(100)
+                Layout.preferredHeight: theme.dp(32)
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                filled: true; captionFontWeight: Font.DemiBold
                 caption: qsTr("Browse"); text: caption
                 onClicked: { const path = root.backend.choosePath(root.optionName); if (path.length) root.commit(path) }
             }
