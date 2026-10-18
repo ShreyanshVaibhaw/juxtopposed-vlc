@@ -557,6 +557,17 @@ void MainCtx::reloadPrefs()
 
 void MainCtx::onInputChanged( bool hasInput )
 {
+    if (m_suppressStartupRaise)
+    {
+        // Keep the initial media in the tray. A later media selection uses the
+        // normal raise policy, as does an explicit request to show the player.
+        if (hasInput && !m_startupInputSeen)
+        {
+            m_startupInputSeen = true;
+            return;
+        }
+        m_suppressStartupRaise = false;
+    }
     if( hasInput == false )
         return;
     int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
@@ -574,6 +585,8 @@ void MainCtx::onInputChanged( bool hasInput )
 
 void MainCtx::onVOutChanged( bool video )
 {
+    if (m_suppressStartupRaise)
+        return;
     int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
     if ( video && ( autoRaise & MainCtx::RAISE_VIDEO ) )
         emit askRaise();
@@ -688,6 +701,12 @@ inline void MainCtx::initSystray()
         {
             b_systrayWanted = true;
             b_hideAfterCreation = true;
+            vlc_playlist_locker lock(p_intf->p_playlist);
+            m_suppressStartupRaise = var_InheritBool(p_intf, "playlist-autostart")
+                && vlc_playlist_Count(p_intf->p_playlist) > 0;
+            // Use the GUI's state: the core can already have a media item while
+            // its first inputChanged notification is still in the event queue.
+            m_startupInputSeen = !THEMIM->getUrl().isEmpty();
         }
         else
             msg_Err( p_intf, "cannot start minimized without system tray bar" );

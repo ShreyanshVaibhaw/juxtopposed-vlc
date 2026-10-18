@@ -375,6 +375,7 @@ void InterfaceWindowHandler::setInterfaceVisible(bool visible, bool _requestActi
 {
     if (visible)
     {
+        m_mainCtx->clearStartupHide();
         switch ( m_window->visibility() )
         {
         case QWindow::Hidden:
@@ -412,6 +413,7 @@ void InterfaceWindowHandler::setInterfaceFullScreen( bool fs )
 void InterfaceWindowHandler::setRaise()
 {
     assert(m_window);
+    m_mainCtx->clearStartupHide();
 
     switch ( m_window->visibility() )
     {
@@ -477,6 +479,7 @@ void InterfaceWindowHandler::setInterfaceHiden()
 
 void InterfaceWindowHandler::setInterfaceShown()
 {
+    m_mainCtx->clearStartupHide();
     m_window->setVisible(true);
 }
 
@@ -487,11 +490,13 @@ void InterfaceWindowHandler::setInterfaceMinimized()
 
 void InterfaceWindowHandler::setInterfaceMaximized()
 {
+    m_mainCtx->clearStartupHide();
     setWindowState(m_window, Qt::WindowMaximized);
 }
 
 void InterfaceWindowHandler::setInterfaceNormal()
 {
+    m_mainCtx->clearStartupHide();
     setWindowStatesPreservingGeometry(m_window, Qt::WindowNoState);
     m_window->setVisible(true);
 }

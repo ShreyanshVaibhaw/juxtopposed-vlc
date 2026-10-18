@@ -233,6 +233,11 @@ public:
     inline double getPlayerPlaylistWidth() const { return m_playerPlaylistWidth; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
+    inline void clearStartupHide()
+    {
+        b_hideAfterCreation = false;
+        m_suppressStartupRaise = false;
+    }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline double getIntfScaleFactor() const { return m_intfScaleFactor; }
     Q_INVOKABLE inline double getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
@@ -452,6 +457,8 @@ protected:
     double               m_intfScaleFactor = 1.;
     int                  i_notificationSetting = 0; /// Systray Notifications
     bool                 b_hideAfterCreation = false; /// --qt-start-minimized
+    bool                 m_suppressStartupRaise = false;
+    bool                 m_startupInputSeen = false;
     SidePanelCtx*   m_playqueuePanel = nullptr;
     SidePanelCtx*   m_navigationPanel = nullptr;
     QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
