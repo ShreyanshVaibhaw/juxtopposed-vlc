@@ -21,6 +21,10 @@
 #include <QSignalSpy>
 #include <QThreadPool>
 #include <QGuiApplication>
+#include <QtPlugin>
+#if defined(QT_STATIC) && defined(Q_OS_WIN)
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
 #include <vlc_variables.h>
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include <vlc_cxx_helpers.hpp>
