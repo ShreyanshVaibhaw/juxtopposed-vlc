@@ -8,7 +8,8 @@
 static inline bool vlc_instance_HasNativeOverride(vlc_object_t *instance)
 {
     return var_Type(instance, "one-instance") != 0
-        || var_Type(instance, "one-instance-when-started-from-file") != 0;
+        || var_Type(instance, "one-instance-when-started-from-file") != 0
+        || var_Type(instance, "playlist-enqueue") != 0;
 }
 
 static inline bool vlc_instance_UsesGroupedPreferences(vlc_object_t *instance)

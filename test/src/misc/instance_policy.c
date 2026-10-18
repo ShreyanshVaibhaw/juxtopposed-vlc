@@ -49,7 +49,8 @@ int main(void)
             vlc_object_delete(obj);
             count++;
         }
-    const char *keys[] = {"one-instance", "one-instance-when-started-from-file"};
+    const char *keys[] = {"one-instance", "one-instance-when-started-from-file",
+                          "playlist-enqueue"};
     for (unsigned key = 0; key < ARRAY_SIZE(keys); ++key)
         for (unsigned value = 0; value < 2; ++value)
             for (unsigned bits = 0; bits < 8; ++bits) {
@@ -60,7 +61,8 @@ int main(void)
                 var_Create(obj, keys[key], VLC_VAR_BOOL);
                 var_SetBool(obj, keys[key], value);
                 unsigned effective = key == 0 ? (bits & 3) | (value << 2)
-                                              : (bits & 5) | (value << 1);
+                                              : key == 1 ? (bits & 5) | (value << 1)
+                                                         : bits;
                 assert(vlc_instance_ShouldReuse(obj) == legacy[effective]);
                 vlc_instance_MigratePreferences(obj);
                 assert(config_GetInt("single-instance-preferences-version") == 0);
