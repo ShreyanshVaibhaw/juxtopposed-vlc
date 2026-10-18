@@ -77,6 +77,14 @@ class CacheGeneratorTest(unittest.TestCase):
     def test_missing_explicit_path_fails(self):
         self.run_helper("--verify", self.root / "not-present", success=False)
 
+    def test_silent_cache_replace_failure_is_reported(self):
+        cache = self.plugins / "plugins.dat"
+        cache.mkdir()
+        # The legacy helper returns zero when the cache cannot replace a directory.
+        self.run_helper(self.plugins)
+        self.run_helper("--verify", success=False)
+        self.assertTrue(cache.is_dir())
+
     def test_missing_configured_path_fails(self):
         self.env["VLC_PLUGIN_PATH"] = str(self.root / "not-present")
         self.run_helper("--verify", success=False)
