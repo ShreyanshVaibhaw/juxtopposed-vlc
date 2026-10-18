@@ -327,6 +327,8 @@ libqt_plugin_la_SOURCES = \
 	playlist/playlist_item.hpp \
 	playlist/playlist_model.cpp \
 	playlist/playlist_model.hpp \
+	playlist/playlist_tree_model.cpp \
+	playlist/playlist_tree_model.hpp \
 	playlist/playlist_model_p.hpp \
 	util/asynctask.hpp \
 	util/accessible_compat_attached.cpp util/accessible_compat_attached.hpp \
@@ -538,6 +540,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	playlist/playlist_controller.moc.cpp \
 	playlist/playlist_item.moc.cpp \
 	playlist/playlist_model.moc.cpp \
+	playlist/playlist_tree_model.moc.cpp \
 	util/asynctask.moc.cpp \
 	util/accessible_compat_attached.moc.cpp \
 	util/audio_device_model.moc.cpp \
@@ -2154,6 +2157,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_playlist_tree_model
+
+test_playlist_tree_model_SOURCES = tests/test_playlist_tree_model.cpp playlist/playlist_tree_model.hpp playlist/playlist_tree_model.cpp
+nodist_test_playlist_tree_model_SOURCES = tests/test_playlist_tree_model.moc playlist/playlist_tree_model.moc.cpp
+BUILT_SOURCES += tests/test_playlist_tree_model.moc
+CLEANFILES += tests/test_playlist_tree_model.moc
+test_playlist_tree_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_playlist_tree_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_playlist_tree_model_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_playlist_tree_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_playlist_tree_model
+TESTS += test_playlist_tree_model
 
 # test_video_window_geometry
 

@@ -139,6 +139,7 @@ moc_headers = files(
     'playlist/playlist_controller.hpp',
     'playlist/playlist_item.hpp',
     'playlist/playlist_model.hpp',
+    'playlist/playlist_tree_model.hpp',
     'util/subtitle_source_service.hpp',
     'util/asynctask.hpp',
     'util/accessible_compat_attached.hpp',
@@ -464,7 +465,9 @@ qt_plugin_sources = files(
     'playlist/playlist_item.cpp',
     'playlist/playlist_item.hpp',
     'playlist/playlist_model.cpp',
+    'playlist/playlist_tree_model.cpp',
     'playlist/playlist_model.hpp',
+    'playlist/playlist_tree_model.hpp',
     'playlist/playlist_model_p.hpp',
     'util/asynctask.hpp',
     'util/accessible_compat_attached.cpp',
@@ -1793,6 +1796,17 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_playlist_tree_model',
+            'sources': files('tests/test_playlist_tree_model.cpp', 'playlist/playlist_tree_model.cpp'),
+            'moc_sources': files('tests/test_playlist_tree_model.cpp'),
+            'moc_headers': files('playlist/playlist_tree_model.hpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
         }
 
         vlc_tests += {

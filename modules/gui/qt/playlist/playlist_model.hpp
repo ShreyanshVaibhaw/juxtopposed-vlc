@@ -52,7 +52,9 @@ public:
         AlbumRole,
         ArtworkRole,
         UrlRole,
-        PreparsedRole
+        PreparsedRole,
+        ItemIdRole,
+        AncestorsRole
     };
     Q_ENUM(Roles);
 

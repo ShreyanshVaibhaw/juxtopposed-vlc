@@ -37,6 +37,7 @@
 #include "dialogs/toolbar/controlbar_profile.hpp"
 
 #include "playlist/playlist_model.hpp"
+#include "playlist/playlist_tree_model.hpp"
 #include "playlist/playlist_controller.hpp"
 
 #include "util/csdmenu.hpp"
@@ -379,6 +380,7 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Playlist
         qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "playlistItem", "");
         qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
+        qmlRegisterType<PlaylistTreeModel>( uri, versionMajor, versionMinor, "PlaylistTreeModel" );
         qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
         qmlRegisterType<PlaylistContextMenu>( uri, versionMajor, versionMinor, "PlaylistContextMenu" );
         assert(m_intf->p_mainPlaylistController);

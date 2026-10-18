@@ -29,6 +29,7 @@
 #include <QExplicitlySharedDataPointer>
 #include <QUrl>
 #include <QMetaType>
+#include <QVariantList>
 
 #include "util/vlctick.hpp"
 
@@ -85,6 +86,8 @@ public:
 
     QString getAlbum() const;
     QString getPlaylistName() const;
+    QString getId() const;
+    QVariantList getAncestors() const;
 
     QUrl getArtwork() const;
 
@@ -106,6 +109,7 @@ private:
         QString artist;
         QString album;
         QString playlistName;
+        QVariantList ancestors;
         QUrl artwork;
 
         VLCDuration duration;
