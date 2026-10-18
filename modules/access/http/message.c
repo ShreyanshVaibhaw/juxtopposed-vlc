@@ -190,6 +190,16 @@ const char *vlc_http_msg_get_path(const struct vlc_http_msg *m)
     return m->path;
 }
 
+char *vlc_http_msg_get_url(const struct vlc_http_msg *m)
+{
+    if (!m->scheme || !m->authority || !m->path)
+        return NULL;
+    char *url;
+    if (asprintf(&url, "%s://%s%s", m->scheme, m->authority, m->path) < 0)
+        return NULL;
+    return url;
+}
+
 void vlc_http_msg_destroy(struct vlc_http_msg *m)
 {
     if (m->payload != NULL)

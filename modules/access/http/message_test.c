@@ -49,6 +49,9 @@ static void check_req(const struct vlc_http_msg *m)
     assert(str != NULL && !strcmp(str, "www.example.com"));
     str = vlc_http_msg_get_path(m);
     assert(str != NULL && !strcmp(str, "/"));
+    char *url = vlc_http_msg_get_url(m);
+    assert(url != NULL && !strcmp(url, "http://www.example.com/"));
+    free(url);
     assert(vlc_http_msg_get_size(m) == 0);
 
     str = vlc_http_msg_get_header(m, "Cache-Control");
@@ -73,6 +76,7 @@ static void check_resp(const struct vlc_http_msg *m)
     assert(str == NULL);
     str = vlc_http_msg_get_path(m);
     assert(str == NULL);
+    assert(vlc_http_msg_get_url(m) == NULL);
 
     str = vlc_http_msg_get_header(m, "Cache-Control");
     assert(str != NULL && !strcmp(str, "private"));
@@ -93,6 +97,7 @@ static void check_resp(const struct vlc_http_msg *m)
 static void check_connect(const struct vlc_http_msg *m)
 {
     const char *str;
+    assert(vlc_http_msg_get_url(m) == NULL);
 
     assert(vlc_http_msg_get_status(m) < 0);
     str = vlc_http_msg_get_method(m);
@@ -187,6 +192,26 @@ int main(void)
     struct vlc_http_msg *m;
     const char *str;
     int ret;
+
+    const char *proxy_urls[][4] = {
+        {"http", "media.example.com", "/films/one%20two.mkv?track=2",
+         "http://media.example.com/films/one%20two.mkv?track=2"},
+        {"https", "media.example.com:8443", "/private/movie.mkv",
+         "https://media.example.com:8443/private/movie.mkv"},
+        {"http", "[2001:db8::1]:8080", "/movie.mkv",
+         "http://[2001:db8::1]:8080/movie.mkv"},
+        {"https", "[::1]", "/", "https://[::1]/"},
+    };
+    for (size_t i = 0; i < ARRAY_SIZE(proxy_urls); ++i)
+    {
+        m = vlc_http_req_create("GET", proxy_urls[i][0], proxy_urls[i][1],
+                                 proxy_urls[i][2]);
+        assert(m);
+        char *url = vlc_http_msg_get_url(m);
+        assert(url && !strcmp(url, proxy_urls[i][3]));
+        free(url);
+        vlc_http_msg_destroy(m);
+    }
 
     /* Formatting and parsing */
     m = vlc_http_req_create("GET", "http", "www.example.com", "/");

@@ -104,6 +104,7 @@ static void *serve_pac(void *opaque)
     {
         const char *script = "function FindProxyForURL(url, host) {"
             "if (host == 'direct.invalid') return 'DIRECT';"
+            "if (url.indexOf('/direct/') >= 0) return 'DIRECT';"
             "return 'PROXY pac-proxy.invalid:8123; DIRECT'; }";
         char response[1024];
         int size = snprintf(response, sizeof(response),
@@ -231,6 +232,11 @@ int main(void)
         swprintf(pac_url, ARRAY_SIZE(pac_url), L"http://127.0.0.1:%u/direct.pac", server.port);
         system_proxy = L"fallback.invalid:8888";
         check("https://direct.invalid", NULL);
+        stop_pac(&server);
+
+        start_pac(&server, false);
+        swprintf(pac_url, ARRAY_SIZE(pac_url), L"http://127.0.0.1:%u/path.pac", server.port);
+        check("http://outside.invalid/direct/movie.mkv?track=2", NULL);
         stop_pac(&server);
         system_proxy = NULL;
 

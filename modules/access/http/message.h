@@ -239,6 +239,9 @@ const char *vlc_http_msg_get_authority(const struct vlc_http_msg *);
  */
 const char *vlc_http_msg_get_path(const struct vlc_http_msg *);
 
+/** Gets the full request URL for proxy selection. The caller frees the result. */
+char *vlc_http_msg_get_url(const struct vlc_http_msg *);
+
 /**
  * Looks up a token in a header field.
  *
