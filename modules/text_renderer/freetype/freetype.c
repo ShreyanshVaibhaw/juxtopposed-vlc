@@ -760,6 +760,12 @@ static void UpdateDefaultLiveStyles( filter_t *p_filter )
     p_style->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
 
     p_sys->i_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" );
+
+    float f_shadow_angle       = var_InheritFloat( p_filter, "freetype-shadow-angle" );
+    float f_shadow_distance    = var_InheritFloat( p_filter, "freetype-shadow-distance" );
+    f_shadow_distance          = VLC_CLIP( f_shadow_distance, 0, 1 );
+    p_sys->f_shadow_vector_x   = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_y   = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 }
 
 static void FillDefaultStyles( filter_t *p_filter )
@@ -1354,15 +1360,10 @@ static int Create( filter_t *p_filter )
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
      * freetype-rel-fontsize, freetype-background-mode, freetype-background-opacity, freetype-background-color,
-     * freetype-outline-thickness, freetype-color, freetype-blending-style
+     * freetype-outline-thickness, freetype-color, freetype-blending-style,
+     * freetype-shadow-angle, freetype-shadow-distance
      *
      */
-
-    float f_shadow_angle       = var_InheritFloat( p_filter, "freetype-shadow-angle" );
-    float f_shadow_distance    = var_InheritFloat( p_filter, "freetype-shadow-distance" );
-    f_shadow_distance          = VLC_CLIP( f_shadow_distance, 0, 1 );
-    p_sys->f_shadow_vector_x   = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
-    p_sys->f_shadow_vector_y   = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 
     p_sys->fs = FontSelectNew( p_filter  );
     if( !p_sys->fs )
