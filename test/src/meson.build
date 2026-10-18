@@ -84,6 +84,14 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_misc_instance_forward',
+    'sources' : files('misc/instance_forward.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : dbus_dep.found() ? ['dbus'] : [],
+}
+
+vlc_tests += {
     'name' : 'test_src_misc_addons',
     'sources' : files('misc/addons.c'),
     'suite' : ['src', 'test_src'],

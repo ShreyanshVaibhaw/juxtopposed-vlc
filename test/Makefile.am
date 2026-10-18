@@ -84,6 +84,7 @@ check_PROGRAMS = \
 	test_src_misc_image \
 	test_src_misc_addons \
 	test_src_misc_instance_policy \
+	test_src_misc_instance_forward \
 	test_src_misc_viewpoint \
 	test_src_video_output \
 	test_src_video_output_filter_format \
@@ -445,8 +446,12 @@ test_src_misc_addons_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_instance_policy_SOURCES = src/misc/instance_policy.c
 test_src_misc_instance_policy_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_instance_policy_CPPFLAGS = $(AM_CPPFLAGS)
+test_src_misc_instance_forward_SOURCES = src/misc/instance_forward.c
+test_src_misc_instance_forward_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_instance_forward_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_DBUS
 test_src_misc_instance_policy_CPPFLAGS += -DHAVE_DBUS
+test_src_misc_instance_forward_CPPFLAGS += -DHAVE_DBUS
 endif
 
 test_modules_lua_extension_SOURCES = modules/lua/extension.c

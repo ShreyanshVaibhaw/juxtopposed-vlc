@@ -97,6 +97,28 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
 
     msg_Warn(vlc, "running VLC instance - exiting...");
 
+    if (argc == 0)
+    {
+        DBusMessage *req = dbus_message_new_method_call(MPRIS_BUS_NAME,
+            MPRIS_OBJECT_PATH, "org.mpris.MediaPlayer2", "Raise");
+        if (unlikely(req == NULL))
+        {
+            dbus_connection_unref(conn);
+            return;
+        }
+        DBusMessage *reply = dbus_connection_send_with_reply_and_block(conn,
+                                                               req, 3000, &err);
+        dbus_message_unref(req);
+        if (reply == NULL)
+        {
+            msg_Err(vlc, "D-Bus error: %s", err.message);
+            dbus_error_free(&err);
+            dbus_connection_unref(conn);
+            return;
+        }
+        dbus_message_unref(reply);
+    }
+
     const dbus_bool_t play = !var_InheritBool(vlc, "playlist-enqueue");
 
     for (int i = 0; i < argc; i++)
