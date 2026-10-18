@@ -33,6 +33,7 @@
 class QTreeWidget;
 class QTreeWidgetItem;
 class MsgEvent;
+struct vlc_log_subscription;
 
 class MessagesDialog : public QVLCFrame
 {
@@ -68,6 +69,7 @@ private:
 
     QToolButton *updateButton;
     QMutex messageLocker;
+    vlc_log_subscription *m_logSubscription = nullptr;
 #ifndef NDEBUG
     QTreeWidget *pldebugTree;
     void updatePLTree();

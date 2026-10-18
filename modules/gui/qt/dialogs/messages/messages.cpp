@@ -40,6 +40,7 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
+#include <vlc_log_observer.h>
 #include <vlc_input_item.h>
 
 
@@ -145,15 +146,17 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     };
     libvlc_int_t *vlc = vlc_object_instance(p_intf);
 
-    vlc_LogSet( vlc, &log_ops, this );
+    m_logSubscription = vlc_LogSubscribe(vlc, &log_ops, this);
+    if (!m_logSubscription)
+        msg_Err(p_intf, "Cannot read log messages.");
 
     buildTree( NULL, VLC_OBJECT(vlc) );
 }
 
 MessagesDialog::~MessagesDialog()
 {
+    vlc_LogUnsubscribe(m_logSubscription);
     saveWidgetPosition( "Messages" );
-    vlc_LogSet( vlc_object_instance(p_intf), NULL, NULL );
 };
 
 void MessagesDialog::changeVerbosity( int i_verbosity )
