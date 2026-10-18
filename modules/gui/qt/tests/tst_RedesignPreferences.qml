@@ -590,6 +590,54 @@ TestCase {
         keyClick(Qt.Key_Home)
         compare(store.value("timeout"), 0)
     }
+    function test_subtitleOpacityScaleStaysFixedWhenTheValueChanges() {
+        const spec = catalog.sections.subtitles.find(section => section.title === "Appearance").rows.find(row => row[0] === "freetype-opacity")[2]
+        const row = createTemporaryObject(inlineSliderRow, testCase, {presentation: spec})
+        verify(row !== null)
+        for (const value of [0, 128, 255]) {
+            store.stage("timeout", value); wait(20)
+            for (const index of [0, 1, 2]) {
+                const label = findChild(row, "preferenceSliderTick_" + index)
+                verify(label.visible)
+                compare(label.text, ["0%", "50%", "100%"][index])
+            }
+        }
+        const slider = findChild(row, "preferenceSliderEditor")
+        slider.forceActiveFocus(); keyClick(Qt.Key_Home); compare(store.value("timeout"), 0)
+        keyClick(Qt.Key_End); compare(store.value("timeout"), 255)
+    }
+    function test_subtitleDelayScaleKeepsTheCenterAndMillisecondPrecision() {
+        const spec = catalog.sections.subtitles.find(section => section.title === "Timing").rows[0][2]
+        const row = createTemporaryObject(inlineSliderRow, testCase, {presentation: spec})
+        verify(row !== null); store.stage("timeout", 0); wait(20)
+        const slider = findChild(row, "preferenceSliderEditor")
+        compare(slider.position, .5)
+        compare(findChild(row, "preferenceSliderTick_0").text, "-5 s")
+        compare(findChild(row, "preferenceSliderTick_1").text, "0 s")
+        compare(findChild(row, "preferenceSliderTick_2").text, "+5 s")
+        slider.forceActiveFocus(); keyClick(Qt.Key_Home); compare(store.value("timeout"), -5000)
+        keyClick(Qt.Key_End); compare(store.value("timeout"), 5000)
+        store.stage("timeout", 1234); wait(20); fuzzyCompare(slider.value, 1.234, .000001)
+    }
+    function test_speedScaleUsesTheReferenceRatios() {
+        const spec = catalog.sections.playback.reduce((rows, section) => rows.concat(section.rows), []).find(row => row[0] === "rate")[2]
+        const row = createTemporaryObject(inlineSliderRow, testCase, {presentation: spec})
+        verify(row !== null); wait(20)
+        const expected = ["0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2"]
+        for (let index = 0; index < expected.length; ++index) {
+            const label = findChild(row, "preferenceSliderTick_" + index)
+            compare(label.text, expected[index])
+            if (index) {
+                const previous = findChild(row, "preferenceSliderTick_" + (index - 1))
+                verify(label.x >= previous.x + previous.width, index + ": " + label.x + " < " + (previous.x + previous.width) + "; label width=" + label.width + "; scale width=" + label.parent.width)
+            }
+        }
+        row.width = 244; wait(20)
+        compare(findChild(row, "preferenceSliderTick_0").text, "0.25")
+        compare(findChild(row, "preferenceSliderTick_1").text, "1")
+        compare(findChild(row, "preferenceSliderTick_2").text, "2")
+        verify(findChild(row, "preferenceSliderTick_3") === null)
+    }
     function test_numericTextShowsUnitsAndPreservesNativeScale() {
         const field = findChild(timingTextRow, "preferenceTextEditor")
         compare(field.text, "1.8")

@@ -384,7 +384,8 @@ ColumnLayout {
                         Rectangle {
                             required property real modelData
                             width: theme.dp(1); height: theme.dp(7); anchors.verticalCenter: parent.verticalCenter
-                            x: slider.handle.width / 2 + (modelData - slider.from) / (slider.to - slider.from) * (parent.width - slider.handle.width)
+                            readonly property real position: (modelData - slider.from) / (slider.to - slider.from)
+                            x: slider.handle.width / 2 + (slider.mirrored ? 1 - position : position) * (parent.width - slider.handle.width)
                             color: theme.background
                         }
                     }
@@ -410,13 +411,17 @@ ColumnLayout {
                 Layout.fillWidth: true; Layout.preferredHeight: theme.dp(14)
                 visible: !root.presentation.inlineSlider && !!root.presentation.ticks
                 Repeater {
-                    model: root.presentation.ticks || []
+                    model: parent.width < theme.dp(280) && root.presentation.compactTicks ? root.presentation.compactTicks : root.presentation.ticks || []
                     Text {
                         required property int index
                         required property var modelData
-                        x: index * parent.width / Math.max(1, (root.presentation.ticks || []).length - 1)
-                            - (index === 0 ? 0 : index === (root.presentation.ticks || []).length - 1 ? width : width / 2)
-                        text: modelData + (root.presentation.suffix || "")
+                        objectName: "preferenceSliderTick_" + index
+                        readonly property real position: (Number(modelData) - slider.from) / (slider.to - slider.from)
+                        readonly property real visualPosition: slider.mirrored ? 1 - position : position
+                        x: visualPosition * parent.width - (visualPosition === 0 ? 0 : visualPosition === 1 ? width : width / 2)
+                        text: (root.presentation.positiveTickSign && modelData > 0 ? "+" : "")
+                            + Number(modelData).toLocaleString(Qt.locale(), 'f', Number.isInteger(Number(modelData)) ? 0 : String(modelData).split('.')[1].length)
+                            + (root.presentation.tickSuffix === undefined ? root.presentation.suffix || "" : root.presentation.tickSuffix)
                         color: theme.foreground; font.pixelSize: theme.dp(11)
                     }
                 }

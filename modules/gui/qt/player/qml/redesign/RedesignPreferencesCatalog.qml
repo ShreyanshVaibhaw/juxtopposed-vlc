@@ -73,7 +73,7 @@ QtObject {
             { title: qsTr("Startup"), rows: [
                 ["restore-playback-pos", qsTr("Continue where you left off")],
                 ["playlist-autostart", qsTr("Start playing as soon as a file opens")],
-                ["rate", qsTr("Default playback speed"), {editor: "slider", from: 0.25, to: 2, step: 0.05, decimals: 2, suffix: "×"}],
+                ["rate", qsTr("Default playback speed"), {editor: "slider", from: 0.25, to: 2, step: 0.05, decimals: 2, suffix: "×", tickSuffix: "", ticks: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2], compactTicks: [0.25, 1, 2], trackTicks: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]}],
                 ["playlist-cork", qsTr("Pause when another app uses audio")] ] },
             { title: qsTr("Tracks"), rows: [
                 ["preferred-resolution", qsTr("Preferred video quality")], ["menu-language", qsTr("Preferred menu language")],
@@ -124,15 +124,15 @@ QtObject {
             { title: qsTr("Appearance"), rows: [ ["freetype-font", qsTr("Font")],
                 ["redesign-subtitle-relative-size", qsTr("Font size"), {choices: [{label: qsTr("Automatic"), value: 100}, {label: qsTr("Very small"), value: 50}, {label: qsTr("Small"), value: 75}, {label: qsTr("Large"), value: 150}, {label: qsTr("Very large"), value: 200}]}],
                 ["freetype-bold", qsTr("Bold")], ["freetype-color", qsTr("Text color")],
-                ["freetype-opacity", qsTr("Text opacity"), {editor: "slider", from: 0, to: 100, factor: 100/255, suffix: "%"}],
+                ["freetype-opacity", qsTr("Text opacity"), {editor: "slider", from: 0, to: 100, factor: 100/255, suffix: "%", ticks: [0, 50, 100], trackTicks: [10, 20, 30, 40, 50, 60, 70, 80, 90]}],
                 ["freetype-outline-thickness", qsTr("Outline thickness"), {choices: [{label: qsTr("None"), value: 0}, {label: qsTr("Thin"), value: 1}, {label: qsTr("Normal"), value: 4}, {label: qsTr("Thick"), value: 8}]}], ["freetype-outline-color", qsTr("Outline color")],
                 ["freetype-shadow-opacity", qsTr("Shadow"), {editor: "toggle", toggleValues: {on: 128, off: 0}}],
                 ["freetype-shadow-color", qsTr("Shadow color")], ["freetype-shadow-distance", qsTr("Shadow distance"), {dynamicChoices: true}],
                 ["freetype-background-color", qsTr("Background color")],
-                ["freetype-background-opacity", qsTr("Background opacity"), {editor: "slider", from: 0, to: 100, factor: 100/255, suffix: "%"}] ] },
-            { title: qsTr("Timing"), rows: [ ["redesign-subtitle-delay", qsTr("Subtitle delay"), {editor: "slider", from: -10, to: 10, factor: 0.001, step: 0.001, decimals: 3, suffix: " s"}] ] },
+                ["freetype-background-opacity", qsTr("Background opacity"), {editor: "slider", from: 0, to: 100, factor: 100/255, suffix: "%", ticks: [0, 50, 100], trackTicks: [10, 20, 30, 40, 50, 60, 70, 80, 90]}] ] },
+            { title: qsTr("Timing"), rows: [ ["redesign-subtitle-delay", qsTr("Subtitle delay"), {editor: "slider", from: -5, to: 5, factor: 0.001, step: 0.001, decimals: 3, suffix: " s", ticks: [-5, 0, 5], positiveTickSign: true, trackTicks: [-4, -3, -2, -1, 0, 1, 2, 3, 4]}] ] },
             { title: qsTr("On-Screen Messages"), rows: [ ["osd", qsTr("Show feedback for shortcuts")], ["video-title-show", qsTr("Show filename when a video starts")],
-                ["video-title-timeout", qsTr("Show filename for"), {editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, suffix: " s"}] ] } ],
+                ["video-title-timeout", qsTr("Show filename for"), {editor: "slider", from: 1, to: 10, factor: 0.001, step: 0.1, suffix: " s", ticks: [1, 10], trackTicks: [2, 3, 4, 5, 6, 7, 8, 9]}] ] } ],
         library: [
             { title: qsTr("Opening Files"), rows: [ ["one-instance", qsTr("Only allow one VLC window")],
                 ["one-instance-when-started-from-file", qsTr("Apply to files opened from the file manager")],
