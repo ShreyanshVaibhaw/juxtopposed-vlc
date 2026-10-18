@@ -64,6 +64,15 @@ TestCase {
             {tag: "positive-rtl", delay: 4000, mirrored: true}
         ]
     }
+    function test_hiddenBackgroundShowsZeroAndCanBeEnabledFromOpacity() {
+        store.stage("freetype-background-opacity", 128); store.stage("freetype-background-mode", 0); wait(20)
+        compare(item("subtitleBackgroundOpacitySetting").currentValue, 0)
+        compare(store.value("freetype-background-opacity"), 128)
+        slider("subtitleBackgroundOpacitySetting").forceActiveFocus(); keyClick(Qt.Key_End)
+        compare(store.value("freetype-background-mode"), 1)
+        compare(store.value("freetype-background-opacity"), 255)
+        compare(item("subtitleBackgroundOpacitySetting").currentValue, 100)
+    }
     function test_delayFillRunsBetweenZeroAndTheSelectedTime(data) {
         mirrored = data.mirrored
         store.stage("redesign-subtitle-delay", data.delay)
@@ -137,6 +146,7 @@ TestCase {
         keyClick(Qt.Key_End); compare(store.lastValue, 50)
         slider("subtitleBackgroundOpacitySetting").forceActiveFocus(); keyClick(Qt.Key_End)
         compare(store.lastName, "freetype-background-opacity"); compare(store.lastValue, 255)
+        compare(store.value("freetype-background-mode"), 1)
         keyClick(Qt.Key_Home); compare(store.lastValue, 0)
         keyClick(Qt.Key_Right); compare(store.lastValue, 3)
         keyClick(Qt.Key_Right); compare(store.lastValue, 5)

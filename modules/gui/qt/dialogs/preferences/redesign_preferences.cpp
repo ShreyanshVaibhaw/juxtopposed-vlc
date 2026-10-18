@@ -149,7 +149,8 @@ const QStringList& presetOptions()
             QStringLiteral("freetype-color"), QStringLiteral("freetype-opacity"), QStringLiteral("freetype-bold"),
             QStringLiteral("freetype-outline-thickness"), QStringLiteral("freetype-outline-color"), QStringLiteral("freetype-outline-opacity"),
             QStringLiteral("freetype-shadow-angle"), QStringLiteral("freetype-shadow-distance"), QStringLiteral("freetype-shadow-color"),
-            QStringLiteral("freetype-shadow-opacity"), QStringLiteral("freetype-background-color"), QStringLiteral("freetype-background-opacity")
+            QStringLiteral("freetype-shadow-opacity"), QStringLiteral("freetype-background-color"), QStringLiteral("freetype-background-opacity"),
+            QStringLiteral("freetype-background-mode")
         };
         names += videoFilterOptions();
         names += overlayOptions();
@@ -639,18 +640,22 @@ QVariantMap RedesignPreferences::playerPresetState() const
     if (!selected.isEmpty() && !ids.contains(selected)) return {};
     // Older presets stored fit=None for pixel zoom but omitted autoscale.
     // Normalize each snapshot before merging a named preset with defaults.
-    const auto withScaling = [](QVariantMap options) {
+    const auto normalize = [](QVariantMap options) {
         if (!options.contains(QStringLiteral("autoscale")) && options.contains(QStringLiteral("fit")))
             options.insert(QStringLiteral("autoscale"), options.value(QStringLiteral("fit")).toInt() != VLC_VIDEO_FIT_NONE);
         // Presets made before layout editing use the original player layout.
         if (!options.contains(QStringLiteral("qt-player-layout")))
             options.insert(QStringLiteral("qt-player-layout"), QString());
+        // Resolve each older snapshot before it is merged with newer defaults.
+        if (options.contains(QStringLiteral("freetype-background-opacity"))
+            && !options.contains(QStringLiteral("freetype-background-mode")))
+            options.insert(QStringLiteral("freetype-background-mode"), -1);
         return options;
     };
-    state.insert(QStringLiteral("default"), withScaling(state.value(QStringLiteral("default")).toMap()));
+    state.insert(QStringLiteral("default"), normalize(state.value(QStringLiteral("default")).toMap()));
     for (auto& row : presets) {
         auto preset = row.toMap();
-        preset.insert(QStringLiteral("options"), withScaling(preset.value(QStringLiteral("options")).toMap()));
+        preset.insert(QStringLiteral("options"), normalize(preset.value(QStringLiteral("options")).toMap()));
         row = preset;
     }
     state.insert(QStringLiteral("presets"), presets);
@@ -853,6 +858,12 @@ QVariant RedesignPreferences::value(const QString& name) const
             : current == quality->balanced ? QStringLiteral("balanced")
             : current == quality->high ? QStringLiteral("high") : QStringLiteral("custom");
     }
+    if (name == QLatin1String("redesign-subtitle-background")) {
+        const int mode = value(QStringLiteral("freetype-background-mode")).toInt();
+        return mode < 0 ? int(value(QStringLiteral("freetype-background-opacity")).toInt() > 0) : mode;
+    }
+    if (name == QLatin1String("redesign-subtitle-background-opacity"))
+        return value(QStringLiteral("freetype-background-opacity"));
     if (name == QLatin1String("redesign-subtitle-relative-size"))
         return value(QStringLiteral("sub-text-scale"));
     if (name == QLatin1String("redesign-subtitle-duration"))
@@ -936,6 +947,10 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-subtitle-background"))
+        return m_edits.contains(QStringLiteral("freetype-background-mode"));
+    if (name == QLatin1String("redesign-subtitle-background-opacity"))
+        return m_edits.contains(QStringLiteral("freetype-background-mode")) || m_edits.contains(QStringLiteral("freetype-background-opacity"));
     if (name == QLatin1String("redesign-video-zoom"))
         return m_edits.contains(QStringLiteral("zoom")) || m_edits.contains(QStringLiteral("fit")) || m_edits.contains(QStringLiteral("autoscale"));
     if (name == QLatin1String("redesign-snapshot-size"))
@@ -957,6 +972,22 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-subtitle-background")) {
+        auto description = describe(QStringLiteral("freetype-background-mode"));
+        if (description.isEmpty()) return {};
+        description.insert(QStringLiteral("value"), value(name));
+        description.insert(QStringLiteral("defaultValue"), 0);
+        description.insert(QStringLiteral("choices"), QVariantList{
+            QVariantMap{{QStringLiteral("label"), qtr("None")}, {QStringLiteral("value"), 0}},
+            QVariantMap{{QStringLiteral("label"), qtr("Box")}, {QStringLiteral("value"), 1}}});
+        description.insert(QStringLiteral("help"), qtr("Select None to hide the background. The color and opacity values stay saved."));
+        return description;
+    }
+    if (name == QLatin1String("redesign-subtitle-background-opacity")) {
+        auto description = describe(QStringLiteral("freetype-background-opacity"));
+        description.insert(QStringLiteral("value"), value(name));
+        return description;
+    }
     if (name == QLatin1String("redesign-video-zoom")) {
         QVariantList choices{
             QVariantMap{{QStringLiteral("label"), qtr("Fit")}, {QStringLiteral("value"), -1.0}},
@@ -1285,6 +1316,23 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         // Select the matching converter when Automatic would otherwise fall
         // back to a resampler that has no quality control.
         return stage(QStringLiteral("audio-resampler"), qfu(quality->module));
+    }
+    if (name == QLatin1String("redesign-subtitle-background")) {
+        bool valid = false;
+        const auto mode = proposed.toLongLong(&valid);
+        if (!valid || (mode != 0 && mode != 1)) return false;
+        if (mode == 1 && value(QStringLiteral("freetype-background-opacity")).toInt() == 0
+            && !stage(QStringLiteral("freetype-background-opacity"), 128)) return false;
+        return stage(QStringLiteral("freetype-background-mode"), mode);
+    }
+    if (name == QLatin1String("redesign-subtitle-background-opacity")) {
+        bool valid = false;
+        const auto opacity = proposed.toLongLong(&valid);
+        if (!valid || opacity < 0 || opacity > 255) return false;
+        // Editing opacity in Settings retains the selected background mode.
+        // Resolve the legacy automatic mode before changing its opacity.
+        return stage(QStringLiteral("freetype-background-mode"), value(QStringLiteral("redesign-subtitle-background")))
+            && stage(QStringLiteral("freetype-background-opacity"), opacity);
     }
     if (name == QLatin1String("redesign-subtitle-relative-size")) {
         if (!stage(QStringLiteral("sub-text-scale"), proposed)) return false;

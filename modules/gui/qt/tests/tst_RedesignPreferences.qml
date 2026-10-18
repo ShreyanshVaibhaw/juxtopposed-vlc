@@ -22,6 +22,8 @@ TestCase {
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
         function describe(name) {
+            if (name === "redesign-subtitle-background") return {kind: "integer", choices: [{label: "None", value: 0}, {label: "Box", value: 1}]}
+            if (name === "redesign-subtitle-background-opacity") return {kind: "integer", minimum: 0, maximum: 255}
             if (name === "screensaverPolicy") return {kind: "integer", choices: [{label: "Never", value: 0}, {label: "When fullscreen", value: 2}, {label: "Always", value: 1}]}
             if (name.endsWith("-track")) return {kind: "integer", editor: "track", maximum: 2147483647}
             if (name.endsWith("-language")) return {kind: "string", editor: "language", choices: [
@@ -618,6 +620,28 @@ TestCase {
         const slider = findChild(row, "preferenceSliderEditor")
         slider.forceActiveFocus(); keyClick(Qt.Key_Home); compare(store.value("timeout"), 0)
         keyClick(Qt.Key_End); compare(store.value("timeout"), 255)
+    }
+    function test_subtitleBackgroundKeepsOpacityEditableWhenNoneIsSelected() {
+        const rows = catalog.sections.subtitles.find(section => section.title === "Appearance").rows
+        const background = rows.find(row => row[0] === "redesign-subtitle-background")
+        const opacity = rows.find(row => row[0] === "redesign-subtitle-background-opacity")
+        verify(background !== undefined); verify(opacity !== undefined)
+        const index = rows.findIndex(row => row[0] === background[0])
+        compare(rows[index - 1][0], "freetype-shadow-distance")
+        compare(rows[index + 1][0], "freetype-background-color")
+        store.stage(background[0], 0); store.stage(opacity[0], 128)
+        const selector = createTemporaryObject(inlineSliderRow, testCase, {optionName: background[0], presentation: {}, y: 370})
+        const alpha = createTemporaryObject(inlineSliderRow, testCase, {optionName: opacity[0], presentation: opacity[2]})
+        verify(selector !== null && alpha !== null); wait(20)
+        const choice = findChild(selector, "preferenceChoiceEditor")
+        compare(choice.currentText, "None"); verify(alpha.editorEnabled)
+        const slider = findChild(alpha, "preferenceSliderEditor")
+        slider.forceActiveFocus(); keyClick(Qt.Key_End)
+        compare(store.value(opacity[0]), 255); compare(choice.currentText, "None")
+        mouseClick(choice); keyClick(Qt.Key_End); keyClick(Qt.Key_Return)
+        compare(choice.currentText, "Box"); compare(store.value(opacity[0]), 255)
+        mouseClick(choice); keyClick(Qt.Key_Home); keyClick(Qt.Key_Return)
+        compare(choice.currentText, "None"); compare(store.value(opacity[0]), 255)
     }
     function test_subtitleDelayScaleKeepsTheCenterAndMillisecondPrecision() {
         const spec = catalog.sections.subtitles.find(section => section.title === "Timing").rows[0][2]

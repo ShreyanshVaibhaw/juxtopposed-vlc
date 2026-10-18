@@ -168,8 +168,15 @@ ColumnLayout {
         valueLabel: Math.round(currentValue) + " %"
         from: 0; to: 100; stepSize: 1; ticks: [0, 20, 40, 60, 80, 100]
         scaleLabelsVisible: false; sliderTopMargin: 6; sliderLeftMargin: -4
-        currentValue: { root.backend.revision; return Math.round(Number(root.backend.value("freetype-background-opacity")) * 100 / 255) }
-        onMoved: value => root.backend.stage("freetype-background-opacity", Math.round(value * 255 / 100))
+        currentValue: {
+            root.backend.revision
+            return Number(root.backend.value("freetype-background-mode")) === 0 ? 0
+                : Math.round(Number(root.backend.value("freetype-background-opacity")) * 100 / 255)
+        }
+        onMoved: value => {
+            root.backend.stage("freetype-background-mode", 1)
+            root.backend.stage("freetype-background-opacity", Math.round(value * 255 / 100))
+        }
     }
     Item { Layout.fillWidth: true; height: theme.dp(10) }
 }

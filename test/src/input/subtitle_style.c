@@ -18,6 +18,8 @@ static subpicture_t *new_subtitle(bool subtitle)
     style->psz_fontname = strdup("Authored Font");
     style->i_font_color = 0xff0000;
     style->i_style_flags |= STYLE_ITALIC;
+    style->i_background_alpha = 96;
+    style->i_style_flags |= STYLE_BACKGROUND;
     static const struct vlc_spu_updater_ops ops = {
         .update = SubpictureTextUpdate, .destroy = SubpictureTextDestroy,
     };
@@ -93,6 +95,29 @@ int main(void)
     assert(strcmp(region->p_text->style->psz_fontname, "User Font") == 0);
     assert(!(region->p_text->style->i_style_flags & STYLE_ITALIC));
 
+    // Background visibility and opacity are independent for manual styling.
+    config_PutInt("freetype-background-mode", 0);
+    vlc_subpicture_InvalidateTextStyle();
+    region = update(subtitle);
+    assert(region->p_text->style->i_background_alpha == 0);
+    assert(!(region->p_text->style->i_style_flags & STYLE_BACKGROUND));
+    assert(config_GetInt("freetype-background-opacity") == 128);
+    config_PutInt("freetype-background-opacity", 64);
+    vlc_subpicture_InvalidateTextStyle();
+    region = update(subtitle);
+    assert(region->p_text->style->i_background_alpha == 0);
+    config_PutInt("freetype-background-mode", 1);
+    vlc_subpicture_InvalidateTextStyle();
+    region = update(subtitle);
+    assert(region->p_text->style->i_background_alpha == 64);
+    assert(region->p_text->style->i_style_flags & STYLE_BACKGROUND);
+    // Automatic preserves older opacity-only configuration and presets.
+    config_PutInt("freetype-background-mode", -1);
+    config_PutInt("freetype-background-opacity", 128);
+    vlc_subpicture_InvalidateTextStyle();
+    region = update(subtitle);
+    assert(region->p_text->style->i_background_alpha == 128);
+
     config_PutInt("sub-text-size-mode", 1);
     config_PutInt("sub-text-size-pixels", 36);
     vlc_subpicture_InvalidateTextStyle();
@@ -104,11 +129,13 @@ int main(void)
     // The original author style must survive toggles and preset restoration.
     config_PutInt("sub-text-use-embedded-style", true);
     config_PutInt("sub-text-size-mode", 0);
+    config_PutInt("freetype-background-mode", 0);
     vlc_subpicture_InvalidateTextStyle();
     region = update(subtitle);
     assert(!(region->text_flags & VLC_SUBPIC_TEXT_FLAG_PIXEL_SIZE));
     assert(region->p_text->style->i_font_color == 0xff0000);
     assert(strcmp(region->p_text->style->psz_fontname, "Authored Font") == 0);
+    assert(region->p_text->style->i_background_alpha == 96);
     subpicture_Delete(subtitle);
 
     config_PutInt("sub-text-use-embedded-style", false);

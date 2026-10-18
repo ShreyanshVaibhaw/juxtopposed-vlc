@@ -108,7 +108,8 @@ static text_style_t *SubtitleManualStyle(vlc_object_t *owner)
     style->i_shadow_color = SubtitleStyleInteger(owner, "freetype-shadow-color", 0);
     style->i_shadow_alpha = SubtitleStyleInteger(owner, "freetype-shadow-opacity", 128);
     style->i_background_color = SubtitleStyleInteger(owner, "freetype-background-color", 0);
-    style->i_background_alpha = SubtitleStyleInteger(owner, "freetype-background-opacity", 0);
+    style->i_background_alpha = SubtitleStyleInteger(owner, "freetype-background-mode", -1) == 0
+        ? 0 : SubtitleStyleInteger(owner, "freetype-background-opacity", 0);
     style->i_style_flags = STYLE_OUTLINE | STYLE_SHADOW;
     if (SubtitleStyleInteger(owner, "freetype-bold", 0))
         style->i_style_flags |= STYLE_BOLD;

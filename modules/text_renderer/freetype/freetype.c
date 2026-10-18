@@ -76,6 +76,8 @@ static void Destroy( filter_t * );
 
 #define BG_OPACITY_TEXT N_("Background opacity")
 #define BG_COLOR_TEXT N_("Background color")
+#define BG_MODE_TEXT N_("Subtitle background")
+#define BG_MODE_LONGTEXT N_("Automatic uses the saved opacity. None hides the background. Box uses the saved color and opacity.")
 
 #define OUTLINE_OPACITY_TEXT N_("Outline opacity")
 #define OUTLINE_COLOR_TEXT N_("Outline color")
@@ -131,6 +133,9 @@ static const char *const ppsz_blending_mode[] = {
     N_("Overlay"), N_("Transparent"),
 };
 
+static const int background_modes[] = { -1, 0, 1 };
+static const char *const background_mode_names[] = { N_("Automatic"), N_("None"), N_("Box") };
+
 
 vlc_module_begin ()
     set_shortname( N_("Text renderer"))
@@ -162,6 +167,10 @@ vlc_module_begin ()
 
     add_integer_with_range( "freetype-background-opacity", 0, 0, 255,
                             BG_OPACITY_TEXT, NULL )
+        change_safe()
+    add_integer_with_range( "freetype-background-mode", -1, -1, 1,
+                            BG_MODE_TEXT, BG_MODE_LONGTEXT )
+        change_integer_list( background_modes, background_mode_names )
         change_safe()
     add_rgb("freetype-background-color", 0x00000000, BG_COLOR_TEXT, NULL)
         change_integer_list( pi_color_values, ppsz_color_descriptions )
@@ -746,7 +755,8 @@ static void UpdateDefaultLiveStyles( filter_t *p_filter )
 
     p_style->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
 
-    p_style->i_background_alpha = var_InheritInteger( p_filter, "freetype-background-opacity" );
+    p_style->i_background_alpha = var_InheritInteger(p_filter, "freetype-background-mode") == 0
+        ? 0 : var_InheritInteger(p_filter, "freetype-background-opacity");
     p_style->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
 
     p_sys->i_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" );
@@ -1343,7 +1353,7 @@ static int Create( filter_t *p_filter )
 
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
-     * freetype-rel-fontsize, freetype-background-opacity, freetype-background-color,
+     * freetype-rel-fontsize, freetype-background-mode, freetype-background-opacity, freetype-background-color,
      * freetype-outline-thickness, freetype-color, freetype-blending-style
      *
      */
