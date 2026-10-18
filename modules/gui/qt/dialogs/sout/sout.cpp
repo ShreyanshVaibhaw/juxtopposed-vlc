@@ -105,6 +105,9 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
         primary->style()->unpolish(primary);
         primary->style()->polish(primary);
     }
+
+    ui.localOutput->setChecked( var_InheritBool( p_intf, "sout-display" ) );
+    updateChain();
 }
 
 void SoutDialog::closeTab( int i )
