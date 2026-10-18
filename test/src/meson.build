@@ -77,6 +77,13 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_misc_addons',
+    'sources' : files('misc/addons.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+}
+
+vlc_tests += {
     'name' : 'test_src_audio_output_dec',
     'sources' : files(
         'audio_output/dec.c',

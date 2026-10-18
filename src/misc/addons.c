@@ -337,25 +337,32 @@ static void *FinderThread( void *p_data )
     int i_cancel = vlc_savecancel();
     vlc_interrupt_set( p_manager->p_priv->finder.p_interrupt );
 
-    vlc_mutex_lock( &p_manager->p_priv->finder.lock );
-    while( p_manager->p_priv->finder.b_live )
+    /* I/O can consume the notification, but the kill flag remains set. */
+    while( !vlc_killed() )
     {
         char *psz_uri;
 
+        /* Registration can call back immediately; unregistration can wait
+         * for the callback. Neither may hold the callback's queue lock. */
         vlc_interrupt_register( finder_thread_interrupted, p_data );
+        vlc_mutex_lock( &p_manager->p_priv->finder.lock );
         while( p_manager->p_priv->finder.uris.i_size == 0 &&
                p_manager->p_priv->finder.b_live )
         {
             vlc_cond_wait( &p_manager->p_priv->finder.waitcond,
                            &p_manager->p_priv->finder.lock );
         }
-        vlc_interrupt_unregister();
         if( !p_manager->p_priv->finder.b_live )
+        {
+            vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
+            vlc_interrupt_unregister();
             break;
+        }
         psz_uri = p_manager->p_priv->finder.uris.p_elems[0];
         ARRAY_REMOVE( p_manager->p_priv->finder.uris, 0 );
 
         vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
+        vlc_interrupt_unregister();
 
         addons_finder_t *p_finder =
                 vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );
@@ -380,10 +387,8 @@ static void *FinderThread( void *p_data )
         }
 
         p_manager->owner.discovery_ended( p_manager );
-        vlc_mutex_lock( &p_manager->p_priv->finder.lock );
     }
 
-    vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
     vlc_restorecancel( i_cancel );
     return NULL;
 }
@@ -466,10 +471,10 @@ static void *InstallerThread( void *p_data )
     vlc_interrupt_set( p_manager->p_priv->installer.p_interrupt );
     int i_ret;
 
-    vlc_mutex_lock( &p_manager->p_priv->installer.lock );
-    while( p_manager->p_priv->installer.b_live )
+    while( !vlc_killed() )
     {
         vlc_interrupt_register( installer_thread_interrupted, p_data );
+        vlc_mutex_lock( &p_manager->p_priv->installer.lock );
         while ( !p_manager->p_priv->installer.entries.i_size &&
                 p_manager->p_priv->installer.b_live )
         {
@@ -477,14 +482,17 @@ static void *InstallerThread( void *p_data )
             vlc_cond_wait( &p_manager->p_priv->installer.waitcond,
                            &p_manager->p_priv->installer.lock );
         }
-        vlc_interrupt_unregister();
         if( !p_manager->p_priv->installer.b_live )
+        {
+            vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
+            vlc_interrupt_unregister();
             break;
+        }
 
         addon_entry_t *p_entry = p_manager->p_priv->installer.entries.p_elems[0];
         ARRAY_REMOVE( p_manager->p_priv->installer.entries, 0 );
-        addon_entry_Hold( p_entry );
         vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
+        vlc_interrupt_unregister();
 
         vlc_mutex_lock( &p_entry->lock );
         /* DO WORK */
@@ -524,9 +532,7 @@ static void *InstallerThread( void *p_data )
         addon_entry_Release( p_entry );
 
         addons_manager_WriteCatalog( p_manager );
-        vlc_mutex_lock( &p_manager->p_priv->installer.lock );
     }
-    vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
     vlc_restorecancel( i_cancel );
     return NULL;
 }
@@ -539,6 +545,8 @@ static int InstallEntry( addons_manager_t *p_manager, addon_entry_t *p_entry )
         return VLC_EINVAL;
 
     vlc_mutex_lock( &p_manager->p_priv->installer.lock );
+    /* The queue owns this reference until processing or cancellation. */
+    addon_entry_Hold( p_entry );
     ARRAY_APPEND( p_manager->p_priv->installer.entries, p_entry );
     if( !p_manager->p_priv->installer.b_live )
     {
@@ -547,6 +555,9 @@ static int InstallEntry( addons_manager_t *p_manager, addon_entry_t *p_entry )
         {
             msg_Err( p_manager->p_priv->p_parent,
                      "cannot spawn addons installer thread" );
+            ARRAY_REMOVE( p_manager->p_priv->installer.entries,
+                          p_manager->p_priv->installer.entries.i_size - 1 );
+            addon_entry_Release( p_entry );
             vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
             return VLC_EGENERIC;
         }
