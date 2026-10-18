@@ -30,6 +30,7 @@
 #endif
 #include <vlc_common.h>
 #include "../libvlc.h"
+#include "../instance_policy.h"
 #include "../lib/libvlc_internal.h"
 
 #include <winsock2.h>
@@ -72,9 +73,7 @@ typedef struct
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )
 {
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    if( var_InheritBool( p_this, "one-instance" )
-     || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
-       && var_InheritBool( p_this, "started-from-file" ) ) )
+    if( vlc_instance_ShouldReuse(VLC_OBJECT(p_this)) )
     {
         HANDLE hmutex;
 
@@ -92,7 +91,8 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 
         if( GetLastError() != ERROR_ALREADY_EXISTS )
         {
-            libvlc_InternalAddIntf( p_this, "win_msg,none" );
+            if (libvlc_InternalAddIntf(p_this, "win_msg,none") == VLC_SUCCESS)
+                var_SetBool(p_this, "single-instance-listening", true);
             /* Initialization done.
              * Release the mutex to unblock other instances */
             ReleaseMutex( hmutex );

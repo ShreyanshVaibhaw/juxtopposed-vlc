@@ -66,6 +66,7 @@
 #include "player/player.h"
 
 #include "libvlc.h"
+#include "instance_policy.h"
 
 #include <vlc_vlm.h>
 
@@ -265,6 +266,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_SetString( p_libvlc, "app-id", "org.VideoLAN.VLC" );
     var_Create( p_libvlc, "app-version", VLC_VAR_STRING );
     var_SetString( p_libvlc, "app-version", PACKAGE_VERSION );
+
+    var_Create(p_libvlc, "single-instance-listening", VLC_VAR_BOOL);
+    vlc_instance_MigratePreferences(VLC_OBJECT(p_libvlc));
 
     /* System specific configuration */
     system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );

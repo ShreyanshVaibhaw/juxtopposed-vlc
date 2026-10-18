@@ -212,11 +212,12 @@ int main(int argc, const char *argv[])
     pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    const char *args[argc + 3];
+    const char *args[argc + 4];
     int count = 0;
 
     args[count++] = "--no-ignore-config";
     args[count++] = "--media-library-default";
+    args[count++] = "--single-instance-default";
 #ifdef HAVE_DBUS
     args[count++] = "--dbus";
 #endif

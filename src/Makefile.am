@@ -222,6 +222,7 @@ endif
 libvlccore_la_SOURCES = \
 	libvlc.c \
 	libvlc.h \
+	instance_policy.h \
 	libvlc-module.c \
 	missing.c \
 	revision.c \

@@ -83,6 +83,7 @@ check_PROGRAMS = \
 	test_src_misc_keystore \
 	test_src_misc_image \
 	test_src_misc_addons \
+	test_src_misc_instance_policy \
 	test_src_misc_viewpoint \
 	test_src_video_output \
 	test_src_video_output_filter_format \
@@ -441,6 +442,8 @@ test_src_misc_image_SOURCES = src/misc/image.c
 test_src_misc_image_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_addons_SOURCES = src/misc/addons.c
 test_src_misc_addons_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_instance_policy_SOURCES = src/misc/instance_policy.c
+test_src_misc_instance_policy_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_modules_lua_extension_SOURCES = modules/lua/extension.c
 test_modules_lua_extension_LDADD = $(LIBVLCCORE) $(LIBVLC)

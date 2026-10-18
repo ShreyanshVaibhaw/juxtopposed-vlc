@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
+#include "../instance_policy.h"
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include <vlc_url.h>
@@ -159,9 +160,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
         }
     }
 
-    if( var_InheritBool( p_this, "one-instance" )
-        || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
-             && var_InheritBool( p_this, "started-from-file" ) ) )
+    if( vlc_instance_ShouldReuse(VLC_OBJECT(p_this)) )
     {
         HPIPE hpipe;
         ULONG ulAction;
@@ -215,6 +214,8 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 
                 tidIPCFirst = -1;
             }
+            else
+                var_SetBool(p_this, "single-instance-listening", true);
         }
         else
         {

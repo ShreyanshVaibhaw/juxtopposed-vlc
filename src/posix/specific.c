@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
+#include "../instance_policy.h"
 #include "../lib/libvlc_internal.h"
 
 #ifdef HAVE_DBUS
@@ -51,9 +52,13 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
     if (var_InheritBool(vlc, "dbus"))
         libvlc_InternalAddIntf(vlc, "dbus,none");
 
-    if (!var_InheritBool(vlc, "one-instance")
-     && !(var_InheritBool(vlc, "one-instance-when-started-from-file")
-       && var_InheritBool(vlc, "started-from-file")))
+    if (var_Type(vlc, "dbus-mpris-name") != 0) {
+        char *name = var_GetString(vlc, "dbus-mpris-name");
+        const bool listening = name && !strcmp(name, MPRIS_BUS_NAME);
+        free(name);
+        var_SetBool(vlc, "single-instance-listening", listening);
+    }
+    if (!vlc_instance_ShouldReuse(VLC_OBJECT(vlc)))
          return;
 
     for (int i = 0; i < argc; i++)
