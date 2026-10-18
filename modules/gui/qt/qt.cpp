@@ -437,7 +437,7 @@ vlc_module_begin ()
 
     add_bool( "qt-menubar", false, QT_MENUBAR_TEXT, QT_MENUBAR_LONGTEXT )
 
-    add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,
+    add_bool( "qt-embedded-open", true, QT_NATIVEOPEN_TEXT,
                nullptr )
 
     add_bool( "qt-pin-controls", false, QT_PIN_CONTROLS_TEXT, QT_PIN_CONTROLS_LONGTEXT )

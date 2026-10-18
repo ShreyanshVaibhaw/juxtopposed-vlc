@@ -132,6 +132,8 @@ OpenDialog::OpenDialog(qt_intf_t *_p_intf, QWindow* parent, OpenTab sourceKind)
             connect(panel, &OpenPanel::mrlUpdated, this,
                     QOverload<const QStringList&, const QString&>::of(&OpenDialog::updateMRL));
             connect(panel, &OpenPanel::methodChanged, this, &OpenDialog::newCachingMethod);
+            connect(panel, &OpenPanel::acceptRequested, this, &OpenDialog::close);
+            connect(panel, &OpenPanel::cancelRequested, this, &OpenDialog::cancel);
         }
 
     /* Advanced frame Connects */

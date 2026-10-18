@@ -60,6 +60,7 @@ class QWidget;
 class QLineEdit;
 class QString;
 class QEvent;
+class EmbeddedFileBrowser;
 
 class OpenPanel: public QWidget
 {
@@ -89,20 +90,8 @@ public slots:
 signals:
     void mrlUpdated( const QStringList&, const QString& );
     void methodChanged( const QString& method );
-};
-
-class FileOpenBox: public QFileDialog
-{
-    Q_OBJECT
-public:
-    FileOpenBox( QWidget *parent, const QString &caption,
-                 const QUrl &directory, const QString &filter ):
-                QFileDialog( parent, caption, "", filter ) {
-        setDirectoryUrl(directory);
-    }
-public slots:
-    void accept(){}
-    void reject(){}
+    void acceptRequested();
+    void cancelRequested();
 };
 
 
@@ -113,18 +102,9 @@ public:
     FileOpenPanel( QWidget *, qt_intf_t * );
     virtual ~FileOpenPanel();
     void clear() override;
-    virtual void accept() ;
+    void onFocus() override;
+    void onAccept() override;
 protected:
-    bool eventFilter(QObject *, QEvent *event) override
-    {
-        if( event->type() == QEvent::Hide ||
-            event->type() == QEvent::HideToParent )
-        {
-            event->accept();
-            return true;
-        }
-        return false;
-    }
     void dropEvent( QDropEvent *) override;
     void dragEnterEvent( QDragEnterEvent * ) override;
     void dragMoveEvent( QDragMoveEvent * ) override;
@@ -133,8 +113,9 @@ private:
     Ui::OpenFile ui;
     QList<QUrl> urlList;
     QUrl subUrl; //url for subtitle
-    FileOpenBox *dialogBox;
-    void BuildOldPanel();
+    EmbeddedFileBrowser *dialogBox;
+    bool embedded = false;
+    void createEmbeddedBrowser();
 public slots:
     void updateMRL() override;
 private slots:

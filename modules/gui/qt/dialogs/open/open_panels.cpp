@@ -39,6 +39,7 @@
 #include "util/qt_dirs.hpp"
 #include "util/validators.hpp"
 #include "util/colorizedsvgicon.hpp"
+#include "widgets/native/embedded_file_browser.hpp"
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -87,12 +88,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
 
     setAcceptDrops( true );
 
-    if( var_InheritBool( p_intf, "qt-embedded-open" ) )
-    {
-        ui.tempWidget->hide();
-        BuildOldPanel();
-    }
-
     /* Subtitles */
     /* Deactivate the subtitles control by default. */
     ui.subGroupBox->setEnabled( false );
@@ -108,71 +103,33 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
 
     connect( ui.fileListWidg, &QListWidget::itemChanged, this, &FileOpenPanel::updateMRL );
     connect( ui.subInput, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
+    onFocus();
     updateButtons();
 }
 
-inline void FileOpenPanel::BuildOldPanel()
+void FileOpenPanel::createEmbeddedBrowser()
 {
-    /** BEGIN QFileDialog tweaking **/
-    /* Use a QFileDialog and customize it because we don't want to
-       rewrite it all. Be careful to your eyes cause there are a few hacks.
-       Be very careful and test correctly when you modify this. */
+    dialogBox = new EmbeddedFileBrowser(this);
+    dialogBox->setDirectoryUrl(p_intf->p_mi->getDialogFilePath());
+    dialogBox->restoreState(getSettings()->value("file-dialog-state").toByteArray());
+    dialogBox->setLabelText(QFileDialog::FileName, qtr("File names:"));
+    dialogBox->setLabelText(QFileDialog::FileType, qtr("File type:"));
+    connect(dialogBox, &EmbeddedFileBrowser::selectionChanged, this, &FileOpenPanel::updateMRL);
+    connect(dialogBox, &EmbeddedFileBrowser::filesActivated, this, &OpenPanel::acceptRequested);
+    connect(dialogBox, &EmbeddedFileBrowser::cancelRequested, this, &OpenPanel::cancelRequested);
+    ui.gridLayout->addWidget(dialogBox, 0, 0, 1, 3);
+}
 
-    /* Make this QFileDialog a child of tempWidget from the ui. */
-    dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-                                 p_intf->p_mi->getDialogFilePath(), "" );
-
-    dialogBox->setFileMode( QFileDialog::ExistingFiles );
-    dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
-    dialogBox->restoreState(
-            getSettings()->value( "file-dialog-state" ).toByteArray() );
-
-    /* We don't want to see a grip in the middle of the window, do we? */
-    dialogBox->setSizeGripEnabled( false );
-
-    /* Add a tooltip */
-    dialogBox->setToolTip( qtr( "Select one or multiple files" ) );
-    dialogBox->setMinimumHeight( 250 );
-
-#warning Qt open_panels should use a more sustainable way to customize FileDialogBox
-    /* Ugly hacks to get the good Widget */
-    // But hide the two OK/Cancel buttons. Enable them for debug.
-    QList<QDialogButtonBox*> buttons =
-        dialogBox->findChildren<QDialogButtonBox*>();
-    if( !buttons.isEmpty() )
-    {
-        QDialogButtonBox *fileDialogAcceptBox = buttons[0];
-        fileDialogAcceptBox->hide();
-    }
-
-    /* Make a list of QLabel inside the QFileDialog to access the good ones */
-    QList<QLabel *> listLabel = dialogBox->findChildren<QLabel*>();
-
-    if( listLabel.size() > 3 )
-    {
-        /* Hide the FileNames one. Enable it for debug */
-        listLabel[1]->setText( qtr( "File names:" ) );
-        /* Change the text that was uncool in the usual box */
-        listLabel[2]->setText( qtr( "Filter:" ) );
-    }
-
-    //This lineEdit is the normal line in the fileDialog.
-    QList<QLineEdit*> lineEdits = dialogBox->findChildren<QLineEdit*>();
-    if( !lineEdits.isEmpty() )
-    {
-        QLineEdit *lineFileEdit = lineEdits[0];
-        connect( lineFileEdit, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
-    }
-
-    dialogBox->layout()->setContentsMargins(0, 0, 0, 0);
-    dialogBox->layout()->setSizeConstraint( QLayout::SetNoConstraint );
-
-    /** END of QFileDialog tweaking **/
-
-    // Add the DialogBox to the layout
-    ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
-
-    dialogBox->installEventFilter( this );
+void FileOpenPanel::onFocus()
+{
+    const bool enabled = var_InheritBool(p_intf, "qt-embedded-open");
+    if (enabled == embedded) return;
+    clear();
+    if (enabled && !dialogBox) createEmbeddedBrowser();
+    embedded = enabled;
+    ui.tempWidget->setVisible(!embedded);
+    if (dialogBox) dialogBox->setVisible(embedded);
+    updateMRL();
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -204,6 +161,13 @@ void FileOpenPanel::dropEvent( QDropEvent *event )
         return;
 
     const QMimeData *mimeData = event->mimeData();
+    if (embedded) {
+        auto urls = dialogBox->selectedMediaUrls();
+        for (const auto& url : mimeData->urls()) if (url.isValid()) urls.append(url);
+        dialogBox->selectUrls(urls);
+        event->accept();
+        return;
+    }
     foreach( const QUrl &url, mimeData->urls() )
     {
         if( url.isValid() )
@@ -277,12 +241,12 @@ void FileOpenPanel::updateMRL()
     QString mrl;
 
     /* File Listing */
-    if( dialogBox == NULL )
+    if( !embedded )
         foreach( const QUrl& url, urlList )
             fileList << url.toEncoded();
     else
     {
-        QList<QUrl> urls = dialogBox->selectedUrls();
+        QList<QUrl> urls = dialogBox->selectedMediaUrls();
         foreach( const QUrl &url, urls )
             fileList.append( url.toEncoded() );
     }
@@ -292,17 +256,15 @@ void FileOpenPanel::updateMRL()
         mrl.append( " :sub-file=" + colon_escape( toNativeSeparators( subUrl.toLocalFile() ) ) );
     }
 
+    updateButtons();
     emit methodChanged( "file-caching" );
     emit mrlUpdated( fileList, mrl );
 }
 
 /* Function called by Open Dialog when clicke on Play/Enqueue */
-void FileOpenPanel::accept()
+void FileOpenPanel::onAccept()
 {
-    if( dialogBox )
-        p_intf->p_mi->setDialogFilePath(dialogBox->directory().absolutePath());
-    ui.fileListWidg->clear();
-    urlList.clear();
+    if (embedded) p_intf->p_mi->setDialogFilePath(dialogBox->directoryUrl());
 }
 
 /* Function called by Open Dialog when clicked on cancel */
@@ -312,12 +274,15 @@ void FileOpenPanel::clear()
     ui.subInput->clear();
     urlList.clear();
     subUrl = QUrl();
+    ui.subGroupBox->setChecked(false);
+    if (dialogBox) dialogBox->clearSelection();
+    updateMRL();
 }
 
 /* Update buttons depending on current selection */
 void FileOpenPanel::updateButtons()
 {
-    bool b_has_files = !urlList.empty();
+    const bool b_has_files = embedded ? !dialogBox->selectedMediaUrls().isEmpty() : !urlList.empty();
     ui.removeFileButton->setEnabled( b_has_files );
     ui.subGroupBox->setEnabled( b_has_files );
 }
