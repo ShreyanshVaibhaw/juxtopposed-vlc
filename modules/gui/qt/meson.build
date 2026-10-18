@@ -1796,7 +1796,6 @@ if qt6_dep.found()
                 'dialogs/dialogs/dialogmodel.hpp'
             ),
             'suite': ['qt'],
-            'env': ['QT_QPA_PLATFORM=offscreen'],
             'include_directories' : qt_include_dir,
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,

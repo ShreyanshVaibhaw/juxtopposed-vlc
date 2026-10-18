@@ -443,5 +443,14 @@ private:
     std::unique_ptr<QSignalSpy> m_canceledSpy;
 };
 
-QTEST_MAIN(TestVLCDialogModel)
+int main(int argc, char **argv)
+{
+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
+    if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORM"))
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+#endif
+    QGuiApplication app(argc, argv);
+    TestVLCDialogModel test;
+    return QTest::qExec(&test, argc, argv);
+}
 #include "test_vlc_dialog_model.moc"
