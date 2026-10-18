@@ -2130,7 +2130,7 @@ vlc_module_begin ()
     add_category_hint(N_("Stream output"), SOUT_CAT_LONGTEXT)
 
     add_string( "sout", NULL, SOUT_TEXT, SOUT_LONGTEXT )
-    add_bool( "sout-display", false, SOUT_DISPLAY_TEXT,
+    add_bool( "sout-display", true, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT )
     add_bool( "sout-keep", false, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT )
