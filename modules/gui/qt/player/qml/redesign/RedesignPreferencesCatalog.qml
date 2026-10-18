@@ -180,7 +180,9 @@ QtObject {
             ["monitor-par", qsTr("Monitor pixel aspect ratio"), {placeholder: qsTr("Automatic")}], ["input-timeshift-granularity", qsTr("Time-shift buffer size"), {dynamicChoices: true}] ] } ],
         subtitles: [ {title: "", rows: [ ["sub-autodetect-path", qsTr("Load subtitles from these folders")],
             ["sub-text-use-embedded-style", qsTr("Ignore embedded subtitle styles"), {inverted: true, help: qsTr("Use your subtitle appearance settings instead of the styles from the subtitle file.")}],
-            ["freetype-shadow-angle", qsTr("Shadow angle")], ["freetype-text-direction", qsTr("Text direction"), {choiceLabels: {0: qsTr("Automatic")}}],
+            ["freetype-shadow-angle", qsTr("Shadow angle")], ["freetype-text-direction", qsTr("Text direction"), {choices: [
+                {label: qsTr("Automatic"), value: 2}, {label: qsTr("Left to right"), value: 0},
+                {label: qsTr("Right to left"), value: 1}]}],
             ["freetype-monofont", qsTr("Monospace font"), {placeholder: qsTr("System monospace")}] ] } ],
         performance: [ {title: qsTr("Developer"), rows: [ ["encoder", qsTr("Encoder")], ["decoder", qsTr("Decoder")], ["clock-synchro", qsTr("Clock synchronisation")], ["clock-jitter", qsTr("Clock jitter (ms)")], ["clock-average", qsTr("Clock reference averaging")] ] } ],
         library: [ {title: "", rows: [ ["ignore-filetypes", qsTr("Ignore file types")], ["auto-preparse", qsTr("Read file metadata automatically"), {dynamicChoices: true}] ] } ],

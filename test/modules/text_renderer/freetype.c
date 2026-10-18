@@ -70,11 +70,11 @@ static struct raster CaptureRaster(const subpicture_region_t *output, vlc_fourcc
     return result;
 }
 
-static struct raster RenderFamily(filter_t *filter, const char *family, bool monospace)
+static struct raster RenderText(filter_t *filter, const char *text, const char *family, bool monospace)
 {
     subpicture_region_t *input = subpicture_region_NewText();
     assert(input);
-    input->p_text = text_segment_New("Hamburgefonts 012345 iii WWW");
+    input->p_text = text_segment_New(text);
     assert(input->p_text);
     text_style_t *style = input->p_text->style = text_style_Create(STYLE_FULLY_SET);
     assert(style);
@@ -93,6 +93,11 @@ static struct raster RenderFamily(filter_t *filter, const char *family, bool mon
     subpicture_region_Delete(output);
     subpicture_region_Delete(input);
     return result;
+}
+
+static struct raster RenderFamily(filter_t *filter, const char *family, bool monospace)
+{
+    return RenderText(filter, "Hamburgefonts 012345 iii WWW", family, monospace);
 }
 
 static bool SameRaster(struct raster a, struct raster b)
@@ -208,6 +213,31 @@ static void LiveShadow(filter_t *filter)
     fprintf(stderr, "Live shadow angle/distance/reset rasters passed in six output modes\n");
 }
 
+static void ParagraphDirection(filter_t *filter)
+{
+    if (config_GetType("freetype-text-direction") == 0)
+        return;
+    assert(config_GetInt("freetype-text-direction") == 2);
+    config_PutInt("freetype-blending-mode", 0);
+    filter->p_module = vlc_filter_LoadModule(filter, "text renderer", "freetype", true);
+    assert(filter->p_module);
+    const char *rtl = "שלום (abc 123)!";
+    const struct raster automatic_rtl = RenderText(filter, rtl, NULL, false);
+    config_PutInt("freetype-text-direction", 1);
+    assert(SameRaster(automatic_rtl, RenderText(filter, rtl, NULL, false)));
+    config_PutInt("freetype-text-direction", 0);
+    assert(!SameRaster(automatic_rtl, RenderText(filter, rtl, NULL, false)));
+    config_PutInt("freetype-text-direction", 2);
+    assert(SameRaster(automatic_rtl, RenderText(filter, rtl, NULL, false)));
+    const char *ltr = "abc 123 שלום";
+    const struct raster automatic_ltr = RenderText(filter, ltr, NULL, false);
+    config_PutInt("freetype-text-direction", 0);
+    assert(SameRaster(automatic_ltr, RenderText(filter, ltr, NULL, false)));
+    config_PutInt("freetype-text-direction", 2);
+    vlc_filter_UnloadModule(filter);
+    fprintf(stderr, "Automatic/LTR/RTL paragraph-direction rasters passed\n");
+}
+
 int main(void)
 {
     test_init();
@@ -228,6 +258,7 @@ int main(void)
     video_format_Setup(&filter->fmt_out.video, VLC_CODEC_RGBA, 1280, 720, 1280, 720, 1, 1);
     FontDefaults(filter);
     LiveShadow(filter);
+    ParagraphDirection(filter);
     const vlc_fourcc_t chromas[] = {VLC_CODEC_RGBA, VLC_CODEC_ARGB, VLC_CODEC_YUVA};
     for (int mode = 0; mode <= 1; ++mode) {
         config_PutInt("freetype-blending-mode", mode);

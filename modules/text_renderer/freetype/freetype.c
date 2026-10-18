@@ -215,7 +215,7 @@ vlc_module_begin ()
         change_safe()
 
 #ifdef HAVE_FRIBIDI
-    add_integer_with_range( "freetype-text-direction", 0, 0, 2, TEXT_DIRECTION_TEXT,
+    add_integer_with_range( "freetype-text-direction", 2, 0, 2, TEXT_DIRECTION_TEXT,
                             TEXT_DIRECTION_LONGTEXT )
         change_integer_list( pi_text_direction, ppsz_text_direction )
         change_safe()
