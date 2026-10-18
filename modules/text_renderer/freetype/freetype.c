@@ -143,8 +143,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
 #ifdef HAVE_GET_FONT_BY_FAMILY_NAME
-    add_font("freetype-font", DEFAULT_FAMILY, FONT_TEXT, FAMILY_LONGTEXT)
-    add_font("freetype-monofont", DEFAULT_MONOSPACE_FAMILY,
+    add_font("freetype-font", "", FONT_TEXT, FAMILY_LONGTEXT)
+    add_font("freetype-monofont", "",
              MONOSPACE_FONT_TEXT, FAMILY_LONGTEXT)
 #else
     add_loadfile("freetype-font", DEFAULT_FONT_FILE, FONT_TEXT, FONT_LONGTEXT)

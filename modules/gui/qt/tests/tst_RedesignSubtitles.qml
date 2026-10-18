@@ -16,10 +16,12 @@ TestCase {
         property int revision: 0
         property var values: ({})
         property string lastName
+        property bool fontFileMode: false
         property var lastValue
         function value(name) { return values[name] }
         function describe(name) {
             if (name.endsWith("-track")) return {kind: "integer", editor: "track", maximum: 2147483647}
+            if (name === "freetype-font" && fontFileMode) return {kind: "string", editor: "file", placeholder: "Font file"}
             if (name.endsWith("-language") || name === "freetype-font") return {kind: "string"}
             if (name === "sub-text-use-embedded-style") return {kind: "bool"}
             if (name.endsWith("-color")) return {kind: "integer", editor: "color"}
@@ -45,6 +47,7 @@ TestCase {
     function slider(name) { return findChild(item(name), "settingSlider") }
     function field(name) { return findChild(item(name), "settingValueField") }
     function init() {
+        store.fontFileMode = false
         mirrored = false
         subtitles.liveSizeMode = -1; subtitles.liveTextScale = undefined; subtitles.livePixelSize = undefined
         store.values = {"redesign-sub-track": 1, "redesign-sub-language": "English", "redesign-subtitle-delay": -4000,
@@ -95,6 +98,24 @@ TestCase {
             verify(Math.abs(image.green(x, y) - Math.round(expected.g * 255)) <= 1, "Delay fill green at " + sample.position)
             verify(Math.abs(image.blue(x, y) - Math.round(expected.b * 255)) <= 1, "Delay fill blue at " + sample.position)
         }
+    }
+    function test_fontFileBuildKeepsItsFilePrompt() {
+        store.fontFileMode = true
+        store.stage("freetype-font", "C:/Fonts/custom.ttf")
+        const field = findChild(item("subtitleAppearance_freetype-font"), "preferenceTextEditor")
+        compare(field.placeholderText, "Font file")
+        compare(field.text, "C:/Fonts/custom.ttf")
+        compare(item("subtitleAppearance_freetype-font").editor, "file")
+    }
+    function test_systemFontPlaceholderPreservesExplicitFamily() {
+        const field = findChild(item("subtitleAppearance_freetype-font"), "preferenceTextEditor")
+        compare(field.text, "Inter")
+        compare(field.placeholderText, "System, sans-serif")
+        field.forceActiveFocus(); field.text = ""; keyClick(Qt.Key_Return)
+        compare(store.lastName, "freetype-font"); compare(store.lastValue, "")
+        compare(field.text, "")
+        field.text = "Inter"; keyClick(Qt.Key_Return)
+        compare(store.lastValue, "Inter"); compare(field.text, "Inter")
     }
     function test_completeReferenceOrderAndScaleLabels() {
         const names = ["defaultTrackSetting", "defaultLanguageSetting", "subtitleSynchronizationHeading",

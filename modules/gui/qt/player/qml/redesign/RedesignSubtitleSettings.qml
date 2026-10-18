@@ -88,7 +88,7 @@ ColumnLayout {
     }
     Repeater {
         model: [
-            {name: "freetype-font", label: qsTr("Subtitle Font")},
+            {name: "freetype-font", label: qsTr("Subtitle Font"), placeholder: qsTr("System, sans-serif")},
             {name: "freetype-color", label: qsTr("Text Color")},
             {name: "freetype-outline-color", label: qsTr("Outline Color")},
             {name: "sub-margin", label: qsTr("Subtitle Offset"), suffix: " px"}
@@ -98,7 +98,7 @@ ColumnLayout {
             objectName: "subtitleAppearance_" + modelData.name
             Layout.fillWidth: true
             backend: root.backend; optionName: modelData.name; label: modelData.label
-            presentation: ({compact: true, suffix: modelData.suffix || ""})
+            presentation: ({compact: true, suffix: modelData.suffix || "", placeholder: modelData.placeholder || ""})
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
         }
     }

@@ -95,6 +95,16 @@ int main(void)
     assert(strcmp(region->p_text->style->psz_fontname, "User Font") == 0);
     assert(!(region->p_text->style->i_style_flags & STYLE_ITALIC));
 
+    config_PutPsz("freetype-font", "");
+    vlc_subpicture_InvalidateTextStyle();
+    region = update(subtitle);
+    assert(region->p_text->style->psz_fontname == NULL
+        || region->p_text->style->psz_fontname[0] == '\0');
+    config_PutPsz("freetype-font", "User Font");
+    vlc_subpicture_InvalidateTextStyle();
+    region = update(subtitle);
+    assert(strcmp(region->p_text->style->psz_fontname, "User Font") == 0);
+
     // Background visibility and opacity are independent for manual styling.
     config_PutInt("freetype-background-mode", 0);
     vlc_subpicture_InvalidateTextStyle();

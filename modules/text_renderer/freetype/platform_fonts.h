@@ -94,7 +94,7 @@ extern "C" {
 #else
 # define SYSTEM_FONT_PATH                   "/usr/share/fonts/truetype/freefont"
 # define SYSTEM_DEFAULT_FONT_FILE           "FreeSerifBold.ttf"
-# define SYSTEM_DEFAULT_FAMILY              "Serif Bold"
+# define SYSTEM_DEFAULT_FAMILY              "sans-serif"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "FreeMono.ttf"
 # define SYSTEM_DEFAULT_MONOSPACE_FAMILY    "Monospace"
 #endif

@@ -256,6 +256,7 @@ TestCase {
     function test_sizeValuesSwitchKeepsBothSavedSizes() {
         const rows = catalog.sections.subtitles.find(section => section.title === "Appearance").rows
         compare(rows[0][0], "freetype-font"); compare(rows[1][0], "sub-text-size-mode")
+        compare(rows[0][2].placeholder, "System, sans-serif")
         compare(rows[1][2].editor, "segmented"); compare(rows[2][0], "redesign-subtitle-font-size")
         sizeControls.visible = true
         const choice = findChild(fontSizeRow, "preferenceChoiceEditor")

@@ -121,7 +121,7 @@ QtObject {
         subtitles: [
             { title: qsTr("Tracks & Languages"), rows: [ ["spu", qsTr("Enable subtitles")], ["redesign-sub-language", qsTr("Preferred language")], ["redesign-subtitle-encoding", qsTr("Text encoding"), {dynamicChoices: true}] ] },
             { title: qsTr("Loading Subtitles"), rows: [ ["sub-autodetect-file", qsTr("Load subtitle files automatically")], ["sub-autodetect-fuzzy", qsTr("File name matching"), {dynamicChoices: true}] ] },
-            { title: qsTr("Appearance"), rows: [ ["freetype-font", qsTr("Font")],
+            { title: qsTr("Appearance"), rows: [ ["freetype-font", qsTr("Font"), {placeholder: qsTr("System, sans-serif")}],
                 ["sub-text-size-mode", qsTr("Size values"), {editor: "segmented"}],
                 ["redesign-subtitle-font-size", qsTr("Font size"), {dynamicChoices: true}],
                 ["freetype-bold", qsTr("Bold")], ["freetype-color", qsTr("Text color")],

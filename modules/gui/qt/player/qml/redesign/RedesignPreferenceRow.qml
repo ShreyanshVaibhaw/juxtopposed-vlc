@@ -624,7 +624,7 @@ ColumnLayout {
                 Layout.minimumHeight: theme.dp(34)
                 color: invalid ? "#e56b6b" : theme.foreground; font.pixelSize: theme.dp(14)
                 selectByMouse: true
-                placeholderText: root.presentation.placeholder || ""
+                placeholderText: root.description.placeholder || root.presentation.placeholder || ""
                 placeholderTextColor: theme.playerLabel
                 echoMode: root.description.kind === "password" ? TextInput.Password : TextInput.Normal
                 inputMethodHints: root.description.kind === "integer" || root.description.kind === "float" ? Qt.ImhFormattedNumbersOnly : Qt.ImhNone

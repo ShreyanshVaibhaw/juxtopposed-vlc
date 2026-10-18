@@ -1274,6 +1274,15 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
     if (!cfg || !CONFIG_ITEM(cfg->i_type) || !cfg->psz_text) return {};
     QVariantMap result{{QStringLiteral("name"), name}, {QStringLiteral("title"), qtr(cfg->psz_text ? cfg->psz_text : cfg->psz_name)},
         {QStringLiteral("help"), qtr(cfg->psz_longtext ? cfg->psz_longtext : "")}, {QStringLiteral("value"), value(name)}};
+    if (name == QLatin1String("freetype-font") || name == QLatin1String("freetype-monofont")) {
+        const bool family = cfg->i_type == CONFIG_ITEM_FONT;
+        const bool monospace = name == QLatin1String("freetype-monofont");
+        result.insert(QStringLiteral("placeholder"), family
+            ? (monospace ? qtr("System monospace") : qtr("System, sans-serif")) : qtr("Font file"));
+        if (family) result.insert(QStringLiteral("help"), monospace
+            ? qtr("Enter a monospace font family name. Leave the field empty to use the default monospace font.")
+            : qtr("Enter a font family name. Leave the field empty to use the default sans-serif font. A subtitle file can specify its own font."));
+    }
     if (name == QLatin1String("aout"))
         result.insert(QStringLiteral("help"), qtr("Select an audio output driver. Restart VLC to use a new driver."));
     if (name == QLatin1String("pitch-shift"))
