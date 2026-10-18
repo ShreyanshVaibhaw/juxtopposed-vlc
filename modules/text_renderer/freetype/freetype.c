@@ -606,6 +606,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
 
         /* Don't render if invisible or not wanted */
         if(
+           i_a == STYLE_ALPHA_TRANSPARENT ||
            (g == 0 && 0 == (ch->p_style->i_style_flags & STYLE_SHADOW) ) ||
            (g == 1 && 0 == (ch->p_style->i_style_flags & STYLE_OUTLINE) )
           )

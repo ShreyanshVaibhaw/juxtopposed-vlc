@@ -1,4 +1,13 @@
 vlc_tests += {
+    'name': 'test_modules_text_renderer_freetype',
+    'sources': files('text_renderer/freetype.c'),
+    'suite': ['modules', 'test_modules'],
+    'link_with': [libvlc, libvlccore],
+    'module_depends': ['freetype'],
+    'env': ['VLC_PLUGIN_PATH=' + vlc_build_root / 'modules'],
+}
+
+vlc_tests += {
     'name': 'test_modules_video_filter_puzzle',
     'sources': files('video_filter/puzzle.c', '../../modules/video_filter/puzzle/puzzle_lib.c'),
     'suite': ['modules', 'test_modules'],

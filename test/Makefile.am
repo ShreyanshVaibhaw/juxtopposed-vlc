@@ -120,6 +120,12 @@ check_PROGRAMS = \
 
 check_PROGRAMS += $(player_programs)
 
+if HAVE_FREETYPE
+check_PROGRAMS += test_modules_text_renderer_freetype
+endif
+test_modules_text_renderer_freetype_SOURCES = modules/text_renderer/freetype.c
+test_modules_text_renderer_freetype_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
 if HAVE_GL
 check_PROGRAMS += \
 	test_modules_visualization_gl_resize \
