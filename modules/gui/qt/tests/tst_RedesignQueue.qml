@@ -20,6 +20,22 @@ TestCase {
         }
     }
     ListModel { id: media }
+    ListModel {
+        id: treeFixture
+        function populate() {
+            clear()
+            append({title: "Folder", isCurrent: false, queueIndex: -1, treeDepth: 0, treeGroup: true, treeExpanded: true, treeKey: "folder", treePlaylist: false, containsCurrent: true})
+            for (let i = 0; i < 3; ++i) append({title: ["First", "Second", "Third"][i], isCurrent: i === 1, queueIndex: i, treeDepth: 1, treeGroup: false, treeExpanded: false, treeKey: String(i), treePlaylist: false, containsCurrent: false})
+        }
+        function sourceIndexAt(row) { return row >= 0 && row < count ? get(row).queueIndex : -1 }
+        function rowForSourceIndex(index, reveal) { if (reveal && count === 1) populate(); return count > 1 ? index + 1 : -1 }
+        function rowForGroupKey(key) { return key === "folder" ? 0 : -1 }
+        function expandedAt(row) { return row === 0 && count > 1 }
+        function setExpanded(row, expanded) { if (row !== 0) return; if (expanded) populate(); else { if (count > 1) remove(1, 3); setProperty(0, "treeExpanded", false) } }
+        function toggleExpanded(row) { setExpanded(row, !expandedAt(row)) }
+        function insertionIndexAt(row, after) { return row === 0 ? (after ? 3 : 0) : row - 1 + (after ? 1 : 0) }
+        function rowForInsertion(index) { return index === 0 ? 0 : index + 1 }
+    }
     RedesignQueue {
         id: queue
         anchors.fill: parent
@@ -38,7 +54,7 @@ TestCase {
     SignalSpy { id: clearSpy; target: queue; signalName: "clearRequested" }
     function test_contextBackdropLifetime() {
         queue.videoBackdropContent = backdropProbe
-        for (const name of ["queueSortMenu", "queueActionsMenu"]) {
+        for (const name of ["queueSortMenu", "queueActionsMenu", "queueGroupMenu"]) {
             const menu = findChild(queue, name)
             compare(menu.videoBackdropContent, backdropProbe)
             menu.open()
@@ -58,6 +74,8 @@ TestCase {
     }
     function init() {
         queue.videoBackdropContent = null
+        queue.hierarchyModel = null; queue.selectedGroupKey = ""
+        treeFixture.populate()
         queue.visible = true
         media.clear()
         media.append({title: "First", isCurrent: false})
@@ -67,7 +85,47 @@ TestCase {
         moveSpy.clear(); removeSpy.clear(); sortSpy.clear(); playSpy.clear(); saveSpy.clear(); clearSpy.clear()
         findChild(queue, "queueSortMenu").close()
         findChild(queue, "queueActionsMenu").close()
+        findChild(queue, "queueGroupMenu").close()
         wait(50)
+    }
+    function test_treeGroupDisclosureAndKeyboardNeverPlayOrRemoveMedia() {
+        queue.hierarchyModel = treeFixture
+        wait(50)
+        mouseClick(findChild(queue, "queueGroup_0"))
+        compare(treeFixture.count, 1)
+        compare(playSpy.count, 0)
+        queue.forceActiveFocus(); keyClick(Qt.Key_Delete)
+        compare(removeSpy.count, 0); compare(media.count, 3)
+        keyClick(Qt.Key_Right); compare(treeFixture.count, 4)
+        keyClick(Qt.Key_Left); compare(treeFixture.count, 1)
+        keyClick(Qt.Key_Menu)
+        const menu = findChild(queue, "queueGroupMenu")
+        tryCompare(menu, "opened", true); wait(150)
+        mouseClick(findChild(menu, "libraryAction_toggle"))
+        compare(treeFixture.count, 4); compare(playSpy.count, 0); compare(removeSpy.count, 0)
+    }
+    function test_treeChildActionsUseCoreIndexInsteadOfVisibleRow() {
+        queue.hierarchyModel = treeFixture
+        wait(50)
+        const child = findChild(queue, "queueItem_1")
+        mouseClick(child)
+        compare(playSpy.signalArguments[0][0], 1)
+        mouseClick(child, 60, child.height / 2, Qt.RightButton)
+        const menu = findChild(queue, "queueActionsMenu")
+        tryCompare(menu, "opened", true); wait(150)
+        compare(queue.selectedIndex, 1)
+        mouseClick(findChild(menu, "libraryAction_remove"))
+        compare(removeSpy.signalArguments[0][0], 1)
+        compare(media.get(1).title, "Third")
+    }
+    function test_treeDragDoesNotCountVirtualHeadersAsQueueItems() {
+        queue.hierarchyModel = treeFixture
+        wait(50)
+        const handle = findChild(queue, "queueMoveHandle_0")
+        mouseDrag(handle, handle.width / 2, handle.height / 2, 0, 88)
+        compare(moveSpy.count, 1)
+        compare(Array.from(moveSpy.signalArguments[0]), [0, 3])
+        compare(media.get(2).title, "First"); compare(playSpy.count, 0)
     }
     function test_summaryAndRemoveUseCurrentThenSelectedItem() {
         // VLC's translator uses the disambiguation string for plurals.

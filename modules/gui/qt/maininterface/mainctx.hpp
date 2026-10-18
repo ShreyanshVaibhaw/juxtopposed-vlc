@@ -157,6 +157,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool preferHotkeys READ preferHotkeys WRITE setPreferHotkeys NOTIFY preferHotkeysChanged FINAL)
 
     //Property for Activating bgCone in player view
+    Q_PROPERTY(bool playlistTree READ playlistTree NOTIFY playlistTreeChanged FINAL)
     Q_PROPERTY(bool bgCone READ isbgCone WRITE setbgCone NOTIFY bgConeToggled FINAL)
     Q_PROPERTY(bool windowSuportExtendedFrame READ windowSuportExtendedFrame NOTIFY windowSuportExtendedFrameChanged)
     Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
@@ -278,6 +279,7 @@ public:
     inline OsType getOSName() const {return m_osName;}
     inline int getOSVersion() const {return m_osVersion;}
 
+    bool playlistTree() const { return m_playlistTree; }
     inline bool isbgCone() const {return m_bgCone; }
     inline bool isMinimalView() const {return m_mainInterfaceModes & MAININTERFACE_MODE_MINIMAL; }
     inline bool isPlayerView() const {return m_mainInterfaceModes & MAININTERFACE_MODE_PLAYER; }
@@ -518,6 +520,7 @@ protected:
     OsType m_osName;
     int m_osVersion;
 
+    bool m_playlistTree = true;
     bool m_bgCone = true;
     bool m_windowSuportExtendedFrame = false;
     unsigned m_windowExtendedMargin = 0;
@@ -634,6 +637,7 @@ signals:
 
     void navBoxToggled();
 
+    void playlistTreeChanged();
     void bgConeToggled();
     void windowSuportExtendedFrameChanged();
     void windowExtendedMarginChanged(unsigned margin);

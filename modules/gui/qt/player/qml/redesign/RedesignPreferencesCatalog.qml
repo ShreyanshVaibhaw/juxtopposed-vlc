@@ -43,7 +43,7 @@ QtObject {
                 ["qt-start-minimized", qsTr("Start minimized to the tray")],
                 ["qt-notification", qsTr("Show a popup when the track changes"), {enabledWhen: "qt-system-tray"}],
                 ["qt-notification-timeout", qsTr("Popup duration"), {enabledWhen: "qt-system-tray", editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s", ticks: [0, 5, 10], trackTicks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5]}] ] },
-            { title: qsTr("Playlist"), rows: [ ["playlist-tree", qsTr("Show the playlist as a tree")] ] } ],
+            { title: qsTr("Playlist"), rows: [ ["playlist-tree", qsTr("Show the playlist as a tree"), {help: qsTr("Show folders and playlists as groups in the queue. Expand a group to show its items. The playback order does not change.")}] ] } ],
         privacy: [
             { title: qsTr("History"), rows: [
                 ["save-recentplay", qsTr("Save recently played items")],

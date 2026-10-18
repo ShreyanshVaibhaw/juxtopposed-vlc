@@ -5,10 +5,13 @@ import QtQuick.Controls.Basic as C
 
 FocusScope {
     id: root
+    objectName: "redesignQueue"
     property real scaleFactor: 1
     property color accentColor: "#d37918"
     property bool lightTheme: false
     property Component videoBackdropContent
+    property var hierarchyModel: null
+    property string selectedGroupKey: ""
     property var queueModel
     property int itemCount: 0
     property int currentIndex: -1
@@ -19,7 +22,7 @@ FocusScope {
     property bool sortDescending: false
     property bool random: false
     property bool repeating: false
-    readonly property int actionIndex: selectedIndex >= 0 && selectedIndex < itemCount ? selectedIndex : currentIndex
+    readonly property int actionIndex: selectedGroupKey.length ? -1 : selectedIndex >= 0 && selectedIndex < itemCount ? selectedIndex : currentIndex
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
     signal closeRequested()
     signal addRequested()
@@ -41,15 +44,32 @@ FocusScope {
     }
     function moveToRow(from, to) {
         if (from < 0 || from >= itemCount || to < 0 || to >= itemCount || from === to) return
-        moveRequested(from, to > from ? to + 1 : to)
+        moveToInsertion(from, to > from ? to + 1 : to)
+    }
+    function moveToInsertion(from, before) {
+        if (from < 0 || from >= itemCount || before < 0 || before > itemCount) return
+        const to = before > from ? before - 1 : before
+        if (to === from) return
+        moveRequested(from, before)
+        selectedGroupKey = ""
         selectedIndex = to
     }
     function openActions(anchor, point) {
+        if (hierarchyModel && selectedGroupKey.length) {
+            const groupRow = hierarchyModel.rowForGroupKey(selectedGroupKey)
+            if (groupRow < 0) return
+            if (anchor && point) { groupMenu.popup(anchor, point); return }
+            list.positionViewAtIndex(groupRow, ListView.Contain); list.forceLayout()
+            const group = list.itemAtIndex(groupRow)
+            groupMenu.popup(list, group ? group.mapToItem(list, theme.dp(24), group.height) : Qt.point(0, 0))
+            return
+        }
         if (anchor && point) { actionsMenu.popup(anchor, point); return }
         if (actionIndex >= 0 && actionIndex < itemCount) {
-            list.positionViewAtIndex(actionIndex, ListView.Contain)
+            const visibleIndex = hierarchyModel ? hierarchyModel.rowForSourceIndex(actionIndex, true) : actionIndex
+            list.positionViewAtIndex(visibleIndex, ListView.Contain)
             list.forceLayout()
-            const row = list.itemAtIndex(actionIndex)
+            const row = list.itemAtIndex(visibleIndex)
             if (row) { actionsMenu.popup(list, row.mapToItem(list, theme.dp(24), row.height)); return }
         }
         actionsMenu.popup(list, Qt.point(0, 0))
@@ -77,7 +97,10 @@ FocusScope {
     onItemCountChanged: if (selectedIndex >= itemCount) selectedIndex = itemCount - 1
     Keys.onDeletePressed: removeSelection()
     Keys.onPressed: event => {
-        if (event.key === Qt.Key_Menu || (event.key === Qt.Key_F10 && event.modifiers & Qt.ShiftModifier)) {
+        if (hierarchyModel && selectedGroupKey.length && (event.key === Qt.Key_Left || event.key === Qt.Key_Right)) {
+            hierarchyModel.setExpanded(hierarchyModel.rowForGroupKey(selectedGroupKey), event.key === Qt.Key_Right)
+            event.accepted = true
+        } else if (event.key === Qt.Key_Menu || (event.key === Qt.Key_F10 && event.modifiers & Qt.ShiftModifier)) {
             openActions(); event.accepted = true
         } else if (event.modifiers & Qt.AltModifier && (event.key === Qt.Key_Up || event.key === Qt.Key_Down)) {
             moveToRow(actionIndex, actionIndex + (event.key === Qt.Key_Up ? -1 : 1)); event.accepted = true
@@ -111,7 +134,7 @@ FocusScope {
             id: list
             objectName: "queueList"
             Layout.fillWidth: true; Layout.fillHeight: true
-            model: root.queueModel
+            model: root.hierarchyModel || root.queueModel
             clip: true
             C.ScrollBar.vertical: C.ScrollBar {}
             delegate: RowLayout {
@@ -120,46 +143,78 @@ FocusScope {
                 required property string title
                 required property bool isCurrent
                 required property var model
+                readonly property int queueIndex: root.hierarchyModel ? Number(model.queueIndex) : index
+                readonly property bool group: root.hierarchyModel ? Boolean(model.treeGroup) : false
+                readonly property int depth: root.hierarchyModel ? Number(model.treeDepth) : 0
+                readonly property string groupKey: root.hierarchyModel ? String(model.treeKey) : ""
+                readonly property bool containsCurrent: root.hierarchyModel ? Boolean(model.containsCurrent) : false
                 width: list.width; height: theme.dp(44)
                 spacing: theme.dp(8)
+                Item { visible: row.depth > 0; Layout.preferredWidth: theme.dp(Math.min(row.depth * 12, 96)) }
                 QueueButton {
-                    objectName: "queueMoveHandle_" + row.index
+                    objectName: "queueGroupToggle_" + row.index
+                    visible: row.group
+                    Layout.preferredWidth: theme.dp(24)
+                    iconName: row.model.treeExpanded ? "chevron-down" : "chevron-right"
+                    text: row.model.treeExpanded ? qsTr("Collapse") : qsTr("Expand")
+                    foreground: row.containsCurrent ? theme.accent : theme.foreground
+                    onClicked: {
+                        root.selectedGroupKey = row.groupKey; root.selectedIndex = -1
+                        root.forceActiveFocus(); root.hierarchyModel.toggleExpanded(row.index)
+                    }
+                }
+                QueueButton {
+                    objectName: "queueMoveHandle_" + row.queueIndex
+                    visible: row.queueIndex >= 0
                     Layout.preferredWidth: theme.dp(24)
                     iconName: row.isCurrent ? "play" : "drag"
                     foreground: row.isCurrent ? theme.accent : theme.foreground
                     text: qsTr("Move queue item")
-                    onClicked: { root.selectedIndex = row.index; root.forceActiveFocus() }
+                    onClicked: { root.selectedGroupKey = ""; root.selectedIndex = row.queueIndex; root.forceActiveFocus() }
                     DragHandler {
                         id: mover
                         target: null
                         property int originIndex: -1
-                        property int destinationIndex: -1
+                        property int originViewIndex: -1
+                        property int destinationInsertion: -1
+                        property int destinationViewBoundary: -1
                         onActiveChanged: {
-                            if (active) { originIndex = row.index; destinationIndex = originIndex; root.selectedIndex = originIndex }
-                            else if (originIndex >= 0) { if (root.visible) root.moveToRow(originIndex, destinationIndex); originIndex = -1 }
+                            if (active) { originIndex = row.queueIndex; originViewIndex = row.index; destinationInsertion = originIndex; destinationViewBoundary = row.index; root.selectedGroupKey = ""; root.selectedIndex = originIndex }
+                            else if (originIndex >= 0) { if (root.visible) root.moveToInsertion(originIndex, destinationInsertion); originIndex = -1 }
                         }
                         onActiveTranslationChanged: if (active) {
-                            destinationIndex = Math.max(0, Math.min(root.itemCount - 1, originIndex + Math.round(activeTranslation.y / row.height)))
+                            const target = Math.max(0, Math.min(list.count - 1, originViewIndex + Math.round(activeTranslation.y / row.height)))
+                            const after = target > originViewIndex
+                            destinationInsertion = root.hierarchyModel ? root.hierarchyModel.insertionIndexAt(target, after) : target + (after ? 1 : 0)
+                            destinationViewBoundary = root.hierarchyModel ? root.hierarchyModel.rowForInsertion(destinationInsertion) : target + (after ? 1 : 0)
                         }
                         onCanceled: originIndex = -1
                     }
                 }
                 QueueButton {
-                    objectName: "queueItem_" + row.index
+                    objectName: row.queueIndex >= 0 ? "queueItem_" + row.queueIndex : "queueGroup_" + row.index
                     Layout.fillWidth: true
                     text: row.title
-                    selected: root.selectedIndex === row.index
+                    selected: row.queueIndex >= 0 ? !root.selectedGroupKey.length && root.selectedIndex === row.queueIndex : root.selectedGroupKey === row.groupKey
                     selectedForeground: row.isCurrent ? theme.accent : theme.foreground
                     contentItem: RowLayout {
                         spacing: theme.dp(12)
+                        RedesignIcon { visible: row.group; Layout.preferredWidth: theme.dp(18); Layout.preferredHeight: theme.dp(18); name: row.model.treePlaylist ? "playlist" : "folder"; color: row.containsCurrent ? theme.accent : theme.foreground }
                         Text { Layout.fillWidth: true; text: row.title; elide: Text.ElideRight; font.pixelSize: theme.dp(14); color: row.isCurrent ? theme.accent : theme.foreground }
-                        Text { objectName: "queueDuration_" + row.index; text: root.durationText(row.model.duration); font.pixelSize: theme.dp(14); color: theme.foreground }
+                        Text { objectName: "queueDuration_" + row.queueIndex; text: root.durationText(row.model.duration); font.pixelSize: theme.dp(14); color: theme.foreground }
                     }
-                    onClicked: { root.selectedIndex = row.index; root.playRequested(row.index) }
+                    onClicked: {
+                        if (row.queueIndex < 0) {
+                            root.selectedGroupKey = row.groupKey; root.selectedIndex = -1
+                            root.forceActiveFocus(); root.hierarchyModel.toggleExpanded(row.index)
+                        } else {
+                            root.selectedGroupKey = ""; root.selectedIndex = row.queueIndex; root.playRequested(row.queueIndex)
+                        }
+                    }
                 }
                 Rectangle {
                     parent: list.contentItem
-                    x: 0; y: (mover.destinationIndex + (mover.destinationIndex > mover.originIndex ? 1 : 0)) * row.height
+                    x: 0; y: mover.destinationViewBoundary * row.height
                     width: list.width; height: theme.dp(2); color: theme.accent
                     visible: mover.active
                 }
@@ -180,7 +235,11 @@ FocusScope {
         onTapped: point => {
             const position = list.mapFromItem(null, point.scenePosition)
             const index = list.indexAt(position.x + list.contentX, position.y + list.contentY)
-            if (index >= 0) root.selectedIndex = index
+            if (index >= 0) {
+                const row = list.itemAtIndex(index)
+                root.selectedGroupKey = row && row.queueIndex < 0 ? row.groupKey : ""
+                root.selectedIndex = root.hierarchyModel ? root.hierarchyModel.sourceIndexAt(index) : index
+            }
             root.openActions(list, position)
         }
     }
@@ -198,6 +257,14 @@ FocusScope {
                 if (root.sortChoices.length) root.sortRequested(root.sortChoices.some(choice => choice.criteria === root.sortKey) ? root.sortKey : root.sortChoices[0].criteria, !root.sortDescending)
             } else root.sortRequested(Number(action), root.sortDescending)
         }
+    }
+    RedesignActionMenu {
+        id: groupMenu
+        objectName: "queueGroupMenu"
+        videoBackdropContent: root.videoBackdropContent
+        scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+        onAboutToShow: entries = [{ action: "toggle", label: root.hierarchyModel && root.hierarchyModel.expandedAt(root.hierarchyModel.rowForGroupKey(root.selectedGroupKey)) ? qsTr("Collapse") : qsTr("Expand") }]
+        onActionRequested: if (root.hierarchyModel) root.hierarchyModel.toggleExpanded(root.hierarchyModel.rowForGroupKey(root.selectedGroupKey))
     }
     RedesignActionMenu {
         id: actionsMenu

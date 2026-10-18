@@ -1246,7 +1246,7 @@ QVariant RedesignPreferences::value(const QString& name) const
     if (it != m_edits.cend()) return *it;
     if (m_ctx && (name == QLatin1String("audio-visual") || name == QLatin1String("effect-list")))
         return visualizationValue(m_ctx->getIntf(), name.toUtf8().constData());
-    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("qt-video-autoresize")))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("playlist-tree") || name == QLatin1String("qt-video-autoresize")))
         return var_InheritBool(m_ctx->getIntf(), name.toUtf8().constData());
     if (m_ctx && name == QLatin1String("qt-system-tray"))
         return m_ctx->systrayRequested();
@@ -2259,7 +2259,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
-    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("qt-video-autoresize")))
+    if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("playlist-tree") || name == QLatin1String("qt-video-autoresize")))
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("qt-system-tray"))
         applyToPlayer = normalized.toBool() != value(name).toBool();
@@ -2388,7 +2388,7 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray", "qt-video-autoresize"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray", "qt-video-autoresize", "playlist-tree"}) {
         if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
@@ -2696,7 +2696,7 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray", "qt-video-autoresize"}) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus", "qt-error-dialogs", "qt-minor-warnings", "qt-verbose", "qt-system-tray", "qt-video-autoresize", "playlist-tree"}) {
         if (var_Type(intf, option) == 0)
             var_Create(intf, option, VLC_VAR_BOOL);
         var_SetBool(intf, option, bool(config_GetInt(option)));

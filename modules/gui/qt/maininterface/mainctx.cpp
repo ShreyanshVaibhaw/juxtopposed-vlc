@@ -476,6 +476,7 @@ void MainCtx::loadPrefs(const bool callSignals)
         setMinimalView(var_InheritBool(p_intf, "qt-minimal-view"));
     }
 
+    loadFromVLCOption(m_playlistTree, "playlist-tree", &MainCtx::playlistTreeChanged);
     loadFromVLCOption(m_bgCone, "qt-bgcone", &MainCtx::bgConeToggled);
 
     /* Should the UI stays on top of other windows */

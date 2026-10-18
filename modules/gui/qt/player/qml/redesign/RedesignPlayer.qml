@@ -405,6 +405,7 @@ FocusScope {
                 videoBackdropContent: rootPlayer.menuBackdropContent
                 scaleFactor: view.scaleFactor; lightTheme: view.lightTheme; accentColor: view.accentColor
                 queueModel: PlaylistListModel { id: queueModel; playlist: MainPlaylistController.playlist }
+                hierarchyModel: PlaylistTreeModel { sourceModel: queueModel; treeEnabled: MainCtx.playlistTree }
                 itemCount: queueModel.count
                 currentIndex: queueModel.currentIndex
                 totalDurationText: summaryDuration(queueModel.duration)

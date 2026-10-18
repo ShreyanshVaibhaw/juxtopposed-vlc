@@ -2270,7 +2270,7 @@ vlc_module_begin ()
         change_private()
     add_bool( "media-library-startup", true, N_("Use the media library when VLC starts"),
               N_("Use the media library when VLC starts. Restart VLC after a change. The command line can set a different value.") )
-    add_bool( "playlist-tree", false, PLTREE_TEXT, PLTREE_LONGTEXT )
+    add_bool( "playlist-tree", true, PLTREE_TEXT, PLTREE_LONGTEXT )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT )
 
