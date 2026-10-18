@@ -1384,6 +1384,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         choices.prepend(QVariantMap{{QStringLiteral("label"), qtr("None")}, {QStringLiteral("value"), QString()}});
         result.insert(QStringLiteral("help"), qtr("Select settings for the type of video. None uses the default settings."));
     }
+    if (name == QLatin1String("sout-x264-preset"))
+        result.insert(QStringLiteral("help"), qtr("Select the encoding speed. Slow presets use more processor time and can produce smaller files."));
     if (name == QLatin1String("aspect-ratio") || name == QLatin1String("crop")) {
         const bool crop = name == QLatin1String("crop");
         choices = {QVariantMap{{QStringLiteral("label"), crop ? qtr("None") : qtr("Automatic")}, {QStringLiteral("value"), QString()}}};

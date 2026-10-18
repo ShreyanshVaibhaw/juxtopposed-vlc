@@ -22,6 +22,8 @@ TestCase {
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
         function describe(name) {
+            if (name === "sout-x264-preset") return {kind: "string", choices: [
+                {label: "fast", value: "fast"}, {label: "medium", value: "medium"}, {label: "slow", value: "slow"}]}
             if (name === "redesign-subtitle-background") return {kind: "integer", choices: [{label: "None", value: 0}, {label: "Box", value: 1}]}
             if (name === "redesign-subtitle-background-opacity") return {kind: "integer", minimum: 0, maximum: 255}
             if (name === "screensaverPolicy") return {kind: "integer", choices: [{label: "Never", value: 0}, {label: "When fullscreen", value: 2}, {label: "Always", value: 1}]}
@@ -48,7 +50,7 @@ TestCase {
             revision++
             return true
         }
-        function reset(name) { stage(name, name === "timeout" ? 1800 : name === "resize") }
+        function reset(name) { stage(name, name === "sout-x264-preset" ? "" : name === "timeout" ? 1800 : name === "resize") }
     }
     QtObject {
         id: equalizerStore
@@ -110,6 +112,30 @@ TestCase {
         compare(section.rows[0][0], "qt-discover-cast-devices")
         compare(section.rows[0][1], "Discover cast devices")
         compare(section.rows[1][0], "sout-chromecast-conversion-quality")
+    }
+    function test_encoderPresetShowsItsEffectiveDefaultAndCanReset() {
+        const spec = catalog.sections.recording.find(section => section.title === "Streaming")
+            .rows.find(row => row[0] === "sout-x264-preset")
+        store.stage(spec[0], "")
+        const row = createTemporaryObject(inlineSliderRow, testCase,
+            {optionName: spec[0], label: spec[1], presentation: spec[2] || {}})
+        verify(row !== null)
+        const choice = findChild(row, "preferenceChoiceEditor")
+        verify(choice !== null)
+        compare(choice.displayText, "Medium")
+        compare(store.value(spec[0]), "")
+        mouseClick(choice); keyClick(Qt.Key_End); keyClick(Qt.Key_Return)
+        compare(store.value(spec[0]), "slow")
+        compare(choice.displayText, "Slow")
+        mouseMove(row, 20, row.height / 2)
+        const reset = findChild(row, "preferenceResetButton")
+        tryCompare(reset, "visible", true)
+        mouseClick(reset)
+        compare(store.value(spec[0]), "")
+        compare(choice.displayText, "Medium")
+        store.stage(spec[0], "medium")
+        compare(choice.displayText, "Medium")
+        compare(store.value(spec[0]), "medium")
     }
     QtObject {
         id: startupStore

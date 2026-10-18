@@ -50,7 +50,8 @@ ColumnLayout {
         return backend.stage(optionName, value)
     }
     readonly property var displayedValue: presentation.toggleValues ? currentValue !== presentation.toggleValues.off
-        : presentation.inverted ? !currentValue : currentValue
+        : presentation.inverted ? !currentValue
+        : currentValue === "" && presentation.emptyChoiceValue !== undefined ? presentation.emptyChoiceValue : currentValue
     TextMetrics {
         id: languageMetrics
         font.family: Qt.application.font.family; font.pixelSize: root.theme.dp(14)
