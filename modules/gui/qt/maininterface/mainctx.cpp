@@ -468,10 +468,12 @@ void MainCtx::loadPrefs(const bool callSignals)
     loadFromVLCOption(m_backdropBlurEnabled, "qt-backdrop-blur", &MainCtx::backdropBlurEnabledChanged);
     loadFromVLCOption(m_compactMenus, "qt-compact-menus", &MainCtx::compactMenusChanged);
 
-    bool minimalMode = false;
-    /* Are we in the enhanced always-video mode or not ? */
-    loadFromVLCOption(minimalMode, "qt-minimal-view", nullptr);
-    setMinimalView(minimalMode);
+    if (!callSignals)
+    {
+        // The startup preference must not replace a user's current view when
+        // an unrelated setting is saved (or a launch override is still set).
+        setMinimalView(var_InheritBool(p_intf, "qt-minimal-view"));
+    }
 
     loadFromVLCOption(m_bgCone, "qt-bgcone", &MainCtx::bgConeToggled);
 

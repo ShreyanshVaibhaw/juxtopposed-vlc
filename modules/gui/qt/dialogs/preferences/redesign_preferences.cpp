@@ -1708,6 +1708,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         result.insert(QStringLiteral("help"), qtr("Choose plain text or HTML for the log file. Restart VLC after a change."));
     if (name == QLatin1String("verbose"))
         result.insert(QStringLiteral("help"), qtr("Choose the VLC log level. File logs can use this level or a separate file log level. Restart VLC after a change."));
+    if (name == QLatin1String("qt-minimal-view"))
+        result.insert(QStringLiteral("help"), qtr("Start VLC in compact mode. Restart VLC after a change. Launch options can override this setting."));
     if (name == QLatin1String("qt-verbose"))
         result.insert(QStringLiteral("help"), qtr("Add internal interface information, warnings and errors to the VLC log. Use Log details to choose which messages to save."));
     if (name == QLatin1String("qt-error-dialogs"))
