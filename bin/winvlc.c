@@ -130,11 +130,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (wargv == NULL)
         return 1;
 
-    char *argv[argc + 4];
+    char *argv[argc + 5];
     BOOL crash_handling = TRUE;
     int j = 0;
     WCHAR *lang = NULL;
 
+    argv[j++] = strdup("--load-startup-options");
     argv[j++] = strdup("--media-library-default");
     argv[j++] = strdup("--single-instance-default");
     argv[j++] = strdup("--no-ignore-config");

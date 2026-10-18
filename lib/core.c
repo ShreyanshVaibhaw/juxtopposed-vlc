@@ -29,6 +29,7 @@
 #include <vlc/vlc.h>
 
 #include <vlc_interface.h>
+#include <vlc_configuration.h>
 
 #include <stdarg.h>
 #include <limits.h>
@@ -47,7 +48,7 @@ int libvlc_abi_version(void)
     return LIBVLC_ABI_VERSION_INT;
 }
 
-libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
+static libvlc_instance_t *libvlc_new_inner(int argc, const char *const *argv)
 {
     libvlc_threads_init ();
 
@@ -85,6 +86,25 @@ error:
     free (p_new);
     libvlc_threads_deinit ();
     return NULL;
+}
+
+libvlc_instance_t *libvlc_new(int argc, const char *const *argv)
+{
+    char **expanded = NULL;
+    int count = config_ExpandStartupOptions(argc, argv, &expanded);
+    if (count < 0)
+        fprintf(stderr, "VLC could not read the saved startup options. Starting without them.\n");
+    libvlc_instance_t *instance = libvlc_new_inner(expanded != NULL ? count : argc,
+        expanded != NULL ? (const char *const *)expanded : argv);
+    if (instance == NULL && expanded != NULL)
+    {
+        /* A removed plugin can invalidate a previously valid saved option.
+         * Keep the standalone player reachable so the user can correct it. */
+        fprintf(stderr, "VLC could not use the saved startup options. Starting without them.\n");
+        instance = libvlc_new_inner(argc, argv);
+    }
+    config_FreeStartupOptions(expanded);
+    return instance;
 }
 
 libvlc_instance_t *libvlc_retain( libvlc_instance_t *p_instance )

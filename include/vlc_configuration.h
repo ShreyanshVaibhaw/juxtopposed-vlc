@@ -49,6 +49,18 @@
 extern "C" {
 # endif
 
+/**
+ * Expand saved standalone startup options before module/thread setup.
+ * The launch command follows the saved options and takes precedence. Embedded
+ * clients opt in only with --load-startup-options. Ignore/reset-config bypass
+ * saved options. Returns the new argc, or a negative VLC error. If non-NULL,
+ * *expanded owns all strings and must be freed with config_FreeStartupOptions.
+ */
+VLC_API int config_ExpandStartupOptions(int argc, const char *const argv[], char ***expanded);
+VLC_API void config_FreeStartupOptions(char **args);
+/** Validate quoted arguments using native option metadata, without applying them. */
+VLC_API int config_ValidateStartupOptions(vlc_object_t *parent, const char *text);
+
 typedef union
 {
     char       *psz;

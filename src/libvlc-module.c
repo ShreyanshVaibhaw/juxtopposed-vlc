@@ -2253,6 +2253,11 @@ vlc_module_begin ()
     add_bool( "dbus", false, DBUS_TEXT, DBUS_LONGTEXT )
 #endif
     add_bool( "media-library", false, ML_TEXT, ML_LONGTEXT )
+    add_string("startup-options", "", N_("Additional command line options"),
+               N_("Use these options when VLC starts. The launch command takes priority. Restart VLC after a change."))
+    add_bool("load-startup-options", false, NULL, NULL)
+        change_volatile()
+        change_private()
     add_bool( "media-library-default", false, NULL, NULL )
         change_volatile()
     add_bool( "single-instance-default", false, NULL, NULL )

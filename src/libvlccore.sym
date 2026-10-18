@@ -72,6 +72,9 @@ config_ChainParse
 config_ChainParseOptions
 config_ExistIntf
 config_FindConfig
+config_ExpandStartupOptions
+config_FreeStartupOptions
+config_ValidateStartupOptions
 config_GetFloat
 config_GetSysPath
 config_GetUserDir

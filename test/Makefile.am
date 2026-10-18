@@ -55,6 +55,7 @@ check_PROGRAMS = \
 	test_libvlc_slaves \
 	test_src_audio_output_dec \
 	test_src_config_chain \
+	test_src_config_startup \
 	test_src_clock_clock \
 	test_src_clock_start \
 	test_src_misc_ancillary \
@@ -292,6 +293,9 @@ test_src_misc_variables_SOURCES = src/misc/variables.c
 test_src_misc_variables_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_actions_SOURCES = src/misc/actions.c
 test_src_misc_actions_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_config_startup_SOURCES = src/config/startup.c
+test_src_config_startup_LDADD = $(LIBVLC) $(LIBVLCCORE)
+
 test_src_config_chain_SOURCES = src/config/chain.c
 test_src_config_chain_LDADD = $(LIBVLCCORE)
 test_src_crypto_update_SOURCES = src/crypto/update.c

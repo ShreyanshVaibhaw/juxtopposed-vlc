@@ -212,9 +212,10 @@ int main(int argc, const char *argv[])
     pthread_t self = pthread_self ();
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
-    const char *args[argc + 4];
+    const char *args[argc + 5];
     int count = 0;
 
+    args[count++] = "--load-startup-options";
     args[count++] = "--no-ignore-config";
     args[count++] = "--media-library-default";
     args[count++] = "--single-instance-default";

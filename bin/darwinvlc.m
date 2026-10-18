@@ -217,12 +217,13 @@ int main(int i_argc, const char *ppsz_argv[])
     dispatch_resume(sigTermSource);
 
     /* Handle parameters */
-    const char **argv = calloc(i_argc + 3, sizeof (argv[0]));
+    const char **argv = calloc(i_argc + 4, sizeof (argv[0]));
     if (argv == NULL)
         exit(1);
 
     int argc = 0;
 
+    argv[argc++] = "--load-startup-options";
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library-default";
     argv[argc++] = "--single-instance-default";
