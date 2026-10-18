@@ -32,6 +32,12 @@
 #include <QUuid>
 #include "util/vlchotkeyconverter.hpp"
 #include "util/postprocessing_preferences.hpp"
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 namespace {
 const QString presetOption = QStringLiteral("qt-player-presets");
@@ -403,6 +409,32 @@ RedesignPreferences::RedesignPreferences(QObject* parent) : QObject(parent)
     connect(&m_saveTimer, &QTimer::timeout, this, [this]() { if (m_autoSave && dirty()) save(); });
     m_stereoTestTimer.setInterval(50);
     connect(&m_stereoTestTimer, &QTimer::timeout, this, &RedesignPreferences::updateStereoTest);
+    m_pluginScanTimer.setSingleShot(true);
+    m_pluginScanTimer.setInterval(30000);
+    connect(&m_pluginScanTimer, &QTimer::timeout, this, [this] {
+        m_pluginScanTimedOut = true;
+        m_pluginScan.kill();
+    });
+    connect(&m_pluginScan, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart)
+            finishPluginScan(qtr("VLC cannot start the plugin scan. Check that the cache generator is installed."), true);
+    });
+    connect(&m_pluginScan, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+        [this](int code, QProcess::ExitStatus status) {
+            if (m_pluginScanTimedOut)
+                finishPluginScan(qtr("The plugin scan timed out. Try again."), true);
+            else if (code != 0 || status != QProcess::NormalExit)
+                finishPluginScan(qtr("VLC cannot update the plugin cache. Check folder access and try again."), true);
+            else
+                finishPluginScan(qtr("VLC updated the plugin cache. Restart VLC to use plugin changes."), false);
+        });
+    m_pluginScan.setStandardOutputFile(QProcess::nullDevice());
+    m_pluginScan.setStandardErrorFile(QProcess::nullDevice());
+#ifdef _WIN32
+    m_pluginScan.setCreateProcessArgumentsModifier([](QProcess::CreateProcessArguments *args) {
+        args->flags |= CREATE_NO_WINDOW | BELOW_NORMAL_PRIORITY_CLASS;
+    });
+#endif
     size_t count = 0;
     module_t** modules = module_list_get(&count);
     for (size_t i = 0; i < count; ++i) {
@@ -427,8 +459,45 @@ RedesignPreferences::RedesignPreferences(QObject* parent) : QObject(parent)
 
 RedesignPreferences::~RedesignPreferences()
 {
+    m_pluginScanTimer.stop();
+    if (m_pluginScan.state() != QProcess::NotRunning) {
+        m_pluginScan.disconnect(this);
+        m_pluginScan.kill();
+        m_pluginScan.waitForFinished(1000);
+    }
     m_stereoTestTimer.stop();
     m_stereoTest.reset();
+}
+
+bool RedesignPreferences::scanPlugins()
+{
+    if (m_pluginScanRunning || !config_FindConfig("plugins-cache")) return false;
+#ifdef _WIN32
+    const char *filename = "vlc-cache-gen.exe";
+#else
+    const char *filename = "vlc-cache-gen";
+#endif
+    char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, filename);
+    const auto program = qfu(path ? path : "");
+    free(path);
+    m_pluginScanRunning = true;
+    m_pluginScanFailed = m_pluginScanTimedOut = false;
+    m_pluginScanMessage.clear();
+    refresh();
+    emit pluginScanChanged();
+    m_pluginScanTimer.start();
+    m_pluginScan.start(program, {QStringLiteral("--verify")});
+    return true;
+}
+
+void RedesignPreferences::finishPluginScan(const QString& message, bool failed)
+{
+    m_pluginScanTimer.stop();
+    m_pluginScanRunning = false;
+    m_pluginScanFailed = failed;
+    m_pluginScanMessage = message;
+    refresh();
+    emit pluginScanChanged();
 }
 
 bool RedesignPreferences::startStereoTest()
@@ -1062,6 +1131,13 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-rescan-plugins")) {
+        if (!config_FindConfig("plugins-cache")) return {};
+        return {{QStringLiteral("kind"), QStringLiteral("action")}, {QStringLiteral("editor"), QStringLiteral("action")},
+            {QStringLiteral("buttonLabel"), m_pluginScanRunning ? qtr("Scanning…") : qtr("Rescan")},
+            {QStringLiteral("supported"), !m_pluginScanRunning},
+            {QStringLiteral("help"), qtr("Check plugin files and update the plugin cache. Restart VLC after the scan to use plugin changes.")}};
+    }
     if (name == QLatin1String("redesign-postprocessing")) {
         auto description = describe(QStringLiteral("postproc-q"));
         if (description.isEmpty()) return {};
@@ -1345,6 +1421,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
     if (!cfg || !CONFIG_ITEM(cfg->i_type) || !cfg->psz_text) return {};
     QVariantMap result{{QStringLiteral("name"), name}, {QStringLiteral("title"), qtr(cfg->psz_text ? cfg->psz_text : cfg->psz_name)},
         {QStringLiteral("help"), qtr(cfg->psz_longtext ? cfg->psz_longtext : "")}, {QStringLiteral("value"), value(name)}};
+    if (name == QLatin1String("high-priority"))
+        result.insert(QStringLiteral("help"), qtr("Request a higher process priority from the system. Restart VLC after a change."));
     if (name == QLatin1String("freetype-font") || name == QLatin1String("freetype-monofont")) {
         const bool family = cfg->i_type == CONFIG_ITEM_FONT;
         const bool monospace = name == QLatin1String("freetype-monofont");

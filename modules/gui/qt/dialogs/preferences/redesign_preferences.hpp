@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QUrl>
 #include <QElapsedTimer>
+#include <QProcess>
 #include <memory>
 #include "maininterface/mainctx.hpp"
 
@@ -28,6 +29,8 @@ class RedesignPreferences : public QObject
     Q_PROPERTY(bool pendingPlayerPreset READ pendingPlayerPreset NOTIFY changed FINAL)
     Q_PROPERTY(bool stereoTestRunning READ stereoTestRunning NOTIFY stereoTestChanged FINAL)
     Q_PROPERTY(QString stereoTestMessage READ stereoTestMessage NOTIFY stereoTestChanged FINAL)
+    Q_PROPERTY(QString pluginScanMessage READ pluginScanMessage NOTIFY pluginScanChanged FINAL)
+    Q_PROPERTY(bool pluginScanFailed READ pluginScanFailed NOTIFY pluginScanChanged FINAL)
 public:
     explicit RedesignPreferences(QObject* parent = nullptr);
     ~RedesignPreferences() override;
@@ -43,6 +46,9 @@ public:
     QString stereoTestMessage() const { return m_stereoTestMessage; }
     Q_INVOKABLE bool startStereoTest();
     Q_INVOKABLE void stopStereoTest();
+    Q_INVOKABLE bool scanPlugins();
+    QString pluginScanMessage() const { return m_pluginScanMessage; }
+    bool pluginScanFailed() const { return m_pluginScanFailed; }
     Q_INVOKABLE QStringList subtitleSearchLanguages() const;
     QVariantList playerPresets() const;
     QString selectedPlayerPreset() const;
@@ -79,6 +85,7 @@ signals:
     void autoSaveChanged();
     void changed();
     void stereoTestChanged();
+    void pluginScanChanged();
 private:
     bool m_libraryStartupEdited = false;
     bool m_autoPreparseEdited = false;
@@ -95,6 +102,7 @@ private:
     bool stagePlayerPresetOptions(const QVariantMap& options);
     void updateStereoTest();
     void finishStereoTest(const QString& message = {});
+    void finishPluginScan(const QString& message, bool failed);
     MainCtx* m_ctx = nullptr;
     QVariantMap m_edits;
     QSet<QString> m_invalid;
@@ -110,5 +118,11 @@ private:
     QElapsedTimer m_stereoTestElapsed;
     std::unique_ptr<StereoTestPlayer> m_stereoTest;
     QString m_stereoTestMessage;
+    QProcess m_pluginScan;
+    QTimer m_pluginScanTimer;
+    bool m_pluginScanRunning = false;
+    bool m_pluginScanFailed = false;
+    bool m_pluginScanTimedOut = false;
+    QString m_pluginScanMessage;
 };
 #endif

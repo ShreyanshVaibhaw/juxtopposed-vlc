@@ -18,6 +18,7 @@ TestCase {
         property QtObject ctx: shortcuts
         property bool invalidLanguage: false
         property string providedHelp: ""
+        property bool actionBusy: false
         function cancelLanguageEdit(name) { invalidLanguage=false;revision++ }
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
@@ -36,7 +37,7 @@ TestCase {
             if (name.endsWith("-language")) return {kind: "string", editor: "language", choices: [
                 {label:"System language",value:"system"},{label:"Automatic",value:""},
                 {label:"English",value:"en"},{label:"French",value:"fr"},{label:"Creoles, English based",value:"cpe"},{label:"Custom…",value:"__custom__"}]}
-            if (name === "folderAction") return {kind: "action", editor: "action", buttonLabel: "Open"}
+            if (name === "folderAction") return {kind: "action", editor: "action", buttonLabel: actionBusy ? "Scanning…" : "Open", supported: !actionBusy}
             if (name === "audio-spatial-mode") return {kind: "integer", title: "Spatial audio mode", choices: [{label: "Headphone virtualization", value: 2}, {label: "Surround speakers", value: 0}]}
             if (name === "volumeStep") return {kind: "float", title: "Volume step", choices: []}
             if (name === "device") return {kind: "string", title: "Output device", choices: [{label: "System default", value: ""}, {label: "Headphones", value: "native-headphones"}]}
@@ -611,7 +612,7 @@ TestCase {
         store.providedHelp = ""
         defaults.visible = false; defaults.subtitles = false
         confirmation.close(); confirmationAccepted.clear(); confirmationRejected.clear()
-        actionRow.visible = false; actionSpy.clear()
+        actionRow.visible = false; actionRow.presentation = ({}); store.actionBusy = false; store.revision++; actionSpy.clear()
         shortcutEditor.close()
         startupVolume.visible = false; deviceRow.visible = false; volumeStepRow.visible = false; spatialModeRow.visible = false; store.refreshCount = 0
         equalizer.visible = false; equalizer.expanded = false
@@ -790,6 +791,25 @@ TestCase {
         compare(actionSpy.count, 1)
         compare(actionSpy.signalArguments[0][0], "folderAction")
         compare(store.revision, revision)
+    }
+
+    function test_fullWidthActionTracksBusyStateAndPreventsRepeatClicks() {
+        actionRow.presentation = {fullWidthAction: true}
+        actionRow.visible = true
+        const button = findChild(actionRow, "preferenceActionButton")
+        verify(button)
+        tryCompare(button, "width", button.parent.width)
+        verify(button.width > actionRow.width / 3)
+        mouseClick(button)
+        compare(actionSpy.count, 1)
+        store.actionBusy = true; store.revision++
+        tryCompare(button, "enabled", false)
+        compare(button.caption, "Scanning…")
+        mouseClick(button)
+        compare(actionSpy.count, 1)
+        store.actionBusy = false; store.revision++
+        tryCompare(button, "enabled", true)
+        compare(button.caption, "Open")
     }
     function test_accessibleSwitchUpdatesTheSetting() {
         const button = findChild(seekRow, "preferenceToggleEditor")

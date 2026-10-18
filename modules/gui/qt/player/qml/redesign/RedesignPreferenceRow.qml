@@ -261,7 +261,7 @@ ColumnLayout {
             RedesignButton {
                 objectName: "preferenceActionButton"
                 anchors.right: parent.right
-                width: theme.dp(100); height: parent.height
+                width: root.presentation.fullWidthAction ? parent.width : theme.dp(100); height: parent.height
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 caption: root.description.buttonLabel || ""; text: caption
                 foreground: root.description.destructive ? theme.danger : theme.foreground

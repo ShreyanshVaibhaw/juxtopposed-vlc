@@ -155,7 +155,8 @@ QtObject {
         performance: [
             { title: qsTr("Decoding"), rows: [ ["redesign-hardware-decoding", qsTr("Hardware-accelerated decoding"), {dynamicChoices: true}], ["redesign-postprocessing", qsTr("Video post-processing"), {dynamicChoices: true}],
                 ["avcodec-skiploopfilter", qsTr("Skip the H.264 loop filter"), {choiceLabels: {0: qsTr("Never")}}], ["avcodec-threads", qsTr("Decoding threads")] ] },
-            { title: qsTr("Smooth Playback"), rows: [ ["drop-late-frames", qsTr("Drop frames when the system can't keep up")], ["high-priority", qsTr("Give VLC real-time priority")] ] } ],
+            { title: qsTr("Smooth Playback"), rows: [ ["drop-late-frames", qsTr("Drop frames when the system can't keep up")], ["high-priority", qsTr("Give VLC higher priority")],
+                ["redesign-rescan-plugins", qsTr("Rescan plugins"), {fullWidthAction: true}] ] } ],
         recording: [
             { title: qsTr("Recording"), rows: [ ["input-record-path", qsTr("Save recordings to")], ["input-record-native", qsTr("Record without re-encoding when possible")] ] },
             { title: qsTr("Casting"), rows: [ ["qt-discover-cast-devices", qsTr("Discover cast devices")],

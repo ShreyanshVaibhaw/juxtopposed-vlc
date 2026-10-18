@@ -44,6 +44,10 @@ RedesignSettingsDialog {
     Connections {
         target: preferenceStore
         function onChanged() { if (!preferenceStore.errorMessage.length) root.resetFailed = false }
+        function onPluginScanChanged() {
+            root.actionMessage = preferenceStore.pluginScanMessage
+            root.actionMessageIsError = preferenceStore.pluginScanFailed
+        }
     }
     RedesignShortcuts {
         id: shortcuts
@@ -59,7 +63,8 @@ RedesignSettingsDialog {
     }
     function begin() {
         preferenceStore.discard()
-        actionMessage = ""
+        actionMessage = preferenceStore.pluginScanMessage
+        actionMessageIsError = preferenceStore.pluginScanFailed
         resetFailed = false
         searchField.clear()
         if (MainCtx.intfMainWindow.visibility === Window.Minimized) MainCtx.intfMainWindow.showNormal()
@@ -74,6 +79,7 @@ RedesignSettingsDialog {
         if (!preferenceStore.dirty || preferenceStore.save()) close()
     }
     function runAction(action) {
+        if (action === "redesign-rescan-plugins") { preferenceStore.scanPlugins(); return }
         if (action === "redesign-reset-all") { resetDialog.open(); return }
         if (action === "redesign-reset-picture") {
             for (const name of ["hue", "brightness", "contrast", "saturation", "gamma"])
