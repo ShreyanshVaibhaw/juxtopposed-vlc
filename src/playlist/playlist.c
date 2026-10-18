@@ -31,6 +31,23 @@
 #include "item.h"
 #include "player.h"
 
+enum vlc_playlist_preparsing
+vlc_playlist_GetPreparseDepth(vlc_playlist_t *playlist)
+{
+    vlc_playlist_AssertLocked(playlist);
+    return playlist->recursive;
+}
+
+void
+vlc_playlist_SetPreparseDepth(vlc_playlist_t *playlist,
+                              enum vlc_playlist_preparsing rec)
+{
+    vlc_playlist_AssertLocked(playlist);
+    assert(rec >= VLC_PLAYLIST_PREPARSING_ENABLED && rec <= VLC_PLAYLIST_PREPARSING_RECURSIVE);
+    if (playlist->parser != NULL)
+        playlist->recursive = rec;
+}
+
 vlc_playlist_t *
 vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
                  unsigned preparse_max_threads, vlc_tick_t preparse_timeout)

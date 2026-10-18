@@ -269,6 +269,14 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_playlist_preparse_depth',
+    'sources' : files('playlist/preparse_depth.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['demux_mock'],
+}
+
+vlc_tests += {
     'name' : 'test_src_playlist_export',
     'sources' : files('playlist/export.c'),
     'suite' : ['src', 'test_src'],

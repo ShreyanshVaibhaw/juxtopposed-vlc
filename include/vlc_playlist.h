@@ -381,6 +381,24 @@ vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
                  unsigned preparse_max_threads, vlc_tick_t preparse_timeout);
 
 /**
+ * Get the preparsing depth of a locked playlist.
+ */
+VLC_API enum vlc_playlist_preparsing
+vlc_playlist_GetPreparseDepth(vlc_playlist_t *playlist);
+
+/**
+ * Set the depth for future preparsing requests on a locked playlist.
+ *
+ * Existing requests and queue items are not parsed again. This does not enable
+ * parsing on a playlist created with VLC_PLAYLIST_PREPARSING_DISABLED.
+ *
+ * \param rec a depth other than VLC_PLAYLIST_PREPARSING_DISABLED
+ */
+VLC_API void
+vlc_playlist_SetPreparseDepth(vlc_playlist_t *playlist,
+                              enum vlc_playlist_preparsing rec);
+
+/**
  * Delete a playlist.
  *
  * All playlist items are released, and listeners are removed and destroyed.

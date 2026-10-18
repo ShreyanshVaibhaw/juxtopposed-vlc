@@ -8,6 +8,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_player.h>
+#include <vlc_playlist.h>
 #include <vlc_iso_lang.h>
 #include <vlc_subpicture.h>
 #include <vlc_vout.h>
@@ -32,6 +33,24 @@
 
 namespace {
 const QString presetOption = QStringLiteral("qt-player-presets");
+
+vlc_playlist_preparsing directoryDepth(const QString& value)
+{
+    if (value.compare(QLatin1String("none"), Qt::CaseInsensitive) == 0)
+        return VLC_PLAYLIST_PREPARSING_ENABLED;
+    if (value.compare(QLatin1String("expand"), Qt::CaseInsensitive) == 0)
+        return VLC_PLAYLIST_PREPARSING_RECURSIVE;
+    return VLC_PLAYLIST_PREPARSING_COLLAPSE;
+}
+
+vlc_playlist_preparsing directoryDepth(MainCtx* ctx)
+{
+    auto* playlist = ctx->getIntf()->p_playlist;
+    vlc_playlist_Lock(playlist);
+    const auto depth = vlc_playlist_GetPreparseDepth(playlist);
+    vlc_playlist_Unlock(playlist);
+    return depth;
+}
 
 const char *const bufferingOptions[] = {"file-caching", "disc-caching", "network-caching", "live-caching"};
 // Retain VLC's caching levels while using each input type's current defaults.
@@ -958,6 +977,14 @@ QVariant RedesignPreferences::value(const QString& name) const
         return m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
         return m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->discoveryEnabled();
+    if (m_ctx && name == QLatin1String("recursive")) {
+        switch (directoryDepth(m_ctx)) {
+        case VLC_PLAYLIST_PREPARSING_ENABLED: return QStringLiteral("none");
+        case VLC_PLAYLIST_PREPARSING_COLLAPSE: return QStringLiteral("collapse");
+        case VLC_PLAYLIST_PREPARSING_RECURSIVE: return QStringLiteral("expand");
+        case VLC_PLAYLIST_PREPARSING_DISABLED: break;
+        }
+    }
     return read(name.toUtf8());
 }
 
@@ -1335,6 +1362,20 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         if (!supported)
             result.insert(QStringLiteral("help"), qtr("The media library is not available in this build."));
     }
+    if (name == QLatin1String("recursive")) {
+        const bool supported = !m_ctx || directoryDepth(m_ctx) != VLC_PLAYLIST_PREPARSING_DISABLED;
+        result.insert(QStringLiteral("supported"), supported);
+        result.insert(QStringLiteral("help"), supported
+            ? qtr("Include subfolders adds files from the folder and keeps its subfolders in the queue. Open folders on playback reads a folder when you play it. Expand all subfolders reads all files at once. Changes apply to the next folder you add.")
+            : value(QStringLiteral("auto-preparse")).toBool()
+                ? qtr("Restart VLC to use this option. A command-line option can stop VLC from reading file information.")
+                : qtr("Turn on \"Read file metadata automatically\" in Advanced Options, then restart VLC to use this option."));
+    }
+    if (name == QLatin1String("auto-preparse")) {
+        result.insert(QStringLiteral("restartRequired"), m_ctx && m_autoPreparseEdited
+            && value(name).toBool() != (directoryDepth(m_ctx) != VLC_PLAYLIST_PREPARSING_DISABLED));
+        result.insert(QStringLiteral("help"), qtr("Read file information for items added to the queue. Restart VLC after a change."));
+    }
     result.insert(QStringLiteral("kind"), kind);
     result.insert(QStringLiteral("choices"), choices);
     return result;
@@ -1594,6 +1635,7 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
     }
     m_invalid.remove(name);
     if (name == QLatin1String("media-library-startup")) m_libraryStartupEdited = true;
+    if (name == QLatin1String("auto-preparse")) m_autoPreparseEdited = true;
     if (isBufferingOption(name) && !value(QStringLiteral("qt-buffering-custom")).toBool())
         stage(QStringLiteral("qt-buffering-custom"), true);
     if (QStringList{QStringLiteral("hue"), QStringLiteral("brightness"), QStringLiteral("contrast"), QStringLiteral("saturation"), QStringLiteral("gamma")}.contains(name))
@@ -1610,6 +1652,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         && normalized.toBool() != m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
         applyToPlayer = normalized.toBool() != value(name).toBool();
+    if (m_ctx && name == QLatin1String("recursive"))
+        applyToPlayer = normalized.toString() != value(name).toString();
     if (m_ctx && (name == QLatin1String("sub-text-scale") || name == QLatin1String("sub-text-size-mode")
         || name == QLatin1String("sub-text-size-pixels"))) {
         auto *player = m_ctx->getIntf()->p_player;
@@ -1720,6 +1764,12 @@ bool RedesignPreferences::save()
     if (previous.contains(QStringLiteral("qt-discover-cast-devices")))
         m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
             bool(config_GetInt("qt-discover-cast-devices")));
+    if (previous.contains(QStringLiteral("recursive"))) {
+        auto* playlist = m_ctx->getIntf()->p_playlist;
+        vlc_playlist_Lock(playlist);
+        vlc_playlist_SetPreparseDepth(playlist, directoryDepth(read("recursive").toString()));
+        vlc_playlist_Unlock(playlist);
+    }
     for (const auto& name : {QStringLiteral("mouse-pause-policy"), QStringLiteral("hotkeys-x-wheel-mode"),
                             QStringLiteral("hotkeys-y-wheel-mode"), QStringLiteral("hotkeys-wheel-direction")}) {
         if (!previous.contains(name)) continue;
@@ -2000,6 +2050,9 @@ bool RedesignPreferences::resetAll()
     var_SetBool(intf, "qt-backdrop-blur", bool(config_GetInt("qt-backdrop-blur")));
     intf->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
         bool(config_GetInt("qt-discover-cast-devices")));
+    vlc_playlist_Lock(intf->p_playlist);
+    vlc_playlist_SetPreparseDepth(intf->p_playlist, directoryDepth(read("recursive").toString()));
+    vlc_playlist_Unlock(intf->p_playlist);
     applyOsdPreferences(intf);
     vlc_subpicture_InvalidateTextStyle();
     vlc_player_Lock(intf->p_player);

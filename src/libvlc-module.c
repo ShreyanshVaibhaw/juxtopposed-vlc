@@ -1255,14 +1255,14 @@ static const char *const clock_sources_text[] = {
 static const char *const psz_recursive_list[] = {
     "none", "collapse", "expand" };
 static const char *const psz_recursive_list_text[] = {
-    N_("None"), N_("Collapse"), N_("Expand") };
+    N_("Open folders on playback"), N_("Include subfolders"), N_("Expand all subfolders") };
 
 #define RECURSIVE_TEXT N_("Subdirectory behavior")
 #define RECURSIVE_LONGTEXT N_( \
-        "Select whether subdirectories must be expanded.\n" \
-        "none: subdirectories do not appear in the play queue.\n" \
-        "collapse: subdirectories appear but are expanded on first play.\n" \
-        "expand: all subdirectories are expanded.\n" )
+        "Select when VLC reads folders added to the queue.\n" \
+        "none: read folders when they are played.\n" \
+        "collapse: read one folder level and keep its subfolders in the queue.\n" \
+        "expand: read all subfolders at once.\n" )
 
 #define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \

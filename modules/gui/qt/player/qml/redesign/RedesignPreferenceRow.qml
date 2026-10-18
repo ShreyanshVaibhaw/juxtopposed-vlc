@@ -17,7 +17,12 @@ ColumnLayout {
     property bool lightTheme: false
     signal actionRequested(string action)
     signal editorResetRequested()
-    readonly property var description: { if (presentation.dynamicChoices || optionName.endsWith("-language")) backend.revision; return backend.describe(optionName) }
+    readonly property var description: {
+        const data = backend.describe(optionName)
+        if (presentation.dynamicChoices || optionName.endsWith("-language")
+            || data.restartRequired !== undefined || data.supported !== undefined) backend.revision
+        return data
+    }
     readonly property var currentValue: { backend.revision; return backend.value(optionName) }
     readonly property var choices: {
         const options = presentation.choices || description.choices || []

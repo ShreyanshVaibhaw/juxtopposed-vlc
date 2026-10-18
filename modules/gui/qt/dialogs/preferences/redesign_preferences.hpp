@@ -81,6 +81,7 @@ signals:
     void stereoTestChanged();
 private:
     bool m_libraryStartupEdited = false;
+    bool m_autoPreparseEdited = false;
     struct Entry { QString name, category, title; };
     QString audioOutputModule() const;
     QVariantList audioDeviceChoices() const;

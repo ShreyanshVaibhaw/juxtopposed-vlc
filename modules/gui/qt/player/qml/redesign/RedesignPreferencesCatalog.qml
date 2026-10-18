@@ -141,7 +141,7 @@ QtObject {
             { title: qsTr("Opening Files"), rows: [ ["one-instance", qsTr("Only allow one VLC window")],
                 ["one-instance-when-started-from-file", qsTr("Apply to files opened from the file manager")],
                 ["playlist-enqueue", qsTr("Add to the playlist instead of replacing it")],
-                ["recursive", qsTr("When opening a folder")], ["show-hiddenfiles", qsTr("Show hidden files")] ] },
+                ["recursive", qsTr("When opening a folder"), {dynamicChoices: true}], ["show-hiddenfiles", qsTr("Show hidden files")] ] },
             { title: qsTr("Metadata & Artwork"), rows: [ ["metadata-network-access", qsTr("Fetch titles and artwork"), {choices: [{label: qsTr("From the file only"), value: false}, {label: qsTr("From the file and the internet"), value: true}]}], ["media-library-startup", qsTr("Use the media library"), {dynamicChoices: true}] ] } ],
         network: [
             { title: qsTr("Buffering"), rows: [ ["redesign-buffering", qsTr("Buffering")],
@@ -183,7 +183,7 @@ QtObject {
             ["freetype-shadow-angle", qsTr("Shadow angle")], ["freetype-text-direction", qsTr("Text direction"), {choiceLabels: {0: qsTr("Automatic")}}],
             ["freetype-monofont", qsTr("Monospace font"), {placeholder: qsTr("System monospace")}] ] } ],
         performance: [ {title: qsTr("Developer"), rows: [ ["encoder", qsTr("Encoder")], ["decoder", qsTr("Decoder")], ["clock-synchro", qsTr("Clock synchronisation")], ["clock-jitter", qsTr("Clock jitter (ms)")], ["clock-average", qsTr("Clock reference averaging")] ] } ],
-        library: [ {title: "", rows: [ ["ignore-filetypes", qsTr("Ignore file types")], ["auto-preparse", qsTr("Read file metadata automatically")] ] } ],
+        library: [ {title: "", rows: [ ["ignore-filetypes", qsTr("Ignore file types")], ["auto-preparse", qsTr("Read file metadata automatically"), {dynamicChoices: true}] ] } ],
         network: [ {title: "", rows: [ ["http-reconnect", qsTr("Reconnect automatically")], ["http-user-agent", qsTr("User agent")], ["ipv4-timeout", qsTr("Connection timeout (ms)")] ] } ]
     })
     function find(query) {
