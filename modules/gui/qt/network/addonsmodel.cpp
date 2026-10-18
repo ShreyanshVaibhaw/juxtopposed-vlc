@@ -31,6 +31,7 @@
 #include <QHash>
 
 #include <vlc_media_source.h>
+#include <vlc_interface.h>
 #include <vlc_addons.h>
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_addons.h>
@@ -649,6 +650,14 @@ QString AddonsModel::getIconForType(AddonsModel::Type type)
     vlc_assert_unreachable();
 }
 
+bool AddonsModel::isTypeVisible(Type type)
+{
+    // Interface scripts remain loadable when installed manually.
+    constexpr bool showInterfaces = false;
+    return (type != Type::TYPE_SKIN2 || VLC_SKINS_ENABLED)
+        && (type != Type::TYPE_INTERFACE || showInterfaces);
+}
+
 int AddonsModel::getMaxScore()
 {
     return ADDON_MAX_SCORE;
@@ -718,6 +727,8 @@ bool AddonsModelPrivate::initializeModel()
 
 void AddonsModelPrivate::addonFound( AddonPtr addon )
 {
+    if (!AddonsModel::isTypeVisible(static_cast<AddonsModel::Type>(addon->e_type)))
+        return;
     m_items.emplace_back(std::make_shared<AddonItem>(addon));
     m_revision++;
     emit q_func()->catalogChanged();
@@ -725,6 +736,8 @@ void AddonsModelPrivate::addonFound( AddonPtr addon )
 
 void AddonsModelPrivate::addonChanged( AddonPtr addon, addon_state_t state )
 {
+    if (!AddonsModel::isTypeVisible(static_cast<AddonsModel::Type>(addon->e_type)))
+        return;
     AddonItemPtr sdItem = std::make_shared<AddonItem>(addon);
     for (auto& item : m_items)
         if (item->identifier == sdItem->identifier) { item = sdItem; break; }

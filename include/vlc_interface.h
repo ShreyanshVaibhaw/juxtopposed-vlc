@@ -27,6 +27,9 @@
 
 #include <vlc_threads.h>
 
+/* Keep the skin engine available in source, but use the bespoke interface. */
+#define VLC_SKINS_ENABLED 0
+
 # ifdef __cplusplus
 extern "C" {
 # endif

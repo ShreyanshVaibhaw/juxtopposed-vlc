@@ -337,6 +337,8 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     signalMapper = new QSignalMapper();
 
     auto addCategory = [this, leftPane]( const QString& label, const QString& ltooltip,  AddonsModel::Type type) {
+        if (!AddonsModel::isTypeVisible(type))
+            return;
         auto button = new QToolButton( this );
 
         QString iconpath = QQmlFile::urlToLocalFileOrQrc(AddonsModel::getIconForType( type ));

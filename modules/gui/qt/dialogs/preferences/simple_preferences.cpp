@@ -78,6 +78,7 @@
 # include <shobjidl.h>
 #endif
 #include <vlc_modules.h>
+#include <vlc_interface.h>
 
 static struct {
     const char iso[6];
@@ -735,7 +736,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.osGroupBox->hide();
 #endif
 
-            if( !module_exists( "skins2" ) )
+            if( !VLC_SKINS_ENABLED || !module_exists( "skins2" ) )
             {
                 ui.skins->hide();
                 ui.skinImage->hide();

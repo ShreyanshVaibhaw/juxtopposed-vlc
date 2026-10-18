@@ -112,6 +112,8 @@ public: //invokable functions
 
     static int getMaxScore();
 
+    static bool isTypeVisible(Type type);
+
 public: // properties
     void setCtx(MainCtx* ctx);
     MainCtx* getCtx() const;

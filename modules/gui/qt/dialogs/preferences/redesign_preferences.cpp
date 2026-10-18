@@ -5,6 +5,7 @@
 #include "util/renderer_manager.hpp"
 #include <vlc_configuration.h>
 #include <vlc_modules.h>
+#include <vlc_interface.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_player.h>
@@ -1131,6 +1132,8 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (!VLC_SKINS_ENABLED && name == QLatin1String("skins2-last"))
+        return {};
     if (name == QLatin1String("redesign-rescan-plugins")) {
         if (!config_FindConfig("plugins-cache")) return {};
         return {{QStringLiteral("kind"), QStringLiteral("action")}, {QStringLiteral("editor"), QStringLiteral("action")},

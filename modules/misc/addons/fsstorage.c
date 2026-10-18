@@ -33,6 +33,7 @@
 #include <vlc_stream.h>
 #include <vlc_stream_extractor.h>
 #include <vlc_addons.h>
+#include <vlc_interface.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_xml.h>
@@ -341,7 +342,8 @@ static int List( addons_finder_t *p_finder )
     {
         ListScripts( p_finder, types[i_type++] );
     }
-    ListSkins( p_finder );
+    if (VLC_SKINS_ENABLED)
+        ListSkins( p_finder );
 
     return VLC_SUCCESS;
 }
