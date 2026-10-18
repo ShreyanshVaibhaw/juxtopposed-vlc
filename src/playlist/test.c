@@ -287,6 +287,7 @@ test_expand_item(void)
         assert(node);
     }
 
+    const uint64_t source_id = vlc_playlist_item_GetId(vlc_playlist_Get(playlist, 8));
     playlist->current = 8;
     playlist->has_prev = true;
     playlist->has_next = true;
@@ -307,12 +308,73 @@ test_expand_item(void)
 
     EXPECT_AT(14, 9);
 
+    vlc_playlist_item_t *source = vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 8));
+    assert(source != NULL && source->preparser_req == NULL);
+    assert(vlc_playlist_item_GetId(source) == source_id);
+    assert(vlc_playlist_item_GetMedia(source) == item_to_expand);
+    assert(vlc_playlist_item_GetParent(source) == NULL);
+    assert(vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 9)) == source);
+    vlc_playlist_item_t *nested = vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 11));
+    assert(nested != NULL && nested->preparser_req == NULL);
+    assert(vlc_playlist_item_GetId(nested) == vlc_playlist_item_GetId(vlc_playlist_Get(playlist, 10)));
+    assert(vlc_playlist_item_GetMedia(nested) == media[12]);
+    assert(vlc_playlist_item_GetParent(nested) == source);
+    assert(vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 12)) == nested);
+    assert(vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 14)) == NULL);
+
     /* item 8 will be replaced, the current must stay the same */
     assert(playlist->current == 8);
 
     input_item_node_Delete(root);
     DestroyMediaArray(media, 16);
     vlc_playlist_Delete(playlist);
+}
+
+static void
+test_expansion_ancestry_lifetime(void)
+{
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
+    assert(playlist);
+    input_item_t *media[4];
+    CreateDummyMediaArray(media, ARRAY_SIZE(media));
+    assert(vlc_playlist_Append(playlist, media, 2) == VLC_SUCCESS);
+    for (size_t i = 0; i < 2; ++i)
+    {
+        input_item_node_t *node = input_item_node_Create(media[i]);
+        assert(node && input_item_node_AppendItem(node, media[2]));
+        assert(vlc_playlist_ExpandItem(playlist, i, node) == VLC_SUCCESS);
+        input_item_node_Delete(node);
+    }
+    vlc_playlist_item_t *first = vlc_playlist_Get(playlist, 0);
+    vlc_playlist_item_t *second = vlc_playlist_Get(playlist, 1);
+    vlc_playlist_item_t *a = vlc_playlist_item_GetParent(first);
+    vlc_playlist_item_t *b = vlc_playlist_item_GetParent(second);
+    assert(a && b && a != b);
+    assert(vlc_playlist_item_GetMedia(first) == vlc_playlist_item_GetMedia(second));
+    assert(vlc_playlist_item_GetId(a) != vlc_playlist_item_GetId(b));
+    assert(vlc_playlist_item_GetMedia(a) == media[0]);
+    assert(vlc_playlist_item_GetMedia(b) == media[1]);
+    vlc_playlist_item_Hold(first);
+    vlc_playlist_item_Hold(b);
+    input_item_node_t *nested = input_item_node_Create(media[2]);
+    assert(nested && input_item_node_AppendItem(nested, media[3]));
+    assert(vlc_playlist_ExpandItem(playlist, 0, nested) == VLC_SUCCESS);
+    input_item_node_Delete(nested);
+    vlc_playlist_item_t *parent = vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 0));
+    assert(parent && vlc_playlist_item_GetMedia(parent) == media[2]);
+    assert(vlc_playlist_item_GetParent(parent) == a);
+    assert(vlc_playlist_item_GetParent(vlc_playlist_Get(playlist, 1)) == b);
+    DestroyMediaArray(media, ARRAY_SIZE(media));
+    vlc_playlist_Delete(playlist);
+    assert(vlc_playlist_item_GetParent(first) == a);
+    char *name = input_item_GetName(vlc_playlist_item_GetMedia(a));
+    assert(name && !strcmp(name, "item-0"));
+    free(name);
+    vlc_playlist_item_Release(first);
+    name = input_item_GetName(vlc_playlist_item_GetMedia(b));
+    assert(name && !strcmp(name, "item-1"));
+    free(name);
+    vlc_playlist_item_Release(b);
 }
 
 struct playlist_state
@@ -2433,6 +2495,7 @@ int main(void)
     test_remove();
     test_clear();
     test_expand_item();
+    test_expansion_ancestry_lifetime();
     test_items_added_callbacks();
     test_items_moved_callbacks();
     test_items_removed_callbacks();

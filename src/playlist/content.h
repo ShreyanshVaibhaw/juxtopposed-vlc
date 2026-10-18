@@ -23,14 +23,15 @@
 
 typedef struct vlc_playlist vlc_playlist_t;
 typedef struct input_item_t input_item_t;
+typedef struct vlc_playlist_item vlc_playlist_item_t;
 
 /* called by vlc_playlist_Delete() in playlist.c */
 void
 vlc_playlist_ClearItems(vlc_playlist_t *playlist);
 
-/* expand an item (replace it by the given media array) */
+/* Expand an item with prepared queue entries, including their ancestry. */
 int
 vlc_playlist_Expand(vlc_playlist_t *playlist, size_t index,
-                    input_item_t *const media[], size_t count);
+                    vlc_playlist_item_t *const items[], size_t count);
 
 #endif

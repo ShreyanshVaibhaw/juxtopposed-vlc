@@ -653,3 +653,24 @@ vlc_tests += {
     'c_args' : ['-Dvout_PutSubpicture=CaptureSubpicture'],
     'link_with' : [libvlc, libvlccore],
 }
+
+vlc_tests += {
+    'name': 'test_src_playlist',
+    'sources': files(
+        '../../src/playlist/test.c',
+        '../../src/playlist/content.c',
+        '../../src/playlist/control.c',
+        '../../src/playlist/item.c',
+        '../../src/playlist/notify.c',
+        '../../src/playlist/player.c',
+        '../../src/playlist/playlist.c',
+        '../../src/playlist/preparse.c',
+        '../../src/playlist/randomizer.c',
+        '../../src/playlist/request.c',
+        '../../src/playlist/shuffle.c',
+        '../../src/playlist/sort.c'),
+    'c_args': ['-DTEST_PLAYLIST'],
+    'include_directories': include_directories('../../src'),
+    'suite': ['src', 'test_src'],
+    'link_with': [libvlccore],
+}

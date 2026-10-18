@@ -29,21 +29,41 @@
 #include "playlist.h"
 #include "notify.h"
 
-typedef struct VLC_VECTOR(input_item_t *) media_vector_t;
+typedef struct VLC_VECTOR(vlc_playlist_item_t *) item_vector_t;
 
-static void
-vlc_playlist_CollectChildren(vlc_playlist_t *playlist,
-                             media_vector_t *dest,
-                             const input_item_node_t *node)
+static int
+vlc_playlist_CollectChildren(vlc_playlist_t *playlist, item_vector_t *dest,
+                             const input_item_node_t *node,
+                             vlc_playlist_item_t *parent)
 {
     vlc_playlist_AssertLocked(playlist);
     for (int i = 0; i < node->i_children; ++i)
     {
         input_item_node_t *child = node->pp_children[i];
-        input_item_t *media = child->p_item;
-        vlc_vector_push(dest, media);
-        vlc_playlist_CollectChildren(playlist, dest, child);
+        vlc_playlist_item_t *item = vlc_playlist_item_NewChild(child->p_item,
+                                                playlist->idgen++, parent);
+        if (item == NULL)
+            return VLC_ENOMEM;
+        if (!vlc_vector_push(dest, item))
+        {
+            vlc_playlist_item_Release(item);
+            return VLC_ENOMEM;
+        }
+        if (child->i_children > 0)
+        {
+            /* Descendants keep a snapshot, not an active queue entry with a
+               parser request and callbacks that refer to this playlist. */
+            vlc_playlist_item_t *snapshot = vlc_playlist_item_NewChild(
+                                        item->media, item->id, parent);
+            if (snapshot == NULL)
+                return VLC_ENOMEM;
+            int ret = vlc_playlist_CollectChildren(playlist, dest, child, snapshot);
+            vlc_playlist_item_Release(snapshot);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
     }
+    return VLC_SUCCESS;
 }
 
 int
@@ -51,13 +71,23 @@ vlc_playlist_ExpandItem(vlc_playlist_t *playlist, size_t index,
                         const input_item_node_t *node)
 {
     vlc_playlist_AssertLocked(playlist);
-
-    media_vector_t flatten = VLC_VECTOR_INITIALIZER;
-    vlc_playlist_CollectChildren(playlist, &flatten, node);
-
-    int ret = vlc_playlist_Expand(playlist, index, flatten.data, flatten.size);
+    assert(index < playlist->items.size);
+    if (node->i_children == 0)
+        return vlc_playlist_Expand(playlist, index, NULL, 0);
+    vlc_playlist_item_t *source = playlist->items.data[index];
+    vlc_playlist_item_t *parent = vlc_playlist_item_NewChild(node->p_item,
+                                                source->id, source->parent);
+    if (parent == NULL)
+        return VLC_ENOMEM;
+    item_vector_t flatten = VLC_VECTOR_INITIALIZER;
+    int ret = vlc_playlist_CollectChildren(playlist, &flatten, node, parent);
+    vlc_playlist_item_Release(parent);
+    if (ret == VLC_SUCCESS)
+        ret = vlc_playlist_Expand(playlist, index, flatten.data, flatten.size);
+    vlc_playlist_item_t *item;
+    vlc_vector_foreach(item, &flatten)
+        vlc_playlist_item_Release(item);
     vlc_vector_destroy(&flatten);
-
     return ret;
 }
 

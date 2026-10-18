@@ -360,10 +360,24 @@ VLC_API input_item_t *
 vlc_playlist_item_GetMedia(vlc_playlist_item_t *);
 
 /**
- * Return a unique id for the playlist item instance.
+ * Return the unique source entry id.
+ * An ancestry snapshot retains its source entry's id.
  */
 VLC_API uint64_t
 vlc_playlist_item_GetId(vlc_playlist_item_t *);
+
+/**
+ * Return the source folder or playlist parent, or NULL for a top-level item.
+ *
+ * The returned item is an immutable ancestry snapshot. It remains valid while
+ * this item is held. It has the source item's id and media, but no parser
+ * request. Follow its parent to read the complete source hierarchy.
+ *
+ * The snapshot is not a member of the queue and must not be used in queue
+ * mutation requests. Hold it explicitly to keep it beyond this item's lifetime.
+ */
+VLC_API vlc_playlist_item_t *
+vlc_playlist_item_GetParent(vlc_playlist_item_t *);
 
 /* Playlist */
 

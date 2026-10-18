@@ -999,6 +999,7 @@ vlc_playlist_item_Hold
 vlc_playlist_item_Release
 vlc_playlist_item_GetMedia
 vlc_playlist_item_GetId
+vlc_playlist_item_GetParent
 vlc_playlist_view_Count
 vlc_playlist_view_Get
 vlc_playlist_New

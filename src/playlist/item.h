@@ -30,6 +30,7 @@ typedef struct input_item_t input_item_t;
 struct vlc_playlist_item
 {
     input_item_t *media;
+    vlc_playlist_item_t *parent;
     uint64_t id;
     vlc_preparser_req *preparser_req;
     vlc_atomic_rc_t rc;
@@ -38,5 +39,10 @@ struct vlc_playlist_item
 /* _New() is private, it is called when inserting new media in the playlist */
 vlc_playlist_item_t *
 vlc_playlist_item_New(input_item_t *media, uint64_t id);
+
+/* The parent is an immutable ancestry snapshot, never an active parser item. */
+vlc_playlist_item_t *
+vlc_playlist_item_NewChild(input_item_t *media, uint64_t id,
+                           vlc_playlist_item_t *parent);
 
 #endif

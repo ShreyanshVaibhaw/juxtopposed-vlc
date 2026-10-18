@@ -30,6 +30,13 @@
 vlc_playlist_item_t *
 vlc_playlist_item_New(input_item_t *media, uint64_t id)
 {
+    return vlc_playlist_item_NewChild(media, id, NULL);
+}
+
+vlc_playlist_item_t *
+vlc_playlist_item_NewChild(input_item_t *media, uint64_t id,
+                           vlc_playlist_item_t *parent)
+{
     vlc_playlist_item_t *item = malloc(sizeof(*item));
     if (unlikely(!item))
         return NULL;
@@ -38,6 +45,8 @@ vlc_playlist_item_New(input_item_t *media, uint64_t id)
     item->id = id;
     item->preparser_req = NULL;
     item->media = media;
+    item->parent = parent;
+    if (parent != NULL) vlc_playlist_item_Hold(parent);
     input_item_Hold(media);
     return item;
 }
@@ -51,12 +60,14 @@ vlc_playlist_item_Hold(vlc_playlist_item_t *item)
 void
 vlc_playlist_item_Release(vlc_playlist_item_t *item)
 {
-    if (vlc_atomic_rc_dec(&item->rc))
+    while (item != NULL && vlc_atomic_rc_dec(&item->rc))
     {
+        vlc_playlist_item_t *parent = item->parent;
         if (item->preparser_req != NULL)
             vlc_preparser_req_Release(item->preparser_req);
         input_item_Release(item->media);
         free(item);
+        item = parent;
     }
 }
 
@@ -70,4 +81,10 @@ uint64_t
 vlc_playlist_item_GetId(vlc_playlist_item_t *item)
 {
     return item->id;
+}
+
+vlc_playlist_item_t *
+vlc_playlist_item_GetParent(vlc_playlist_item_t *item)
+{
+    return item->parent;
 }
