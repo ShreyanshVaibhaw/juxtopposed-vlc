@@ -36,13 +36,13 @@ QtObject {
             { title: qsTr("Playback Controls"), rows: [
                 ["qt-minimal-view", qsTr("Start in compact mode")],
                 ["qt-controls-autohide", qsTr("Auto-hide the controls")],
-                ["qt-controls-hide-timeout", qsTr("Hide after"), {editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s"}],
+                ["qt-controls-hide-timeout", qsTr("Hide after"), {editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s", ticks: [0, 5, 10], trackTicks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5]}],
                 ["qt-fs-controller", qsTr("Show controls in fullscreen")] ] },
             { title: qsTr("Notifications and System Tray"), rows: [
                 ["qt-system-tray", qsTr("Show a system tray icon")],
                 ["qt-start-minimized", qsTr("Start minimized to the tray")],
                 ["qt-notification", qsTr("Show a popup when the track changes"), {enabledWhen: "qt-system-tray"}],
-                ["qt-notification-timeout", qsTr("Popup duration"), {enabledWhen: "qt-system-tray", editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s"}] ] },
+                ["qt-notification-timeout", qsTr("Popup duration"), {enabledWhen: "qt-system-tray", editor: "slider", from: 0, to: 10, factor: 0.001, step: 0.1, decimals: 1, suffix: " s", ticks: [0, 5, 10], trackTicks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5]}] ] },
             { title: qsTr("Playlist"), rows: [ ["playlist-tree", qsTr("Show the playlist as a tree")] ] } ],
         privacy: [
             { title: qsTr("History"), rows: [
@@ -174,7 +174,7 @@ QtObject {
         general: [ {title: "", rows: [ ["qt-minor-warnings", qsTr("Show minor warnings")], ["startup-options", qsTr("Additional command line options")], ["logmode", qsTr("Log format"), {choiceLabels: {text: qsTr("Plain text"), html: "HTML"}}], ["stats", qsTr("Collect playback statistics")], ["redesign-config-folder", qsTr("Open configurations folder")], ["redesign-reset-all", qsTr("Reset all settings")] ] },
             {title: qsTr("Developer Options"), rows: [ ["syslog", qsTr("Write to the system log")], ["syslog-debug", qsTr("Include debug messages in the system log")],
                 ["syslog-ident", qsTr("System log identity")], ["syslog-facility", qsTr("System log facility"), {choiceLabels: {user: qsTr("User")}}] ] } ],
-        interface: [ {title: "", rows: [ ["qt-opacity", qsTr("Window opacity"), {editor: "slider", from: 10, to: 100, factor: 100, suffix: "%"}],
+        interface: [ {title: "", rows: [ ["qt-opacity", qsTr("Window opacity"), {editor: "slider", from: 10, to: 100, factor: 100, suffix: "%", ticks: [10, 100], trackTicks: [20, 30, 40, 50, 60, 70, 80, 90]}],
             ["qt-pause-minimized", qsTr("Pause video when window is minimized")], ["qt-auto-raise", qsTr("Bring VLC to the front when playback starts")],
             ["qt-bgcone", qsTr("Show cover art in the window when playing audio")], ["qt-embedded-open", qsTr("Show the file browser inside the open dialog")],
             ["qt-icon-change", qsTr("Allow the app icon to change")],

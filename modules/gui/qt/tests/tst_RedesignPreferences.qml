@@ -23,6 +23,8 @@ TestCase {
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
         function describe(name) {
+            if (name === "qt-opacity") return {kind: "float", minimum: 0.1, maximum: 1}
+            if (name === "qt-controls-hide-timeout" || name === "qt-notification-timeout") return {kind: "integer", minimum: 0, maximum: 10000}
             if (name === "sout-chromecast-conversion-quality") return {kind: "integer", choices: [
                 {label: "Automatic", value: -1}, {label: "High (high quality and high bandwidth)", value: 0},
                 {label: "Medium (medium quality and medium bandwidth)", value: 1},
@@ -1023,6 +1025,32 @@ TestCase {
         const slider = findChild(row, "preferenceSliderEditor")
         slider.forceActiveFocus(); keyClick(Qt.Key_Home); compare(store.value("timeout"), 0)
         keyClick(Qt.Key_End); compare(store.value("timeout"), 255)
+    }
+    function test_interfaceSliderScalesStayFixedAndKeepNativeUnits_data() {
+        return [
+            {tag: "hide delay", option: "qt-controls-hide-timeout", advanced: false, values: [1800, 6700], labels: ["0 s", "5 s", "10 s"], minimum: 0, maximum: 10000},
+            {tag: "popup duration", option: "qt-notification-timeout", advanced: false, values: [3000, 8100], labels: ["0 s", "5 s", "10 s"], minimum: 0, maximum: 10000},
+            {tag: "window opacity", option: "qt-opacity", advanced: true, values: [0.7, 0.9], labels: ["10%", "100%"], minimum: 0.1, maximum: 1}
+        ]
+    }
+    function test_interfaceSliderScalesStayFixedAndKeepNativeUnits(data) {
+        const sections = data.advanced ? catalog.advancedSections.interface : catalog.sections.interface
+        const spec = sections.reduce((rows, section) => rows.concat(section.rows), []).find(row => row[0] === data.option)[2]
+        store.stage("qt-system-tray", true)
+        const row = createTemporaryObject(inlineSliderRow, testCase, {optionName: data.option, presentation: spec})
+        verify(row !== null)
+        for (const value of data.values) {
+            store.stage(data.option, value); wait(20)
+            for (let index = 0; index < data.labels.length; index++) {
+                const label = findChild(row, "preferenceSliderTick_" + index)
+                verify(label.visible)
+                compare(label.text, data.labels[index])
+            }
+            verify(findChild(row, "preferenceSliderTick_" + data.labels.length) === null)
+        }
+        const slider = findChild(row, "preferenceSliderEditor")
+        slider.forceActiveFocus(); keyClick(Qt.Key_Home); fuzzyCompare(store.value(data.option), data.minimum, 0.0001)
+        keyClick(Qt.Key_End); fuzzyCompare(store.value(data.option), data.maximum, 0.0001)
     }
     function test_subtitleBackgroundKeepsOpacityEditableWhenNoneIsSelected() {
         const rows = catalog.sections.subtitles.find(section => section.title === "Appearance").rows

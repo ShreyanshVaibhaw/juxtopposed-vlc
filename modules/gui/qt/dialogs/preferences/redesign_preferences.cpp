@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QColorDialog>
 #include <QGuiApplication>
+#include <QWindow>
 #include <QScreen>
 #include <QKeyEvent>
 #include <QRegularExpression>
@@ -298,6 +299,15 @@ const QStringList& presetOptions()
 bool subtitleStyleOption(const QString& name)
 {
     return name.startsWith(QLatin1String("freetype-")) || name.startsWith(QLatin1String("sub-text-"));
+}
+
+void applyWindowOpacity(MainCtx* ctx)
+{
+    auto* intf = ctx->getIntf();
+    const float opacity = config_GetFloat("qt-opacity");
+    if (var_Type(intf, "qt-opacity") == 0) var_Create(intf, "qt-opacity", VLC_VAR_FLOAT);
+    var_SetFloat(intf, "qt-opacity", opacity);
+    if (auto* window = ctx->intfMainWindow()) window->setOpacity(opacity);
 }
 
 void applyOsdPreferences(qt_intf_t* intf)
@@ -1168,6 +1178,8 @@ QVariant RedesignPreferences::value(const QString& name) const
         return m_ctx->systrayRequested();
     if (m_ctx && (name == QLatin1String("qt-notification") || name == QLatin1String("qt-notification-timeout")))
         return QVariant::fromValue<qlonglong>(var_InheritInteger(m_ctx->getIntf(), name.toUtf8().constData()));
+    if (m_ctx && name == QLatin1String("qt-opacity"))
+        return var_InheritFloat(m_ctx->getIntf(), "qt-opacity");
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
@@ -1720,6 +1732,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         result.insert(QStringLiteral("help"), qtr("Show a track message always, only when VLC is hidden or minimized, or never."));
     if (name == QLatin1String("qt-notification-timeout"))
         result.insert(QStringLiteral("help"), qtr("Choose how long the track popup is shown. The system can change this time."));
+    if (name == QLatin1String("qt-opacity"))
+        result.insert(QStringLiteral("help"), qtr("Change the opacity of the main VLC window. The change applies at once."));
     if (name == QLatin1String("qt-minimal-view"))
         result.insert(QStringLiteral("help"), qtr("Start VLC in compact mode. Restart VLC after a change. Launch options can override this setting."));
     if (name == QLatin1String("qt-verbose"))
@@ -2155,6 +2169,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && (name == QLatin1String("qt-notification") || name == QLatin1String("qt-notification-timeout")))
         applyToPlayer = normalized.toLongLong() != value(name).toLongLong();
+    if (m_ctx && name == QLatin1String("qt-opacity"))
+        applyToPlayer = !qFuzzyCompare(normalized.toFloat(), value(name).toFloat());
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
@@ -2288,6 +2304,8 @@ bool RedesignPreferences::save()
     }
     if (previous.contains(QStringLiteral("qt-system-tray")))
         m_ctx->refreshSystray();
+    if (previous.contains(QStringLiteral("qt-opacity")))
+        applyWindowOpacity(m_ctx);
     if (previous.contains(QStringLiteral("qt-verbose")))
         updateVlcQtMessageHandler(var_InheritBool(m_ctx->getIntf(), "qt-verbose"));
     if (previous.contains(QStringLiteral("qt-error-dialogs")) || previous.contains(QStringLiteral("qt-minor-warnings")))
@@ -2590,6 +2608,7 @@ bool RedesignPreferences::resetAll()
         var_SetInteger(intf, option, config_GetInt(option));
     }
     m_ctx->refreshSystray();
+    applyWindowOpacity(m_ctx);
     updateVlcQtMessageHandler(var_InheritBool(intf, "qt-verbose"));
     if (auto* errors = DialogErrorModel::getInstance<false>())
         errors->refreshNotificationPreference();
