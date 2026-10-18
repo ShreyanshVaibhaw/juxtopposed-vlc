@@ -1285,6 +1285,10 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
     }
     if (name == QLatin1String("freetype-text-direction"))
         result.insert(QStringLiteral("help"), qtr("Automatic detects the paragraph direction from the text. Select a direction if the text is not in the correct order."));
+    if (name == QLatin1String("input-record-path")) {
+        result.insert(QStringLiteral("placeholder"), qtr("Automatic"));
+        result.insert(QStringLiteral("help"), qtr("Leave the field empty to use your Videos folder for video recordings and your Music folder for audio recordings. Direct stream recordings use your Downloads folder."));
+    }
     if (name == QLatin1String("aout"))
         result.insert(QStringLiteral("help"), qtr("Select an audio output driver. Restart VLC to use a new driver."));
     if (name == QLatin1String("pitch-shift"))
