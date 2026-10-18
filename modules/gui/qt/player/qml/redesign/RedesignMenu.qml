@@ -21,8 +21,8 @@ C.Menu {
     signal recentRequested(var mediaId)
     signal clearRecentRequested()
     signal profileRequested(string profileId)
-    width: theme.dp(375)
-    padding: theme.dp(4)
+    width: theme.dp(theme.compactMenus ? 280 : 375)
+    padding: theme.menuPadding
     focus: true
     closePolicy: C.Popup.CloseOnEscape | C.Popup.CloseOnPressOutsideParent
 
@@ -68,18 +68,19 @@ C.Menu {
         property string glyph: subMenu === recentMenu ? "menu-recent" : subMenu === profileMenu ? "menu-profile" : ""
         property string hint: ""
         property int textElide: Text.ElideRight
-        implicitHeight: root.theme.dp(48)
-        leftPadding: root.theme.dp(16); rightPadding: root.theme.dp(16)
+        implicitHeight: root.theme.menuItemHeight
+        leftPadding: root.theme.dp(root.theme.compactMenus ? 8 : 16); rightPadding: leftPadding
         topPadding: 0; bottomPadding: 0
         hoverEnabled: true
         indicator: null
         arrow: null
         background: Rectangle { color: row.highlighted ? root.theme.hover : "transparent"; radius: root.theme.dp(6) }
         contentItem: RowLayout {
-            spacing: root.theme.dp(12)
+            spacing: root.theme.dp(root.theme.compactMenus ? 6 : 12)
             RedesignIcon {
                 Layout.preferredWidth: root.theme.dp(20); Layout.preferredHeight: root.theme.dp(20)
                 sourceSize: Qt.size(root.theme.dp(20) * Screen.devicePixelRatio, root.theme.dp(20) * Screen.devicePixelRatio)
+                visible: !root.theme.compactMenus || row.checkable
                 name: row.checkable ? "check" : row.glyph
                 color: row.checkable ? root.theme.accent : root.theme.foreground
                 detailColor: Qt.darker(root.theme.accent, 1.2)
@@ -123,7 +124,7 @@ C.Menu {
         id: recentMenu
         objectName: "redesignRecentMenu"
         title: qsTr("Open Recent")
-        width: root.theme.dp(375); padding: root.padding
+        width: root.theme.dp(root.theme.compactMenus ? 280 : 375); padding: root.padding
         popupType: C.Popup.Item
         delegate: MenuRow { }
         background: MenuSurface { shown: recentMenu.visible }
@@ -158,7 +159,7 @@ C.Menu {
         id: profileMenu
         objectName: "redesignProfileMenu"
         title: qsTr("Profile (%1)").arg(root.profileName)
-        width: root.theme.dp(300); padding: root.padding
+        width: root.theme.dp(root.theme.compactMenus ? 240 : 300); padding: root.padding
         popupType: C.Popup.Item
         delegate: MenuRow { }
         background: MenuSurface { shown: profileMenu.visible }

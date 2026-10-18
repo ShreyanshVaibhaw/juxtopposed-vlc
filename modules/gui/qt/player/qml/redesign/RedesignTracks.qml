@@ -17,6 +17,8 @@ ColumnLayout {
     property bool editableTracks: false
     property bool canEditTracks: true
     property bool refreshable: false
+    property bool menuMode: false
+    readonly property bool compact: menuMode && theme.compactMenus
     readonly property int count: {
         let total = 0
         for (let i = 0; i < choices.count; ++i) {
@@ -45,7 +47,7 @@ ColumnLayout {
         property bool chosen: false
         property string description: text
         Layout.fillWidth: true
-        implicitHeight: root.theme.dp(44)
+        implicitHeight: root.theme.dp(root.compact ? 28 : 44)
         hoverEnabled: true
         focusPolicy: Qt.StrongFocus
         Accessible.name: text
@@ -65,12 +67,12 @@ ColumnLayout {
                 visible: choice.chosen
                 width: root.theme.dp(20); height: width
                 anchors.left: parent.left
-                anchors.leftMargin: root.theme.dp(24)
+                anchors.leftMargin: root.theme.dp(root.compact ? 8 : 24)
                 anchors.verticalCenter: parent.verticalCenter
                 color: root.theme.accent
             }
             Text {
-                anchors.left: parent.left; anchors.leftMargin: root.theme.dp(62)
+                anchors.left: parent.left; anchors.leftMargin: root.theme.dp(root.compact ? 36 : 62)
                 anchors.right: parent.right; anchors.rightMargin: root.theme.dp(20)
                 anchors.verticalCenter: parent.verticalCenter
                 text: choice.text
@@ -83,8 +85,8 @@ ColumnLayout {
     }
     RowLayout {
         Layout.fillWidth: true
-        Layout.leftMargin: theme.dp(28); Layout.rightMargin: theme.dp(24)
-        Layout.topMargin: theme.dp(22); Layout.bottomMargin: theme.dp(14)
+        Layout.leftMargin: theme.dp(root.compact ? 12 : 28); Layout.rightMargin: theme.dp(root.compact ? 12 : 24)
+        Layout.topMargin: theme.dp(root.compact ? 10 : 22); Layout.bottomMargin: theme.dp(root.compact ? 6 : 14)
         spacing: theme.dp(12)
         Text {
             text: root.heading; color: root.theme.foreground; opacity: 0.75
@@ -96,26 +98,29 @@ ColumnLayout {
             objectName: "editExternalTracks"
             visible: root.editableTracks
             enabled: root.canEditTracks && root.count > 0
-            Layout.preferredWidth: root.theme.dp(28); Layout.preferredHeight: root.theme.dp(24)
+            Layout.preferredWidth: root.theme.dp(root.compact ? 54 : 28); Layout.preferredHeight: root.theme.dp(24)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-            iconName: "edit"; iconSize: root.theme.dp(20); text: qsTr("Edit external tracks")
+            caption: root.compact ? qsTr("Edit") : ""
+            iconName: root.compact ? "" : "edit"; iconSize: root.theme.dp(20); text: qsTr("Edit external tracks")
             onClicked: root.editRequested()
         }
         RedesignButton {
             objectName: "addExternalTracks"
             visible: root.editableTracks
             enabled: root.canEditTracks
-            Layout.preferredWidth: root.theme.dp(28); Layout.preferredHeight: root.theme.dp(24)
+            Layout.preferredWidth: root.theme.dp(root.compact ? 54 : 28); Layout.preferredHeight: root.theme.dp(24)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-            iconName: "add"; iconSize: root.theme.dp(20); text: qsTr("Add external tracks")
+            caption: root.compact ? qsTr("Add") : ""
+            iconName: root.compact ? "" : "add"; iconSize: root.theme.dp(20); text: qsTr("Add external tracks")
             onClicked: root.addRequested()
         }
         RedesignButton {
             objectName: "refreshTrackDevices"
             visible: root.refreshable
-            Layout.preferredWidth: root.theme.dp(28); Layout.preferredHeight: root.theme.dp(24)
+            Layout.preferredWidth: root.theme.dp(root.compact ? 54 : 28); Layout.preferredHeight: root.theme.dp(24)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-            iconName: "refresh-two-tone"; iconSize: root.theme.dp(20); text: qsTr("Refresh output devices")
+            caption: root.compact ? qsTr("Refresh") : ""
+            iconName: root.compact ? "" : "refresh-two-tone"; iconSize: root.theme.dp(20); text: qsTr("Refresh output devices")
             onClicked: root.refreshRequested()
         }
     }
@@ -142,7 +147,7 @@ ColumnLayout {
             readonly property string label: typeof model.displayLabel === "string" && model.displayLabel.length ? model.displayLabel : display
             visible: accepted
             Layout.fillWidth: true
-            implicitHeight: accepted ? root.theme.dp(44) : 0
+            implicitHeight: accepted ? root.theme.dp(root.compact ? 28 : 44) : 0
             TrackChoice {
                 anchors.fill: parent
                 objectName: "trackChoice_" + track.index

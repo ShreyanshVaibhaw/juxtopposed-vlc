@@ -1097,6 +1097,7 @@ qml_tests = {
     'tst_RedesignSettingsDialog': files('tests/tst_RedesignSettingsDialog.qml'),
     'tst_RedesignShortcutEditor': files('tests/tst_RedesignShortcutEditor.qml'),
     'tst_RedesignAppearance': files('tests/tst_RedesignAppearance.qml'),
+    'tst_RedesignCompactMenus': files('tests/tst_RedesignCompactMenus.qml'),
     'tst_RedesignLibrary': files('tests/tst_RedesignLibrary.qml'),
     'tst_RedesignQueue': files('tests/tst_RedesignQueue.qml'),
     'tst_RedesignBookmarks': files('tests/tst_RedesignBookmarks.qml'),

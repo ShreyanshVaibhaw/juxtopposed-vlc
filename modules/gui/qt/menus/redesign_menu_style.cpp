@@ -14,6 +14,7 @@
 #include <QStyleOptionMenuItem>
 #include <QPainter>
 #include <QEvent>
+#include <QScopedValueRollback>
 
 namespace {
 class RedesignMenuMask final : public QObject
@@ -48,6 +49,7 @@ public:
         const bool light = scheme == ColorSchemeModel::Day ||
             (scheme == ColorSchemeModel::System && qApp->styleHints()->colorScheme() == Qt::ColorScheme::Light);
         m_scale = ctx->getIntfScaleFactor();
+        m_compact = ctx->compactMenus();
         m_background = QColor(light ? "#acacac" : "#191919");
         m_background.setAlpha(242);
         m_foreground = QColor(light ? "#404040" : "#8f8f8f");
@@ -79,8 +81,8 @@ public:
                     const auto label = item->text.section(QLatin1Char('\t'), 0, 0);
                     const auto hint = item->text.section(QLatin1Char('\t'), 1);
                     // QMenu adds the shared shortcut column after it measures each item.
-                    const int trailing = item->menuItemType == QStyleOptionMenuItem::SubMenu ? dp(44) : hint.isEmpty() ? dp(12) : dp(28);
-                    return QSize(dp(49) + item->fontMetrics.horizontalAdvance(label) + trailing, dp(48));
+                    const int trailing = item->menuItemType == QStyleOptionMenuItem::SubMenu ? dp(m_compact ? 28 : 44) : hint.isEmpty() ? dp(12) : dp(28);
+                    return QSize(textInset(item) + item->fontMetrics.horizontalAdvance(label) + trailing, dp(m_compact ? 28 : 48));
                 }
             }
         }
@@ -90,7 +92,7 @@ public:
     {
         switch (metric) {
         case PM_MenuPanelWidth: return 0;
-        case PM_MenuHMargin: case PM_MenuVMargin: return dp(4);
+        case PM_MenuHMargin: case PM_MenuVMargin: return dp(m_compact ? 2 : 4);
         case PM_SmallIconSize: return dp(24);
         case PM_MenuScrollerHeight: return dp(24);
         default: return QProxyStyle::pixelMetric(metric, option, widget);
@@ -132,7 +134,7 @@ public:
         painter->setRenderHint(QPainter::Antialiasing);
         painter->setLayoutDirection(item->direction);
         QRect rect = item->rect;
-        if (widget) rect.setRight(qMin(rect.right(), widget->width() - dp(4) - 1));
+        if (widget) rect.setRight(qMin(rect.right(), widget->width() - dp(m_compact ? 2 : 4) - 1));
         if (item->state & State_Selected) {
             painter->setPen(Qt::NoPen);
             painter->setBrush(m_hover);
@@ -141,8 +143,8 @@ public:
         const bool enabled = item->state & State_Enabled;
         const QColor foreground = enabled ? m_foreground : m_disabled;
         const auto visual = [&](const QRect& box) { return visualRect(item->direction, rect, box); };
-        const QRect icon = visual(QRect(rect.x() + dp(14), rect.center().y() - dp(12), dp(24), dp(24)));
-        if (!item->icon.isNull()) {
+        const QRect icon = visual(QRect(rect.x() + dp(m_compact ? 4 : 14), rect.center().y() - dp(12), dp(24), dp(24)));
+        if (!m_compact && !item->icon.isNull()) {
             const auto state = item->checked ? QIcon::On : QIcon::Off;
             if (enabled) item->icon.paint(painter, icon, Qt::AlignCenter, QIcon::Normal, state);
             else {
@@ -169,7 +171,7 @@ public:
         int trailing = dp(12);
         painter->setFont(item->font);
         if (item->menuItemType == QStyleOptionMenuItem::SubMenu) {
-            const QRect arrow = visual(QRect(rect.right() - dp(37) + 1, rect.center().y() - dp(12), dp(24), dp(24)));
+            const QRect arrow = visual(QRect(rect.right() - dp(m_compact ? 25 : 37) + 1, rect.center().y() - dp(12), dp(24), dp(24)));
             painter->setPen(QPen(foreground, 1.5 * m_scale, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             QPainterPath chevron;
             const bool rtl = item->direction == Qt::RightToLeft;
@@ -177,7 +179,7 @@ public:
             chevron.lineTo(arrow.x() + (rtl ? 9 : 15) * m_scale, arrow.y() + 12 * m_scale);
             chevron.lineTo(arrow.x() + (rtl ? 14 : 10) * m_scale, arrow.y() + 17 * m_scale);
             painter->drawPath(chevron);
-            trailing = dp(44);
+            trailing = dp(m_compact ? 28 : 44);
         } else if (!hint.isEmpty()) {
             const int width = item->fontMetrics.horizontalAdvance(hint);
             QColor hintColor = foreground;
@@ -187,13 +189,19 @@ public:
             trailing += width + dp(16);
         }
         painter->setPen(foreground);
-        const QRect text = visual(rect.adjusted(dp(49), 0, -trailing, 0));
+        const QRect text = visual(rect.adjusted(textInset(item), 0, -trailing, 0));
         const int flags = Qt::AlignVCenter | Qt::AlignLeading |
             (styleHint(SH_UnderlineShortcut, item, widget) ? Qt::TextShowMnemonic : Qt::TextHideMnemonic);
         painter->drawText(text, flags, item->fontMetrics.elidedText(label, Qt::ElideRight, text.width()));
         painter->restore();
     }
 private:
+    int textInset(const QStyleOptionMenuItem* item) const
+    {
+        if (!m_compact) return dp(49);
+        return dp(item->menuHasCheckableItems ? 32 : 12);
+    }
+    bool m_compact = false;
     qreal m_scale = 1;
     QColor m_background, m_foreground, m_disabled, m_hover, m_border, m_accent;
 };
@@ -215,7 +223,10 @@ void styleRedesignMenus(QMenu* root, MainCtx* ctx)
         menu->setStyle(style);
         menu->setPalette(style->menuPalette(menu->palette()));
         menu->setFont(font);
-        menu->setMinimumWidth(dp(292));
+        const int width = dp(ctx->compactMenus() ? 220 : 292);
+        if (menu->property("redesignFixedMenuWidth").toBool()) menu->setFixedWidth(width);
+        else menu->setMinimumWidth(width);
+        menu->setProperty("redesignCompactMenu", ctx->compactMenus());
         menu->setWindowFlag(Qt::NoDropShadowWindowHint);
         menu->setAttribute(Qt::WA_TranslucentBackground);
         menu->setProperty("redesignMenuRadius", dp(10));
@@ -228,3 +239,50 @@ void styleRedesignMenus(QMenu* root, MainCtx* ctx)
     apply(apply, root);
 }
 
+namespace {
+// Include menus created by Qt itself (for example, text-field context menus)
+// and menus populated after the player menu was first built.
+class RedesignMenuWatcher final : public QObject
+{
+public:
+    explicit RedesignMenuWatcher(MainCtx* ctx) : QObject(ctx), m_ctx(ctx)
+    {
+        qApp->installEventFilter(this);
+        connect(ctx, &MainCtx::compactMenusChanged, this, [this] { refresh(); });
+        connect(ctx, &MainCtx::intfScaleFactorChanged, this, [this] { refresh(); });
+    }
+protected:
+    bool eventFilter(QObject* object, QEvent* event) override
+    {
+        if (m_updating || (event->type() != QEvent::Polish && event->type() != QEvent::Show))
+            return false;
+        auto* menu = qobject_cast<QMenu*>(object);
+        if (menu && (m_ctx->compactMenus() || menu->property("redesignMenuMaskInstalled").toBool())) {
+            QScopedValueRollback guard(m_updating, true);
+            const bool changed = menu->property("redesignCompactMenu") != QVariant(m_ctx->compactMenus());
+            styleRedesignMenus(menu, m_ctx);
+            if (changed && event->type() == QEvent::Show) menu->adjustSize();
+        }
+        return false;
+    }
+private:
+    void refresh()
+    {
+        QScopedValueRollback guard(m_updating, true);
+        for (auto* widget : QApplication::allWidgets()) {
+            auto* menu = qobject_cast<QMenu*>(widget);
+            if (!menu || (!m_ctx->compactMenus() && !menu->property("redesignMenuMaskInstalled").toBool()))
+                continue;
+            styleRedesignMenus(menu, m_ctx);
+            if (menu->isVisible()) menu->adjustSize();
+        }
+    }
+    MainCtx* m_ctx;
+    bool m_updating = false;
+};
+}
+
+void watchRedesignMenus(MainCtx* ctx)
+{
+    new RedesignMenuWatcher(ctx);
+}

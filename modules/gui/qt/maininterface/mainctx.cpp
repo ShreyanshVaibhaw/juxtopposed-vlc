@@ -55,6 +55,7 @@
 
 #include "videosurface.hpp"
 
+#include "menus/redesign_menu_style.hpp"
 #include "menus/menus.hpp"                            // Menu creation
 
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
@@ -212,6 +213,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
     loadPrefs(false);
     loadFromSettingsImpl(false);
+    watchRedesignMenus(this);
 
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", this);
@@ -464,6 +466,7 @@ void MainCtx::loadPrefs(const bool callSignals)
     };
 
     loadFromVLCOption(m_backdropBlurEnabled, "qt-backdrop-blur", &MainCtx::backdropBlurEnabledChanged);
+    loadFromVLCOption(m_compactMenus, "qt-compact-menus", &MainCtx::compactMenusChanged);
 
     bool minimalMode = false;
     /* Are we in the enhanced always-video mode or not ? */

@@ -833,8 +833,8 @@ QMenu* VLCMenuBar::RedesignPopupMenu(qt_intf_t* p_intf, bool show)
         if (stored) hotkeys->add(action, qfu(stored));
         free(stored);
     };
+    menu->setProperty("redesignFixedMenuWidth", true);
     styleRedesignMenus(menu, ctx);
-    menu->setFixedWidth(qRound(292 * ctx->getIntfScaleFactor()));
     const QString playHint = redesignHotkey(p_intf, "key-play-pause");
     auto* play = menu->addAction(QString(), [p_intf]() {
         if (THEMPL->isEmpty()) THEDP->simpleOpenDialog();

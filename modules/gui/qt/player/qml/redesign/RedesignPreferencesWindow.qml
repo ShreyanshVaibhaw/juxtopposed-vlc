@@ -278,9 +278,14 @@ RedesignSettingsDialog {
                                 }
                             }
                             TapHandler { acceptedButtons: Qt.RightButton; onTapped: accentMenu.popup() }
-                            C.Menu {
+                            RedesignActionMenu {
                                 id: accentMenu
-                                C.MenuItem { text: qsTr("Custom accent color"); onTriggered: { const color = preferenceStore.chooseColor(root.accentColor.toString()); if (color.length) preferenceStore.stage("qt-accent-color", color) } }
+                                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                                entries: [{label: qsTr("Custom accent color"), action: "custom"}]
+                                onActionRequested: {
+                                    const color = preferenceStore.chooseColor(root.accentColor.toString())
+                                    if (color.length) preferenceStore.stage("qt-accent-color", color)
+                                }
                             }
                         }
                     }
@@ -290,6 +295,7 @@ RedesignSettingsDialog {
                             required property var modelData
                             Layout.fillWidth: true
                             backend: preferenceStore; optionName: modelData[0]; label: modelData[1]
+                            presentation: modelData[2] || {}
                             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                         }
                     }

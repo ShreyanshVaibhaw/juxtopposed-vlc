@@ -115,6 +115,7 @@ class MainCtx : public QObject
     Q_PROPERTY(QVariantMap redesignPlayerPreferences READ redesignPlayerPreferences NOTIFY redesignPlayerPreferencesChanged FINAL)
     Q_PROPERTY(QColor redesignAccent READ redesignAccent NOTIFY redesignAccentChanged FINAL)
     Q_PROPERTY(bool backdropBlurEnabled READ backdropBlurRequested NOTIFY backdropBlurEnabledChanged FINAL)
+    Q_PROPERTY(bool compactMenus READ compactMenus NOTIFY compactMenusChanged FINAL)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT FINAL)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT FINAL)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged FINAL)
@@ -244,6 +245,7 @@ public:
     inline bool lyricsMode() const { return m_lyricsMode; }
     QVariantMap redesignPlayerPreferences() const;
     QColor redesignAccent() const { return m_redesignAccent; }
+    bool compactMenus() const { return m_compactMenus; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
@@ -459,6 +461,7 @@ protected:
     Grouping             m_grouping = GROUPING_NONE;
     QColor m_redesignAccent = QColor(QStringLiteral("#d37918"));
     bool m_backdropBlurEnabled = true;
+    bool m_compactMenus = false;
     ColorSchemeModel*    m_colorScheme = nullptr;
     bool                 m_windowTitlebar = true;
     // NOTE: Ideally this should be a QVLCBool.
@@ -585,6 +588,7 @@ signals:
     void colorSchemeChanged( QString );
     void redesignAccentChanged();
     void backdropBlurEnabledChanged();
+    void compactMenusChanged();
     void redesignPlayerPreferencesChanged();
     void useClientSideDecorationChanged();
     void hasToolbarMenuChanged();

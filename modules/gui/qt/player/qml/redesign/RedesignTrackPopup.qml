@@ -34,7 +34,8 @@ C.Popup {
     signal addTracksRequested(string page)
     signal editTracksRequested(string page)
     width: Math.max(0, Math.min(placementArea.width - theme.dp(40), theme.dp(400)))
-    height: Math.max(0, Math.min(placementArea.height - theme.dp(134), theme.dp(524)))
+    height: Math.max(0, Math.min(placementArea.height - theme.dp(134), theme.dp(524),
+        theme.compactMenus ? trackChoices.implicitHeight + theme.dp(82) : Infinity))
     padding: 0
     margins: theme.dp(20)
     topMargin: theme.dp(60)
@@ -67,8 +68,8 @@ C.Popup {
         spacing: 0
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: theme.dp(50)
-            Layout.maximumHeight: theme.dp(50)
+            Layout.preferredHeight: theme.dp(theme.compactMenus ? 34 : 50)
+            Layout.maximumHeight: theme.dp(theme.compactMenus ? 34 : 50)
             color: theme.field
             radius: theme.dp(10)
             Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: parent.height / 2; color: parent.color }
@@ -83,7 +84,7 @@ C.Popup {
                         objectName: "trackTab_" + modelData.key
                         Layout.fillWidth: true; Layout.fillHeight: true
                         scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                        text: modelData.label; caption: root.width > theme.dp(360) ? text : ""; iconName: modelData.icon
+                        text: modelData.label; caption: theme.compactMenus || root.width > theme.dp(360) ? text : ""; iconName: theme.compactMenus ? "" : modelData.icon
                         iconSize: theme.dp(20)
                         foreground: root.page === modelData.key ? root.theme.foreground : Qt.darker(root.theme.foreground, 1.3)
                         onClicked: root.page = modelData.key
@@ -104,12 +105,14 @@ C.Popup {
             contentWidth: availableWidth
             clip: true
             ColumnLayout {
+                id: trackChoices
                 width: scroll.availableWidth
                 spacing: 0
                 RedesignTracks {
                     objectName: "embeddedTrackChoices"
                     Layout.fillWidth: true
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    menuMode: true
                     heading: qsTr("Embedded Tracks")
                     trackModel: root.currentTracks
                     allowDisable: true
@@ -124,6 +127,7 @@ C.Popup {
                     Layout.topMargin: root.theme.dp(16)
                     visible: root.page === "subtitles" || count > 0
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    menuMode: true
                     heading: qsTr("External Tracks"); trackModel: root.currentTracks
                     trackGroup: 1; showEmptyMessage: false
                     editableTracks: root.page !== "video"; canEditTracks: root.canAddTracks
@@ -142,6 +146,7 @@ C.Popup {
                     Layout.fillWidth: true
                     visible: root.page === "audio"
                     scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    menuMode: true
                     heading: qsTr("Output Device"); trackModel: root.audioDevices
                     refreshable: true
                     onRefreshRequested: if (root.audioDevices) root.audioDevices.refresh()
@@ -154,7 +159,7 @@ C.Popup {
             objectName: "trackPreferencesButton"
             Layout.fillWidth: true
             Layout.preferredHeight: theme.dp(32); Layout.maximumHeight: theme.dp(32)
-            Layout.margins: theme.dp(20)
+            Layout.margins: theme.dp(theme.compactMenus ? 8 : 20)
             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
             caption: qsTr("Show Preferences"); text: caption
             background: Rectangle { color: parent.hovered ? root.theme.hover : root.theme.field; radius: root.theme.dp(4); border.width: parent.visualFocus ? 1 : 0; border.color: root.theme.accent }

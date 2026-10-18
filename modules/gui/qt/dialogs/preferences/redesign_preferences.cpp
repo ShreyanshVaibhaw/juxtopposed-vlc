@@ -979,6 +979,8 @@ QVariant RedesignPreferences::value(const QString& name) const
     if (it != m_edits.cend()) return *it;
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
+    if (m_ctx && name == QLatin1String("qt-compact-menus"))
+        return m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
         return m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->discoveryEnabled();
     if (m_ctx && name == QLatin1String("recursive")) {
@@ -1741,6 +1743,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
+    if (m_ctx && name == QLatin1String("qt-compact-menus"))
+        applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("recursive"))
@@ -1845,12 +1849,13 @@ bool RedesignPreferences::save()
     auto* instance = vlc_object_instance(m_ctx->getIntf());
     if (previous.contains(QStringLiteral("osd")) || previous.contains(QStringLiteral("osd-duration")))
         applyOsdPreferences(m_ctx->getIntf());
-    if (previous.contains(QStringLiteral("qt-backdrop-blur"))) {
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus"}) {
+        if (!previous.contains(QLatin1String(option))) continue;
         // An explicit UI choice replaces a startup override for this interface.
         auto* intf = m_ctx->getIntf();
-        if (var_Type(intf, "qt-backdrop-blur") == 0)
-            var_Create(intf, "qt-backdrop-blur", VLC_VAR_BOOL);
-        var_SetBool(intf, "qt-backdrop-blur", bool(config_GetInt("qt-backdrop-blur")));
+        if (var_Type(intf, option) == 0)
+            var_Create(intf, option, VLC_VAR_BOOL);
+        var_SetBool(intf, option, bool(config_GetInt(option)));
     }
     if (previous.contains(QStringLiteral("qt-discover-cast-devices")))
         m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
@@ -2136,9 +2141,11 @@ bool RedesignPreferences::resetAll()
     }
 #endif
     intf->preferencesResetPending = true;
-    if (var_Type(intf, "qt-backdrop-blur") == 0)
-        var_Create(intf, "qt-backdrop-blur", VLC_VAR_BOOL);
-    var_SetBool(intf, "qt-backdrop-blur", bool(config_GetInt("qt-backdrop-blur")));
+    for (const auto* option : {"qt-backdrop-blur", "qt-compact-menus"}) {
+        if (var_Type(intf, option) == 0)
+            var_Create(intf, option, VLC_VAR_BOOL);
+        var_SetBool(intf, option, bool(config_GetInt(option)));
+    }
     intf->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
         bool(config_GetInt("qt-discover-cast-devices")));
     vlc_playlist_Lock(intf->p_playlist);

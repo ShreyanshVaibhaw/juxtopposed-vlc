@@ -396,7 +396,9 @@ ColumnLayout {
                             delegate: C.ItemDelegate {
                                 required property var modelData
                                 required property int index
-                                width: ListView.view.width; height: root.theme.dp(34)
+                                width: ListView.view.width; height: root.theme.dp(root.theme.compactMenus ? 28 : 34)
+                                leftPadding: root.theme.compactMenus ? root.theme.dp(8) : padding; rightPadding: leftPadding
+                                topPadding: root.theme.compactMenus ? 0 : padding; bottomPadding: topPadding
                                 text: modelData.label; highlighted: languageList.currentIndex===index
                                 font.pixelSize: root.theme.dp(14)
                                 onClicked: languageMenu.choose(index)

@@ -491,6 +491,9 @@ vlc_module_begin ()
 
     add_bool( "qt-backdrop-blur", true, BACKDROP_BLUR_FILTER_TEXT, BACKDROP_BLUR_FILTER_LONGTEXT )
 
+    add_bool( "qt-compact-menus", false, N_("Compact menus"),
+              N_("Show menus without icons. Decrease the space around menu items.") )
+
     add_bool( "qt-pip-mode", true, PIP_MODE_TEXT, PIP_MODE_LONGTEXT )
 
     add_float_with_range( "qt-safe-area", 0, 0, 100.0, SAFE_AREA_TEXT, SAFE_AREA_LONGTEXT )

@@ -82,7 +82,9 @@ C.ComboBox {
         objectName: "comboChoice_" + index
         enabled: root.choiceEnabled(index)
         width: ListView.view.width
-        implicitHeight: root.theme.dp(root.choiceHeight)
+        implicitHeight: root.theme.dp(root.theme.compactMenus ? Math.min(28, root.choiceHeight) : root.choiceHeight)
+        leftPadding: root.theme.compactMenus ? root.theme.dp(8) : padding; rightPadding: leftPadding
+        topPadding: root.theme.compactMenus ? 0 : padding; bottomPadding: topPadding
         text: root.labelAt(index)
         highlighted: root.highlightedIndex === index
         contentItem: RowLayout {
@@ -92,7 +94,7 @@ C.ComboBox {
                 readonly property color fillColor: root.theme.accent
                 readonly property color lineColor: root.theme.foreground
                 Layout.preferredWidth: root.theme.dp(24); Layout.preferredHeight: root.theme.dp(18)
-                visible: root.showCurvePreviews && curve.length > 0
+                visible: !root.theme.compactMenus && root.showCurvePreviews && curve.length > 0
                 sourceSize: Qt.size(width * Screen.devicePixelRatio, height * Screen.devicePixelRatio)
                 svg: {
                     if (curve.length < 2 || width <= 0 || height <= 0) return ""
@@ -126,7 +128,7 @@ C.ComboBox {
         y: root.height + root.theme.dp(root.popupGap)
         width: root.width
         implicitHeight: Math.min(contentItem.implicitHeight + topPadding + bottomPadding, root.theme.dp(300))
-        padding: root.theme.dp(4)
+        padding: root.theme.menuPadding
         contentItem: ListView {
             clip: true
             implicitHeight: contentHeight

@@ -8,6 +8,11 @@ QtObject {
     // Standalone previews use the design default; the app supplies a live preference.
     readonly property bool transparencyEnabled: typeof redesignAppearance === "undefined" || !redesignAppearance
         ? true : redesignAppearance.backdropBlurEnabled
+    readonly property bool compactMenus: typeof redesignAppearance !== "undefined" && !!redesignAppearance
+        && redesignAppearance.compactMenus === true
+    readonly property real menuItemHeight: dp(compactMenus ? 28 : 48)
+    readonly property real menuItemPadding: dp(compactMenus ? 8 : 14)
+    readonly property real menuPadding: dp(compactMenus ? 2 : 4)
     readonly property real floatingOpacity: transparencyEnabled ? 0.90 : 1
     readonly property color background: lightTheme ? "#acacac" : "#1b1b1b"
     readonly property color panel: lightTheme ? "#c3c3c3" : "#0f0f0f"

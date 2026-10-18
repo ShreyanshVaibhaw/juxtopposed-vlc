@@ -20,8 +20,8 @@ C.Menu {
     readonly property bool opensBelow: implicitHeight <= spaceBelow || spaceBelow >= spaceAbove
     signal actionRequested(string action)
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
-    width: theme.dp(265)
-    padding: theme.dp(4)
+    width: theme.dp(theme.compactMenus ? 220 : 265)
+    padding: theme.menuPadding
     margins: theme.dp(10)
     height: Math.max(0, Math.min(implicitHeight, buttonAnchor ? opensBelow ? spaceBelow : spaceAbove : windowHeight - 2 * margins))
     closePolicy: C.Popup.CloseOnEscape | (buttonAnchor ? C.Popup.CloseOnPressOutsideParent : C.Popup.CloseOnPressOutside)
@@ -59,9 +59,9 @@ C.Menu {
             id: row
             required property var modelData
             objectName: "libraryAction_" + modelData.action
-            implicitHeight: root.theme.dp(48)
-            leftPadding: root.theme.dp(14)
-            rightPadding: root.theme.dp(14)
+            implicitHeight: root.theme.menuItemHeight
+            leftPadding: root.theme.menuItemPadding
+            rightPadding: root.theme.menuItemPadding
             text: modelData.label
             enabled: modelData.enabled !== false
             checkable: root.checkedAction.length > 0 || modelData.checked !== undefined
@@ -74,7 +74,7 @@ C.Menu {
                 opacity: row.enabled ? 1 : 0.35
                 RedesignIcon {
                     id: actionIcon
-                    visible: !!row.modelData.icon
+                    visible: !root.theme.compactMenus && !!row.modelData.icon
                     Layout.preferredWidth: root.theme.dp(24)
                     Layout.preferredHeight: root.theme.dp(24)
                     sourceSize: Qt.size(root.theme.dp(24) * Screen.devicePixelRatio, root.theme.dp(24) * Screen.devicePixelRatio)

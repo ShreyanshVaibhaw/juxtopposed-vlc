@@ -15,7 +15,8 @@ QtObject {
     readonly property var sections: ({
         general: [
             { title: qsTr("Appearance"), appearance: true, rows: [
-                ["qt-backdrop-blur", qsTr("Transparency and blur")] ] },
+                ["qt-backdrop-blur", qsTr("Transparency and blur")],
+                ["qt-compact-menus", qsTr("Compact menus"), {help: qsTr("Show menus without icons. Decrease the space around menu items.")}] ] },
             { title: qsTr("Startup"), rows: [
                 ["qt-error-dialogs", qsTr("Show confirmation and error dialogs")],
                 ["qt-updates-notif", qsTr("Check for updates automatically")] ] },

@@ -1106,6 +1106,10 @@ TestCase {
         verify(appearance.rows.some(row => row[0] === "qt-backdrop-blur" && row[1] === "Transparency and blur"))
         compare(catalog.find("transparency")[0].name, "qt-backdrop-blur")
         compare(catalog.find("blur")[0].name, "qt-backdrop-blur")
+        verify(appearance.rows.some(row => row[0] === "qt-compact-menus" && row[1] === "Compact menus"))
+        compare(catalog.find("compact menus")[0].name, "qt-compact-menus")
+        compare(appearance.rows.find(row => row[0] === "qt-compact-menus")[2].help,
+                "Show menus without icons. Decrease the space around menu items.")
         const basicGeneral = catalog.sections.general.reduce((names, section) => names.concat(section.rows.map(row => row[0])), [])
         const advancedGeneral = catalog.advancedSections.general.reduce((names, section) => names.concat(section.rows.map(row => row[0])), [])
         verify(!basicGeneral.includes("stats"))

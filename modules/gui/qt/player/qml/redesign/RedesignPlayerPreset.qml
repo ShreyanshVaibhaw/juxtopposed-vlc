@@ -73,7 +73,7 @@ Item {
         objectName: "playerPresetMenu"
         y: -height - root.theme.dp(8)
         width: root.width
-        height: Math.min(list.count * root.theme.dp(40) + padding * 2, root.theme.dp(340), root.mapToItem(C.Overlay.overlay, 0, 0).y - root.theme.dp(12))
+        height: Math.min(list.count * root.theme.dp(root.theme.compactMenus ? 28 : 40) + padding * 2, root.theme.dp(340), root.mapToItem(C.Overlay.overlay, 0, 0).y - root.theme.dp(12))
         padding: root.theme.dp(1)
         focus: true
         background: Rectangle { color: root.lightTheme ? root.theme.background : "#191919"; radius: root.theme.dp(6) }
@@ -107,8 +107,8 @@ Item {
                 required property var modelData
                 required property int index
                 objectName: modelData.action === "create" ? "playerPresetCreate" : modelData.id ? "playerPreset_" + index : "playerPresetDefault"
-                width: list.width; height: root.theme.dp(40)
-                leftPadding: root.theme.dp(16); rightPadding: root.theme.dp(18)
+                width: list.width; height: root.theme.dp(root.theme.compactMenus ? 28 : 40)
+                leftPadding: root.theme.dp(root.theme.compactMenus ? 8 : 16); rightPadding: root.theme.dp(root.theme.compactMenus ? 8 : 18)
                 text: modelData.name
                 hoverEnabled: true
                 highlighted: list.currentIndex === index
@@ -123,13 +123,14 @@ Item {
                 contentItem: RowLayout {
                     spacing: root.theme.dp(10)
                     Item {
-                        Layout.preferredWidth: root.theme.dp(24); Layout.fillHeight: true
-                        visible: row.modelData.action === "create" || !!row.modelData.id
+                        Layout.preferredWidth: root.theme.dp(root.theme.compactMenus ? 48 : 24); Layout.fillHeight: true
+                        visible: (!root.theme.compactMenus && row.modelData.action === "create") || !!row.modelData.id
                         RedesignButton {
-                            anchors.centerIn: parent; width: root.theme.dp(30); height: width
+                            anchors.centerIn: parent; width: root.theme.dp(root.theme.compactMenus ? 48 : 30); height: root.theme.dp(root.theme.compactMenus ? 24 : 30)
                             visible: !!row.modelData.id
                             scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
-                            iconName: "more"; iconSize: root.theme.dp(20)
+                            iconName: root.theme.compactMenus ? "" : "more"; iconSize: root.theme.dp(20)
+                            caption: root.theme.compactMenus ? qsTr("Actions") : ""
                             text: qsTr("Preset actions for %1").arg(row.modelData.name)
                             onClicked: list.openActions(row.modelData, row)
                         }
@@ -148,18 +149,19 @@ Item {
         parent: dropdown.contentItem
         focus: true
         onOpened: { currentIndex = 0; itemAt(0).forceActiveFocus() }
-        width: root.theme.dp(260); padding: root.theme.dp(4)
+        width: root.theme.dp(root.theme.compactMenus ? 220 : 260); padding: root.theme.menuPadding
         background: Rectangle { color: root.theme.background; radius: root.theme.dp(6); border.color: root.theme.border }
         delegate: C.MenuItem {
             id: actionItem
-            implicitHeight: root.theme.dp(48)
+            implicitHeight: root.theme.menuItemHeight
+            topPadding: 0; bottomPadding: 0
             Keys.onPressed: event => {
                 if (event.key !== Qt.Key_Home && event.key !== Qt.Key_End) return
                 actions.currentIndex = event.key === Qt.Key_Home ? 0 : actions.count - 1
                 actions.itemAt(actions.currentIndex).forceActiveFocus()
                 event.accepted = true
             }
-            contentItem: Text { text: actionItem.text; color: root.theme.foreground; font.pixelSize: root.theme.dp(14); verticalAlignment: Text.AlignVCenter; leftPadding: root.theme.dp(44) }
+            contentItem: Text { text: actionItem.text; color: root.theme.foreground; font.pixelSize: root.theme.dp(14); verticalAlignment: Text.AlignVCenter; leftPadding: root.theme.dp(root.theme.compactMenus ? 8 : 44) }
             background: Rectangle { color: actionItem.highlighted ? root.theme.hover : "transparent"; radius: root.theme.dp(4) }
         }
         C.Action { text: qsTr("Rename"); onTriggered: root.namePreset("rename", root.contextId, root.contextName) }
