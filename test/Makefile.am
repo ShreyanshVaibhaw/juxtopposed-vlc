@@ -208,6 +208,11 @@ test_src_config_dirs_win32_LDADD = $(LIBVLCCORE) -lshell32 -lole32 -ladvapi32 -l
 check_PROGRAMS += test_src_misc_win32_pipe
 test_src_misc_win32_pipe_SOURCES = src/misc/win32_pipe.c
 test_src_misc_win32_pipe_LDADD = $(LIBVLCCORE)
+if !HAVE_WINSTORE
+check_PROGRAMS += test_src_misc_win32_proxy
+test_src_misc_win32_proxy_SOURCES = src/misc/win32_proxy.c
+test_src_misc_win32_proxy_LDADD = $(LIBVLCCORE) ../compat/libcompat.la -lwinhttp -lws2_32
+endif
 endif
 
 test_libvlc_core_SOURCES = libvlc/core.c

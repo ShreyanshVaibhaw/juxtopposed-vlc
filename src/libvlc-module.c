@@ -1000,10 +1000,22 @@ static const char* const ppsz_restore_playback_desc[] = {
    "This private key file (PEM format) is used for server-side TLS.")
 
 #define PROXY_TEXT N_("HTTP proxy")
+#ifdef _WIN32
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define PROXY_LONGTEXT N_( \
+    "Leave this field empty to use the Windows proxy settings. " \
+    "To use another proxy, enter its address, for example " \
+    "http://user@proxy.example.com:8080/." )
+#else
+#define PROXY_LONGTEXT N_( \
+    "Enter the proxy address, for example http://user@proxy.example.com:8080/." )
+#endif
+#else
 #define PROXY_LONGTEXT N_( \
     "HTTP proxy to be used It must be of the form " \
     "http://[user@]myproxy.mydomain:myport/ ; " \
     "if empty, the http_proxy environment variable will be tried." )
+#endif
 
 #define PROXY_PASS_TEXT N_("HTTP proxy password")
 #define PROXY_PASS_LONGTEXT N_( \

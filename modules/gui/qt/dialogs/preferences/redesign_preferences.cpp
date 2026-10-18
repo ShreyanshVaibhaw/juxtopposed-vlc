@@ -1289,6 +1289,12 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         result.insert(QStringLiteral("placeholder"), qtr("Automatic"));
         result.insert(QStringLiteral("help"), qtr("Leave the field empty to use your Videos folder for video recordings and your Music folder for audio recordings. Direct stream recordings use your Downloads folder."));
     }
+#ifdef _WIN32
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+    if (name == QLatin1String("http-proxy"))
+        result.insert(QStringLiteral("placeholder"), qtr("System proxy"));
+#endif
+#endif
     if (name == QLatin1String("aout"))
         result.insert(QStringLiteral("help"), qtr("Select an audio output driver. Restart VLC to use a new driver."));
     if (name == QLatin1String("pitch-shift"))

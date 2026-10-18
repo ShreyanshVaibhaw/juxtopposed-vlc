@@ -6,6 +6,15 @@ vlc_tests += {
 }
 
 if host_system == 'windows'
+    if not have_win_store
+        vlc_tests += {
+            'name': 'test_src_misc_win32_proxy',
+            'sources': files('misc/win32_proxy.c'),
+            'suite': ['src', 'test_src'],
+            'link_with': [libvlccore],
+            'dependencies': [cc.find_library('winhttp'), cc.find_library('ws2_32')],
+        }
+    endif
     vlc_tests += {
         'name': 'test_src_config_dirs_win32',
         'sources': files('config/dirs_win32.c'),
