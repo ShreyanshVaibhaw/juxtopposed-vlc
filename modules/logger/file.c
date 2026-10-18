@@ -42,7 +42,7 @@ typedef struct
 {
     FILE *stream;
     const char *footer;
-    int verbosity;
+    unsigned mask;
 } vlc_logger_sys_t;
 
 #define TEXT_FILENAME "vlc-log.txt"
@@ -56,7 +56,7 @@ static void LogText(void *opaque, int type, const vlc_log_t *meta,
     vlc_logger_sys_t *sys = opaque;
     FILE *stream = sys->stream;
 
-    if (sys->verbosity < type)
+    if (!(sys->mask & (1u << type)))
         return;
 
     flockfile(stream);
@@ -109,7 +109,7 @@ static void LogHtml(void *opaque, int type, const vlc_log_t *meta,
     vlc_logger_sys_t *sys = opaque;
     FILE *stream = sys->stream;
 
-    if (sys->verbosity < type)
+    if (!(sys->mask & (1u << type)))
         return;
 
     flockfile(stream);
@@ -133,13 +133,34 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj,
     if (!var_InheritBool(obj, "file-logging"))
         return NULL;
 
-    int verbosity = var_InheritInteger(obj, "log-verbose");
-    if (verbosity == -1)
-        verbosity = var_InheritInteger(obj, "verbose");
-    if (verbosity < 0)
-        return NULL; /* nothing to log */
-
-    verbosity += VLC_MSG_ERR;
+    unsigned mask;
+    char *level = var_InheritString(obj, "log-level");
+    if (level != NULL && !strcmp(level, "errors"))
+        mask = 1u << VLC_MSG_ERR;
+    else if (level != NULL && !strcmp(level, "warnings"))
+        mask = (1u << VLC_MSG_ERR) | (1u << VLC_MSG_WARN);
+    else if (level != NULL && !strcmp(level, "info"))
+        mask = (1u << VLC_MSG_INFO) | (1u << VLC_MSG_ERR) | (1u << VLC_MSG_WARN);
+    else if (level != NULL && !strcmp(level, "debug"))
+        mask = (1u << VLC_MSG_INFO) | (1u << VLC_MSG_ERR) | (1u << VLC_MSG_WARN) | (1u << VLC_MSG_DBG);
+    else if (level != NULL && !strcmp(level, "silent"))
+        mask = 0;
+    else
+    {
+        if (level != NULL && *level)
+            msg_Warn(obj, "Invalid file log level \"%s\". Use the VLC log level.", level);
+        // Keep the existing --log-verbose / --verbose policy for native callers.
+        int64_t verbosity = var_InheritInteger(obj, "log-verbose");
+        if (verbosity == -1)
+            verbosity = var_InheritInteger(obj, "verbose");
+        mask = verbosity < 0 ? 0 : verbosity == 0
+            ? (1u << VLC_MSG_INFO) | (1u << VLC_MSG_ERR) : verbosity == 1
+            ? (1u << VLC_MSG_INFO) | (1u << VLC_MSG_ERR) | (1u << VLC_MSG_WARN)
+            : (1u << VLC_MSG_INFO) | (1u << VLC_MSG_ERR) | (1u << VLC_MSG_WARN) | (1u << VLC_MSG_DBG);
+    }
+    free(level);
+    if (mask == 0)
+        return NULL;
 
     vlc_logger_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -150,7 +171,7 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj,
 
     const struct vlc_logger_operations *ops = &text_ops;
     sys->footer = TEXT_FOOTER;
-    sys->verbosity = verbosity;
+    sys->mask = mask;
 
     char *mode = var_InheritString(obj, "logmode");
     if (mode != NULL)
@@ -203,6 +224,12 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj,
     return ops;
 }
 
+static const char *const level_list[] = { "", "errors", "warnings", "info", "debug", "silent" };
+static const char *const level_text[] = {
+    N_("Use VLC log level"), N_("Errors only"), N_("Errors and warnings"),
+    N_("Information, warnings and errors"), N_("Debug"), N_("Silent")
+};
+
 static const char *const mode_list[] = { "text", "html" };
 static const char *const mode_list_text[] = { N_("Text"), N_("HTML") };
 
@@ -240,6 +267,9 @@ vlc_module_begin()
     add_savefile("logfile", NULL, LOGFILE_NAME_TEXT, LOGFILE_NAME_LONGTEXT)
     add_string("logmode", "text", LOGMODE_TEXT, LOGMODE_LONGTEXT)
         change_string_list(mode_list, mode_list_text)
+    add_string("log-level", "", N_("File log level"),
+               N_("Choose the messages to save in the log file. The VLC log level uses --log-verbose or --verbose."))
+        change_string_list(level_list, level_text)
     add_integer("log-verbose", -1, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT)
         change_integer_list(verbosity_values, verbosity_text)
 vlc_module_end ()

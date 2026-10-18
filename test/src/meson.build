@@ -1,4 +1,12 @@
 vlc_tests += {
+    'name': 'test_src_misc_file_logger',
+    'sources': files('misc/file_logger.c'),
+    'suite': ['src', 'test_src'],
+    'link_with': [libvlc, libvlccore],
+    'module_depends': ['file_logger'],
+}
+
+vlc_tests += {
     'name': 'test_src_misc_log_observer',
     'sources': files('misc/log_observer.c'),
     'suite': ['src', 'test_src'],
