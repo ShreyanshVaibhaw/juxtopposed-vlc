@@ -51,6 +51,58 @@ const QString presetOption = QStringLiteral("qt-player-presets");
 // Minimum pointer movement in pixels, from low to high sensitivity.
 constexpr int fullscreenSensitivityLevels[] = {32, 16, 8, 3, 2, 1, 0};
 
+QString visualizationValue(qt_intf_t* intf, const char* name)
+{
+    auto* output = vlc_player_aout_Hold(intf->p_player);
+    char* text = var_InheritString(output ? VLC_OBJECT(output) : VLC_OBJECT(intf), name);
+    const QString result = qfu(text ? text : "");
+    free(text);
+    if (output) aout_Release(output);
+    return result;
+}
+
+void applyVisualizationPreferences(qt_intf_t* intf, bool moduleChanged, bool effectsChanged)
+{
+    auto* instance = vlc_object_instance(intf);
+    for (const auto* name : {"audio-visual", "effect-list"}) {
+        if (!(moduleChanged && !strcmp(name, "audio-visual"))
+            && !(effectsChanged && !strcmp(name, "effect-list"))) continue;
+        if (!config_FindConfig(name)) continue;
+        char* text = config_GetPsz(name);
+        if (var_Type(instance, name) == 0) var_Create(instance, name, VLC_VAR_STRING);
+        var_SetString(instance, name, text ? text : "");
+        free(text);
+    }
+    auto* output = vlc_player_aout_Hold(intf->p_player);
+    if (!output) return;
+    if (effectsChanged && config_FindConfig("effect-list")) {
+        char* effects = config_GetPsz("effect-list");
+        if (var_Type(output, "effect-list") == 0) var_Create(output, "effect-list", VLC_VAR_STRING);
+        var_SetString(output, "effect-list", effects ? effects : "");
+        free(effects);
+    }
+    char* module = moduleChanged ? config_GetPsz("audio-visual") : var_GetString(output, "audio-visual");
+    const QString selected = qfu(module ? module : "none");
+    free(module);
+    if (moduleChanged || selected == QLatin1String("visual")) {
+        QString choice = selected == QLatin1String("none") ? QString() : selected;
+        if (selected == QLatin1String("visual")) {
+            char* effects = var_InheritString(output, "effect-list");
+            const QString effect = qfu(effects ? effects : "");
+            free(effects);
+            // Single effects share the native menu values. A custom effect
+            // list still uses the visual module and keeps the complete list.
+            for (const auto* name : {"dummy", "scope", "spectrometer", "spectrum", "vuMeter"})
+                if (effect.compare(QLatin1String(name), Qt::CaseInsensitive) == 0) {
+                    choice = qfu(name);
+                    break;
+                }
+        }
+        var_SetString(output, "visual", choice.toUtf8().constData());
+    }
+    aout_Release(output);
+}
+
 QVariantList moduleChoices(const QStringList& capabilities)
 {
     QMap<QString, QStringList> labels;
@@ -1192,6 +1244,8 @@ QVariant RedesignPreferences::value(const QString& name) const
 
     const auto it = m_edits.constFind(name);
     if (it != m_edits.cend()) return *it;
+    if (m_ctx && (name == QLatin1String("audio-visual") || name == QLatin1String("effect-list")))
+        return visualizationValue(m_ctx->getIntf(), name.toUtf8().constData());
     if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("qt-video-autoresize")))
         return var_InheritBool(m_ctx->getIntf(), name.toUtf8().constData());
     if (m_ctx && name == QLatin1String("qt-system-tray"))
@@ -2215,6 +2269,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         applyToPlayer = !qFuzzyCompare(normalized.toFloat(), value(name).toFloat());
     if (m_ctx && name == QLatin1String("qt-fs-sensitivity"))
         applyToPlayer = normalized.toLongLong() != value(name).toLongLong();
+    if (m_ctx && (name == QLatin1String("audio-visual") || name == QLatin1String("effect-list")))
+        applyToPlayer = normalized.toString() != value(name).toString();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
@@ -2497,13 +2553,9 @@ bool RedesignPreferences::save()
         for (const auto& filter : after)
             if (!before.contains(filter)) vlc_player_aout_EnableFilter(player, filter.toUtf8().constData(), true);
     }
-    if (previous.contains(QStringLiteral("audio-visual"))) {
-        audio_output_t* output = vlc_player_aout_Hold(player);
-        if (output) {
-            var_SetString(output, "visual", value(QStringLiteral("audio-visual")).toString().toUtf8().constData());
-            aout_Release(output);
-        }
-    }
+    if (previous.contains(QStringLiteral("audio-visual")) || previous.contains(QStringLiteral("effect-list")))
+        applyVisualizationPreferences(m_ctx->getIntf(), previous.contains(QStringLiteral("audio-visual")),
+                                       previous.contains(QStringLiteral("effect-list")));
     const QStringList equalizerOptions{QStringLiteral("equalizer-preset"), QStringLiteral("equalizer-bands"), QStringLiteral("equalizer-preamp"), QStringLiteral("equalizer-2pass")};
     if (std::any_of(equalizerOptions.cbegin(), equalizerOptions.cend(), [&](const auto& name) { return previous.contains(name); })) {
         audio_output_t* output = vlc_player_aout_Hold(player);
@@ -2654,6 +2706,7 @@ bool RedesignPreferences::resetAll()
         var_SetInteger(intf, option, config_GetInt(option));
     }
     m_ctx->refreshSystray();
+    applyVisualizationPreferences(intf, true, true);
     applyWindowOpacity(m_ctx);
     applyFullscreenControlPreferences(intf, true, true);
     updateVlcQtMessageHandler(var_InheritBool(intf, "qt-verbose"));
