@@ -17,6 +17,7 @@
  *****************************************************************************/
 #include <QTest>
 #include <QAbstractItemModelTester>
+#include <thread>
 
 #include "vlc_stub_modules.hpp"
 
@@ -62,6 +63,7 @@ private slots:
         m_env = std::make_unique<VLCTestingEnv>();
         QVERIFY(m_env->init());
         m_player = m_env->intf->p_player;
+        var_Create(m_env->intf, "qt-discover-cast-devices", VLC_VAR_BOOL);
     }
 
     void cleanupTestCase() {
@@ -71,6 +73,7 @@ private slots:
 
     void init() {
         m_env->renderDiscoveryProbeEnabled = true;
+        var_SetBool(m_env->intf, "qt-discover-cast-devices", true);
 
         m_model = new RendererManager(m_env->intf, m_player);
         //QAbstractItemModelTester checks that QAbstractItemModel events are coherents
@@ -99,6 +102,66 @@ private slots:
         QVERIFY(rd() == nullptr);
         QCOMPARE(m_model->rowCount(), 0);
         QCOMPARE(m_model->getStatus(), RendererManager::IDLE);
+    }
+
+    void testDiscoverySwitchStopsAndBlocksScans() {
+        QVERIFY(m_model->discoveryEnabled());
+        m_model->StartScan();
+        QVERIFY(rd());
+        pushDummyRDItem(1);
+        QCOMPARE(m_model->rowCount(), 1);
+        m_model->setDiscoveryEnabled(false);
+        QVERIFY(!rd());
+        QCOMPARE(m_model->getStatus(), RendererManager::IDLE);
+        QCOMPARE(m_model->getScanRemain(), 0);
+        QCOMPARE(m_model->rowCount(), 0);
+        m_model->StartScan();
+        QVERIFY(!rd());
+        m_model->setDiscoveryEnabled(true);
+        QVERIFY(!rd()); // Enabling discovery waits for a device-list request.
+        m_model->StartScan();
+        QVERIFY(rd());
+    }
+
+    void testDiscoveryDisabledAtStartup() {
+        var_SetBool(m_env->intf, "qt-discover-cast-devices", false);
+        RendererManager other(m_env->intf, m_player);
+        QVERIFY(!other.discoveryEnabled());
+        other.StartScan();
+        QVERIFY(!rd());
+        QCOMPARE(other.getStatus(), RendererManager::IDLE);
+    }
+
+    void testDiscoveryOffKeepsCurrentCast() {
+        m_model->StartScan();
+        auto selected = pushDummyRDItem(1);
+        pushDummyRDItem(2);
+        QVERIFY(m_model->setData(m_model->index(0), true, RendererManager::SELECTED));
+        m_model->setDiscoveryEnabled(false);
+        QVERIFY(!rd());
+        QCOMPARE(m_model->rowCount(), 1);
+        QVERIFY(m_model->useRenderer());
+        {
+            vlc_player_Lock(m_player);
+            QCOMPARE(vlc_player_GetRenderer(m_player), selected.get());
+            vlc_player_Unlock(m_player);
+        }
+        m_model->disableRenderer();
+        QVERIFY(!m_model->useRenderer());
+        QCOMPARE(m_model->rowCount(), 0);
+    }
+
+    void testDiscoveryOffIgnoresPendingDevices() {
+        m_model->StartScan();
+        RendererItemPtr item(vlc_renderer_item_new("type", "Late device", "dummy://1.1.1.1:1",
+            nullptr, nullptr, nullptr, 0));
+        QVERIFY(item.get());
+        std::thread worker([&]() { vlc_rd_add_item(rd(), item.get()); });
+        worker.join();
+        m_model->setDiscoveryEnabled(false);
+        QCoreApplication::processEvents();
+        QCOMPARE(m_model->rowCount(), 0);
+        QVERIFY(!rd());
     }
 
     void testStatic() {

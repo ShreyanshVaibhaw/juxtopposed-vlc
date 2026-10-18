@@ -61,6 +61,7 @@ public:
     RendererManagerPrivate(RendererManager* pub, qt_intf_t* const intf, vlc_player_t* const player)
         : p_intf(intf)
         , m_player(player)
+        , m_discoveryEnabled(var_InheritBool(intf, "qt-discover-cast-devices"))
         , q_ptr(pub)
     {
         assert(m_player);
@@ -109,6 +110,8 @@ public:
 
     void onRendererAdded(const RendererItemPtr& renderItem) {
         Q_Q(RendererManager);
+        if (!m_discoveryEnabled)
+            return;
         QString key = getItemKey(renderItem);
         if( !m_items.contains( key ) )
         {
@@ -157,8 +160,17 @@ public:
             m_selectedItem.reset();
             if (oldIndexRow >= 0)
             {
-                auto oldIndex = q->index(oldIndexRow);
-                emit q->dataChanged(oldIndex, oldIndex, { Qt::CheckStateRole, RendererManager::SELECTED });
+                if (!m_discoveryEnabled)
+                {
+                    emit q->beginRemoveRows({}, oldIndexRow, oldIndexRow);
+                    m_items.remove(m_itemsIndex.takeAt(oldIndexRow));
+                    emit q->endRemoveRows();
+                }
+                else
+                {
+                    auto oldIndex = q->index(oldIndexRow);
+                    emit q->dataChanged(oldIndex, oldIndex, { Qt::CheckStateRole, RendererManager::SELECTED });
+                }
             }
         }
 
@@ -200,6 +212,7 @@ public:
 
     qt_intf_t* const p_intf;
     vlc_player_t* const m_player;
+    bool m_discoveryEnabled;
 
     vlc_player_listener_id* m_playerListener = nullptr;
 
@@ -391,10 +404,27 @@ bool RendererManager::useRenderer() const
     return d->m_selectedItem.get() != nullptr;
 }
 
+bool RendererManager::discoveryEnabled() const
+{
+    Q_D(const RendererManager);
+    return d->m_discoveryEnabled;
+}
+
+void RendererManager::setDiscoveryEnabled(bool enabled)
+{
+    Q_D(RendererManager);
+    if (d->m_discoveryEnabled == enabled)
+        return;
+    d->m_discoveryEnabled = enabled;
+    if (!enabled)
+        StopScan();
+    emit discoveryEnabledChanged();
+}
+
 void RendererManager::StartScan()
 {
     Q_D(RendererManager);
-    if( d->m_stop_scan_timer.isActive() )
+    if( !d->m_discoveryEnabled || d->m_stop_scan_timer.isActive() )
         return;
 
     /* SD subnodes */
@@ -437,6 +467,11 @@ void RendererManager::StopScan()
 {
     Q_D(RendererManager);
     d->m_stop_scan_timer.stop();
+    if (d->m_scan_remain != 0)
+    {
+        d->m_scan_remain = 0;
+        emit scanRemainChanged();
+    }
 
     for ( vlc_renderer_discovery_t* p_rd : d->m_rds )
         vlc_rd_release( p_rd );
@@ -447,7 +482,7 @@ void RendererManager::StopScan()
     {
         QString key = d->m_itemsIndex[i];
         ItemEntry& entry = d->m_items[key];
-        if( !entry.currentScan && entry.renderItem != d->m_selectedItem )
+        if( (!d->m_discoveryEnabled || !entry.currentScan) && entry.renderItem != d->m_selectedItem )
         {
             //remove items from previous scans
             emit beginRemoveRows({}, i, i);

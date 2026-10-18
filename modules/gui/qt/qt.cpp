@@ -463,6 +463,9 @@ vlc_module_begin ()
     add_bool( "qt-autoload-extensions", true,
               QT_AUTOLOAD_EXTENSIONS_TEXT, QT_AUTOLOAD_EXTENSIONS_LONGTEXT )
 
+    add_bool( "qt-discover-cast-devices", true, N_("Discover cast devices"),
+              N_("Search for cast devices when you open the device list. Turn this off to stop the search. This does not stop a cast that is in use.") )
+
     add_bool( "qt-bgcone", true, QT_BGCONE_TEXT, QT_BGCONE_LONGTEXT )
     add_bool( "qt-bgcone-expands", false, QT_BGCONE_EXPANDS_TEXT,
               QT_BGCONE_EXPANDS_LONGTEXT )

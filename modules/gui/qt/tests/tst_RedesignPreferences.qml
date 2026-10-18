@@ -67,6 +67,12 @@ TestCase {
         visible: false
     }
     RedesignPreferencesCatalog { id: catalog }
+    function test_castDiscoveryUsesTheCastingSection() {
+        const section = catalog.sections.recording.find(section => section.title === "Casting")
+        compare(section.rows[0][0], "qt-discover-cast-devices")
+        compare(section.rows[0][1], "Discover cast devices")
+        compare(section.rows[1][0], "sout-chromecast-conversion-quality")
+    }
     QtObject {
         id: startupStore
         property int revision: 0

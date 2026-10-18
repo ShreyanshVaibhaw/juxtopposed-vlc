@@ -157,7 +157,7 @@ QtObject {
             { title: qsTr("Smooth Playback"), rows: [ ["drop-late-frames", qsTr("Drop frames when the system can't keep up")], ["high-priority", qsTr("Give VLC real-time priority")] ] } ],
         recording: [
             { title: qsTr("Recording"), rows: [ ["input-record-path", qsTr("Save recordings to")], ["input-record-native", qsTr("Record without re-encoding when possible")] ] },
-            { title: qsTr("Casting"), rows: [ ["sout-chromecast-conversion-quality", qsTr("Cast quality")] ] },
+            { title: qsTr("Casting"), rows: [ ["qt-discover-cast-devices", qsTr("Discover cast devices")], ["sout-chromecast-conversion-quality", qsTr("Cast quality")] ] },
             { title: qsTr("Streaming"), rows: [ ["sout-display", qsTr("Play locally while streaming")], ["sout-audio", qsTr("Include audio")],
                 ["sout-video", qsTr("Include video")], ["sout-spu", qsTr("Include subtitles")], ["sout-x264-preset", qsTr("Encoding preset")], ["sout-x264-tune", qsTr("Tuning")] ] } ],
         extensions: [ { title: "", rows: [ ["qt-autoload-extensions", qsTr("Load add-ons on startup")] ] } ]

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "redesign_preferences.hpp"
 #include "player/stereo_test_player.hpp"
+#include "player/player_controller.hpp"
+#include "util/renderer_manager.hpp"
 #include <vlc_configuration.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -954,6 +956,8 @@ QVariant RedesignPreferences::value(const QString& name) const
     if (it != m_edits.cend()) return *it;
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
+    if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
+        return m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->discoveryEnabled();
     return read(name.toUtf8());
 }
 
@@ -1604,6 +1608,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
+    if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
+        applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && (name == QLatin1String("sub-text-scale") || name == QLatin1String("sub-text-size-mode")
         || name == QLatin1String("sub-text-size-pixels"))) {
         auto *player = m_ctx->getIntf()->p_player;
@@ -1711,6 +1717,9 @@ bool RedesignPreferences::save()
             var_Create(intf, "qt-backdrop-blur", VLC_VAR_BOOL);
         var_SetBool(intf, "qt-backdrop-blur", bool(config_GetInt("qt-backdrop-blur")));
     }
+    if (previous.contains(QStringLiteral("qt-discover-cast-devices")))
+        m_ctx->getIntf()->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
+            bool(config_GetInt("qt-discover-cast-devices")));
     for (const auto& name : {QStringLiteral("mouse-pause-policy"), QStringLiteral("hotkeys-x-wheel-mode"),
                             QStringLiteral("hotkeys-y-wheel-mode"), QStringLiteral("hotkeys-wheel-direction")}) {
         if (!previous.contains(name)) continue;
@@ -1989,6 +1998,8 @@ bool RedesignPreferences::resetAll()
     if (var_Type(intf, "qt-backdrop-blur") == 0)
         var_Create(intf, "qt-backdrop-blur", VLC_VAR_BOOL);
     var_SetBool(intf, "qt-backdrop-blur", bool(config_GetInt("qt-backdrop-blur")));
+    intf->p_mainPlayerController->getRendererManager()->setDiscoveryEnabled(
+        bool(config_GetInt("qt-discover-cast-devices")));
     applyOsdPreferences(intf);
     vlc_subpicture_InvalidateTextStyle();
     vlc_player_Lock(intf->p_player);
