@@ -73,6 +73,7 @@ public:
     Q_INVOKABLE bool save();
     Q_INVOKABLE bool resetAll();
     Q_INVOKABLE QVariantList catalog(const QString& category, const QString& search = QString()) const;
+    Q_INVOKABLE QVariantList pluginCatalog() const;
 signals:
     void ctxChanged();
     void autoSaveChanged();

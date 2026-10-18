@@ -885,6 +885,7 @@ modules/gui/qt/player/qml/controlbarcontrols/TeletextButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml
 modules/gui/qt/player/qml/redesign/RedesignAddons.qml
+modules/gui/qt/player/qml/redesign/RedesignPlugins.qml
 modules/gui/qt/playlist/qml/PlaylistDelegate.qml
 modules/gui/qt/playlist/qml/PlaylistDetachedWindow.qml
 modules/gui/qt/playlist/qml/PlaylistPane.qml

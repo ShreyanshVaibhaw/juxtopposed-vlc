@@ -1852,6 +1852,24 @@ bool RedesignPreferences::resetAll()
     return true;
 }
 
+QVariantList RedesignPreferences::pluginCatalog() const
+{
+    size_t count = 0;
+    module_t **modules = module_list_get(&count);
+    QVariantList plugins;
+    for (size_t i = 0; i < count; ++i) {
+        const auto capability = qfu(module_get_capability(modules[i]));
+        if (capability.isEmpty()) continue;
+        plugins.append(QVariantMap{
+            {QStringLiteral("name"), qfu(module_GetLongName(modules[i]))},
+            {QStringLiteral("type"), capability},
+            {QStringLiteral("priority"), module_get_score(modules[i])},
+            {QStringLiteral("identifier"), qfu(module_get_object(modules[i]))}});
+    }
+    module_list_free(modules);
+    return plugins;
+}
+
 QVariantList RedesignPreferences::catalog(const QString& category, const QString& search) const
 {
     QVariantList result;

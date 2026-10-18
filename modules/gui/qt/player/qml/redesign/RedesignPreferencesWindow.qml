@@ -385,6 +385,15 @@ RedesignSettingsDialog {
                         }
                     }
                 }
+                Loader {
+                    width: parent.width
+                    active: root.category === "extensions" && root.advanced && !root.search.length
+                    visible: active
+                    sourceComponent: RedesignPlugins {
+                        plugins: preferenceStore.pluginCatalog()
+                        scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    }
+                }
                 RedesignButton {
                     visible: root.advanced && !root.search.length
                     width: parent.width
