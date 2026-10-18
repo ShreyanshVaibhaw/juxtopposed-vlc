@@ -182,6 +182,9 @@ public:
 
     bool nativeEventFilter(const QByteArray &, void *message, qintptr *result) override
     {
+        if (Q_UNLIKELY(!qApp) || qApp->property("isDying").toBool())
+            return false;
+
         MSG* msg = static_cast<MSG*>( message );
 
         if ( !m_useClientSideDecoration || (msg->hwnd != WinId(m_window)) )
@@ -857,7 +860,9 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
     if (mainCtx->platformHandlesResizeWithCSD() || mainCtx->platformHandlesShadowsWithCSD())
     {
         assert(mainCtx->platformHandlesResizeWithCSD() && mainCtx->platformHandlesShadowsWithCSD());
-        m_CSDWindowEventHandler = new CSDWin32EventHandler(mainCtx, window, window);
+        // The video window can outlive the interface and its CSD button model.
+        // Remove its native hit-test filter when the interface is unloaded.
+        m_CSDWindowEventHandler = new CSDWin32EventHandler(mainCtx, window, this);
     }
 
     auto mainCtxWin32 = qobject_cast<MainCtxWin32*>(mainCtx);
