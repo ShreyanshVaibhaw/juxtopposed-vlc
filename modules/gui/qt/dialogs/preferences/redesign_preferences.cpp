@@ -477,8 +477,8 @@ bool RedesignPreferences::scanPlugins()
 #else
     const char *filename = "vlc-cache-gen";
 #endif
-    char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, filename);
-    const auto program = qfu(path ? path : "");
+    char *path = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, nullptr);
+    const auto program = path ? QDir(qfu(path)).filePath(qfu(filename)) : QString();
     free(path);
     m_pluginScanRunning = true;
     m_pluginScanFailed = m_pluginScanTimedOut = false;

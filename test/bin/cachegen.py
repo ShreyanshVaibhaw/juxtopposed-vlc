@@ -10,7 +10,7 @@ import tempfile
 import unittest
 
 if os.name == "nt":
-    print("This test needs the VLC_LIB_PATH override. Use an isolated package for Windows checks.")
+    print("This test uses POSIX plugin paths. Use an isolated package for Windows checks.")
     sys.exit(77)
 
 HELPER = str(Path(sys.argv.pop(1)).resolve())
