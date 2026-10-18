@@ -31,6 +31,7 @@
 #include <QJsonObject>
 #include <QUuid>
 #include "util/vlchotkeyconverter.hpp"
+#include "util/postprocessing_preferences.hpp"
 
 namespace {
 const QString presetOption = QStringLiteral("qt-player-presets");
@@ -119,6 +120,7 @@ QString audioFilterHelp(const QString& name)
 const QStringList& videoFilterOptions()
 {
     static const QStringList names{
+        QStringLiteral("postproc-q"),
         QStringLiteral("sharpen-sigma"), QStringLiteral("gradfun-radius"), QStringLiteral("grain-variance"),
         QStringLiteral("extract-component"), QStringLiteral("colorthres-color"),
         QStringLiteral("colorthres-saturationthres"), QStringLiteral("colorthres-similaritythres"),
@@ -874,6 +876,12 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-postprocessing")) {
+        const auto *cfg = config_FindConfig("postproc-q");
+        if (!cfg) return {};
+        return vlc::postprocessing::quality(value(QStringLiteral("video-filter")).toString(),
+            value(QStringLiteral("postproc-q")).toInt(), cfg->max.i);
+    }
     if (name == QLatin1String("redesign-hardware-decoding")) {
         const auto device = value(QStringLiteral("dec-dev")).toString();
         if (!value(QStringLiteral("hw-dec")).toBool() || device == QLatin1String("none"))
@@ -1018,6 +1026,8 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-postprocessing"))
+        return m_edits.contains(QStringLiteral("postproc-q")) || m_edits.contains(QStringLiteral("video-filter"));
     if (name == QLatin1String("redesign-hardware-decoding"))
         return m_edits.contains(QStringLiteral("hw-dec")) || m_edits.contains(QStringLiteral("dec-dev"));
     if (name == QLatin1String("redesign-subtitle-encoding"))
@@ -1052,6 +1062,26 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-postprocessing")) {
+        auto description = describe(QStringLiteral("postproc-q"));
+        if (description.isEmpty()) return {};
+        const int maximum = description.value(QStringLiteral("maximum")).toInt();
+        QVariantList choices;
+        for (int level = 0; level <= maximum; ++level)
+            choices.append(QVariantMap{{QStringLiteral("value"), level}, {QStringLiteral("label"),
+                level == 0 ? qtr("Off") : level == 1 ? qtr("1 (Lowest)")
+                : level == maximum ? qtr("%1 (Highest)").arg(level) : QString::number(level)}});
+        const auto current = value(name);
+        if (current.toInt() == -1)
+            choices.append(QVariantMap{{QStringLiteral("value"), -1}, {QStringLiteral("label"), qtr("Custom")}});
+        description.insert(QStringLiteral("name"), name);
+        description.insert(QStringLiteral("title"), qtr("Video post-processing"));
+        description.insert(QStringLiteral("choices"), choices);
+        description.insert(QStringLiteral("value"), current);
+        description.insert(QStringLiteral("defaultValue"), 0);
+        description.insert(QStringLiteral("help"), qtr("Off turns off this filter. A higher level can use more processor time."));
+        return description;
+    }
     if (name == QLatin1String("redesign-hardware-decoding")) {
         auto description = describe(QStringLiteral("dec-dev"));
         const auto enabled = describe(QStringLiteral("hw-dec"));
@@ -1501,6 +1531,20 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-postprocessing")) {
+        const auto *cfg = config_FindConfig("postproc-q");
+        bool valid = false;
+        const int level = proposed.toInt(&valid);
+        if (!cfg || !valid || proposed.metaType().id() == QMetaType::Bool
+            || proposed.toDouble() != level) return false;
+        if (level == -1) return value(name).toInt() == -1;
+        if (level < 0 || level > cfg->max.i) return false;
+        const auto chain = vlc::postprocessing::withQuality(videoValue(QStringLiteral("video-filter")).toString(), level);
+        // Inline q values override the inherited level. Update both, then set
+        // the chain so existing and new filters receive the selected quality.
+        return (level == 0 || stage(QStringLiteral("postproc-q"), level))
+            && stage(QStringLiteral("video-filter"), chain);
+    }
     if (name == QLatin1String("redesign-hardware-decoding")) {
         if (proposed.metaType().id() != QMetaType::QString) return false;
         const auto selection = proposed.toString();
@@ -1842,6 +1886,11 @@ void RedesignPreferences::cancelLanguageEdit(const QString& name)
 
 void RedesignPreferences::reset(const QString& name)
 {
+    if (name == QLatin1String("redesign-postprocessing")) {
+        reset(QStringLiteral("postproc-q"));
+        stage(name, 0);
+        return;
+    }
     if (name == QLatin1String("redesign-hardware-decoding")) {
         reset(QStringLiteral("dec-dev"));
         reset(QStringLiteral("hw-dec"));

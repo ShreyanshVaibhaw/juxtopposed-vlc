@@ -369,6 +369,7 @@ libqt_plugin_la_SOURCES = \
 	util/varchoicemodel.cpp  util/varchoicemodel.hpp \
 	util/variables.cpp util/variables.hpp \
 	util/vlchotkeyconverter.cpp util/vlchotkeyconverter.hpp \
+	util/postprocessing_preferences.hpp \
 	util/vlctick.cpp \
 	util/vlctick.hpp \
 	util/shared_input_item.hpp \
@@ -2157,6 +2158,18 @@ test_vlc_dialog_model_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlc_dialog_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlc_dialog_model
 TESTS += test_vlc_dialog_model
+
+# test_qt_postprocessing_preferences
+test_qt_postprocessing_preferences_SOURCES = tests/vlc_stub_modules.cpp tests/test_postprocessing_preferences.cpp util/postprocessing_preferences.hpp
+nodist_test_qt_postprocessing_preferences_SOURCES = tests/test_postprocessing_preferences.moc
+BUILT_SOURCES += tests/test_postprocessing_preferences.moc
+CLEANFILES += tests/test_postprocessing_preferences.moc
+test_qt_postprocessing_preferences_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_qt_postprocessing_preferences_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_qt_postprocessing_preferences_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_qt_postprocessing_preferences_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_qt_postprocessing_preferences
+TESTS += test_qt_postprocessing_preferences
 
 # test_qt_csd_button_model
 check_PROGRAMS += test_qt_csd_button_model

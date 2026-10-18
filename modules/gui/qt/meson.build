@@ -532,6 +532,7 @@ qt_plugin_sources = files(
     'util/vlctick.hpp',
     'util/vlchotkeyconverter.cpp',
     'util/vlchotkeyconverter.hpp',
+    'util/postprocessing_preferences.hpp',
     'util/shared_input_item.hpp',
     'util/fast_gaussian_blur_template.h',
     'util/effects_image_provider.cpp',
@@ -1725,6 +1726,16 @@ if qt6_dep.found()
             ),
             'suite': ['qt'],
             'include_directories' : qt_include_dir,
+            'link_with': [libvlccore, libvlc],
+            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_postprocessing_preferences',
+            'sources': files('tests/vlc_stub_modules.cpp', 'tests/test_postprocessing_preferences.cpp'),
+            'moc_sources': files('tests/test_postprocessing_preferences.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
             'link_with': [libvlccore, libvlc],
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
         }

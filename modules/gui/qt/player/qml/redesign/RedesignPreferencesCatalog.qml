@@ -153,7 +153,7 @@ QtObject {
             { title: qsTr("Proxy"), rows: [ ["http-proxy", qsTr("HTTP proxy")], ["http-proxy-pwd", qsTr("HTTP proxy password")] ] },
             { title: qsTr("Security"), rows: [ ["gnutls-system-trust", qsTr("Verify certificates against the system trust store")], ["gnutls-priorities", qsTr("Cipher preference"), {choiceLabels: {NORMAL: qsTr("Balanced")}}] ] } ],
         performance: [
-            { title: qsTr("Decoding"), rows: [ ["redesign-hardware-decoding", qsTr("Hardware-accelerated decoding"), {dynamicChoices: true}], ["postproc-q", qsTr("Video post-processing")],
+            { title: qsTr("Decoding"), rows: [ ["redesign-hardware-decoding", qsTr("Hardware-accelerated decoding"), {dynamicChoices: true}], ["redesign-postprocessing", qsTr("Video post-processing"), {dynamicChoices: true}],
                 ["avcodec-skiploopfilter", qsTr("Skip the H.264 loop filter"), {choiceLabels: {0: qsTr("Never")}}], ["avcodec-threads", qsTr("Decoding threads")] ] },
             { title: qsTr("Smooth Playback"), rows: [ ["drop-late-frames", qsTr("Drop frames when the system can't keep up")], ["high-priority", qsTr("Give VLC real-time priority")] ] } ],
         recording: [
