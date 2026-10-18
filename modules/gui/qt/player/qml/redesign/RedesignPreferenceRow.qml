@@ -28,6 +28,7 @@ ColumnLayout {
     readonly property real factor: presentation.factor || 1
     readonly property bool fullWidth: !!presentation.fullWidth
     readonly property bool compact: !!presentation.compact
+    readonly property string helpText: presentation.help || description.help || ""
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
     readonly property bool available: description.kind !== undefined
     visible: available
@@ -74,9 +75,9 @@ ColumnLayout {
                 name: "info"; color: theme.foreground; opacity: 0.4
                 width: theme.dp(16); height: width
                 x: labelText.width + theme.dp(8); anchors.verticalCenter: parent.verticalCenter
-                visible: !!root.description.help && !root.compact && !root.presentation.hideHelp
+                visible: root.helpText.length > 0 && !root.compact && !root.presentation.hideHelp
             }
-            RedesignToolTip { theme: root.theme; text: root.description.help || ""; visible: rowHover.hovered && text.length > 0; delay: 500 }
+            RedesignToolTip { theme: root.theme; text: root.helpText; visible: rowHover.hovered && text.length > 0; delay: 500 }
             RedesignButton {
                 objectName: "preferenceResetButton"
                 anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter

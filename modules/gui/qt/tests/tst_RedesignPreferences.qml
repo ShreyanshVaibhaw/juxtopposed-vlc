@@ -332,6 +332,9 @@ TestCase {
         const previous = resizeRow.presentation
         resizeRow.presentation = Object.assign({}, previous, {compact: true})
         verify(!icon.visible)
+        resizeRow.presentation = Object.assign({}, previous, {help: "Help for the displayed control."})
+        verify(icon.visible)
+        compare(findChild(resizeRow, "redesignToolTip").text, "Help for the displayed control.")
         resizeRow.presentation = previous
         store.providedHelp = ""; verify(!icon.visible)
     }
@@ -554,20 +557,24 @@ TestCase {
             presentation: ({editor: "toggle", toggleValues: {on: 1, off: 0}})
         }
     }
-    function test_policyToggleKeepsTheNativePolicyUntilChanged() {
-        store.stage("screensaverPolicy", 2)
+    function test_mappedToggleKeepsTheNativeValueUntilChanged_data() {
+        return [{tag: "fullscreen policy", stored: 2, on: 1}, {tag: "custom shadow opacity", stored: 32, on: 128}]
+    }
+    function test_mappedToggleKeepsTheNativeValueUntilChanged(data) {
+        store.stage("screensaverPolicy", data.stored)
         const row = createTemporaryObject(policyToggleRow, testCase)
         verify(row !== null)
+        row.presentation = {editor: "toggle", toggleValues: {on: data.on, off: 0}}
         const toggle = findChild(row, "preferenceToggleEditor")
         verify(toggle !== null)
         verify(findChild(row, "preferenceChoiceEditor") === null)
-        compare(store.value("screensaverPolicy"), 2)
+        compare(store.value("screensaverPolicy"), data.stored)
         verify(toggle.checked)
         mouseClick(toggle)
         compare(store.value("screensaverPolicy"), 0)
         verify(!toggle.checked)
         mouseClick(toggle)
-        compare(store.value("screensaverPolicy"), 1)
+        compare(store.value("screensaverPolicy"), data.on)
         verify(toggle.checked)
     }
     function test_inlineSliderKeepsItsRangeAndUnitConversion() {

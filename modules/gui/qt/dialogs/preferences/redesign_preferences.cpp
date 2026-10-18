@@ -1162,6 +1162,30 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
             choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom (%1 MiB)").arg(current / (1024. * 1024.), 0, 'g', 4)}, {QStringLiteral("value"), current}});
         result.insert(QStringLiteral("help"), qtr("Set the maximum size of each temporary file used for time-shift playback. Small uses 10 MiB, Medium uses 50 MiB and Large uses 100 MiB."));
     }
+    if (name == QLatin1String("sub-autodetect-fuzzy")) {
+        choices = {
+            QVariantMap{{QStringLiteral("label"), qtr("None")}, {QStringLiteral("value"), 0}},
+            QVariantMap{{QStringLiteral("label"), qtr("Any subtitle file")}, {QStringLiteral("value"), 1}},
+            QVariantMap{{QStringLiteral("label"), qtr("File name contains title")}, {QStringLiteral("value"), 2}},
+            QVariantMap{{QStringLiteral("label"), qtr("Title with extra characters")}, {QStringLiteral("value"), 3}},
+            QVariantMap{{QStringLiteral("label"), qtr("Exact title match")}, {QStringLiteral("value"), 4}}
+        };
+        const auto current = value(name).toLongLong();
+        if (current < 0 || current > 4)
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom (%1)").arg(current)}, {QStringLiteral("value"), current}});
+        result.insert(QStringLiteral("help"), qtr("Choose how closely subtitle file names must match the video title."));
+    }
+    if (name == QLatin1String("freetype-shadow-distance")) {
+        choices = {
+            QVariantMap{{QStringLiteral("label"), qtr("Small")}, {QStringLiteral("value"), .06f}},
+            QVariantMap{{QStringLiteral("label"), qtr("Medium")}, {QStringLiteral("value"), .12f}},
+            QVariantMap{{QStringLiteral("label"), qtr("Large")}, {QStringLiteral("value"), .24f}}
+        };
+        const float current = value(name).toFloat();
+        if (current != .06f && current != .12f && current != .24f)
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom (%1)").arg(current)}, {QStringLiteral("value"), current}});
+        result.insert(QStringLiteral("help"), qtr("Set the distance between the text and its shadow."));
+    }
     if (name == QLatin1String("aspect-ratio") || name == QLatin1String("crop")) {
         const bool crop = name == QLatin1String("crop");
         choices = {QVariantMap{{QStringLiteral("label"), crop ? qtr("None") : qtr("Automatic")}, {QStringLiteral("value"), QString()}}};
