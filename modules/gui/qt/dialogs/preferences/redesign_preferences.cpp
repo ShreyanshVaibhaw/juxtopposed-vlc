@@ -31,6 +31,23 @@
 namespace {
 const QString presetOption = QStringLiteral("qt-player-presets");
 
+const char *const bufferingOptions[] = {"file-caching", "disc-caching", "network-caching", "live-caching"};
+// Retain VLC's caching levels while using each input type's current defaults.
+// In particular, Normal must not reduce the default local file buffer.
+const int bufferingLevels[] = {300, 100, 200, 500, 1000};
+
+qint64 bufferingValue(const char *name, int level)
+{
+    const auto *cfg = config_FindConfig(name);
+    return std::clamp<qint64>(cfg->orig.i * level / 300, cfg->min.i, cfg->max.i);
+}
+
+bool isBufferingOption(const QString& name)
+{
+    return std::any_of(std::begin(bufferingOptions), std::end(bufferingOptions),
+        [&](const char *option) { return name == QLatin1String(option); });
+}
+
 struct ResamplingQuality {
     const char* module;
     const char* option;
@@ -835,6 +852,14 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-buffering")) {
+        if (value(QStringLiteral("qt-buffering-custom")).toBool()) return 0;
+        for (int level : bufferingLevels)
+            if (std::all_of(std::begin(bufferingOptions), std::end(bufferingOptions), [&](const char *option) {
+                return value(qfu(option)).toLongLong() == bufferingValue(option, level);
+            })) return level;
+        return 0;
+    }
     if (name == QLatin1String("redesign-video-zoom"))
         return value(QStringLiteral("autoscale")).toBool()
             ? -std::max(1, value(QStringLiteral("fit")).toInt()) : value(QStringLiteral("zoom"));
@@ -949,6 +974,9 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-buffering"))
+        return m_edits.contains(QStringLiteral("qt-buffering-custom"))
+            || std::any_of(std::begin(bufferingOptions), std::end(bufferingOptions), [&](const char *option) { return m_edits.contains(qfu(option)); });
     if (name == QLatin1String("redesign-subtitle-background"))
         return m_edits.contains(QStringLiteral("freetype-background-mode"));
     if (name == QLatin1String("redesign-subtitle-background-opacity"))
@@ -975,6 +1003,16 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-buffering")) {
+        QVariantList choices;
+        const int levels[] = {100, 200, 300, 500, 1000, 0};
+        const QStringList labels{qtr("Very small"), qtr("Small"), qtr("Normal"), qtr("Large"), qtr("Very large"), qtr("Custom")};
+        for (size_t i = 0; i < std::size(levels); ++i)
+            choices.append(QVariantMap{{QStringLiteral("label"), labels[i]}, {QStringLiteral("value"), levels[i]}});
+        return {{QStringLiteral("kind"), QStringLiteral("integer")}, {QStringLiteral("title"), qtr("Buffering")},
+            {QStringLiteral("choices"), choices}, {QStringLiteral("defaultValue"), 300}, {QStringLiteral("value"), value(name)},
+            {QStringLiteral("help"), qtr("A larger buffer can reduce pauses, but playback can take longer to start. Normal uses the default buffer values. Select Custom to set each value in milliseconds. New media uses these settings.")}};
+    }
     if (name == QLatin1String("redesign-subtitle-background")) {
         auto description = describe(QStringLiteral("freetype-background-mode"));
         if (description.isEmpty()) return {};
@@ -1292,6 +1330,16 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-buffering")) {
+        bool valid = false;
+        const int level = proposed.toInt(&valid);
+        if (!valid || proposed.toDouble() != level
+            || (level != 0 && std::find(std::begin(bufferingLevels), std::end(bufferingLevels), level) == std::end(bufferingLevels))) return false;
+        if (level != 0)
+            for (const char *option : bufferingOptions)
+                if (!stage(qfu(option), bufferingValue(option, level))) return false;
+        return stage(QStringLiteral("qt-buffering-custom"), level == 0);
+    }
     if (name == QLatin1String("redesign-video-zoom")) {
         bool valid = false;
         const auto zoom = proposed.toDouble(&valid);
@@ -1533,6 +1581,8 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         ++m_revision; emit changed(); return false;
     }
     m_invalid.remove(name);
+    if (isBufferingOption(name) && !value(QStringLiteral("qt-buffering-custom")).toBool())
+        stage(QStringLiteral("qt-buffering-custom"), true);
     if (QStringList{QStringLiteral("hue"), QStringLiteral("brightness"), QStringLiteral("contrast"), QStringLiteral("saturation"), QStringLiteral("gamma")}.contains(name))
         stage(QStringLiteral("filter:video-filter:adjust"), true);
 

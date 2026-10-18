@@ -33,7 +33,11 @@ ColumnLayout {
     readonly property bool available: description.kind !== undefined
     visible: available
     spacing: theme.dp(4)
-    readonly property bool editorEnabled: { backend.revision; return description.supported !== false && (!presentation.enabledWhen || !!backend.value(presentation.enabledWhen)) }
+    readonly property bool editorEnabled: {
+        backend.revision
+        return description.supported !== false && (!presentation.enabledWhen || !!backend.value(presentation.enabledWhen))
+            && (!presentation.enabledWhenEquals || backend.value(presentation.enabledWhenEquals.name) === presentation.enabledWhenEquals.value)
+    }
     opacity: editorEnabled ? 1 : 0.5
     function commit(value) {
         if (presentation.inverted) value = !value
@@ -596,7 +600,7 @@ ColumnLayout {
                 Layout.fillWidth: true; Layout.fillHeight: true
                 property bool invalid: false
                 readonly property bool numeric: root.description.kind === "integer" || root.description.kind === "float"
-                readonly property string formattedValue: root.currentValue === undefined ? "" : numeric
+                readonly property string formattedValue: root.presentation.hideDisabledValue && !root.editorEnabled ? "" : root.currentValue === undefined ? "" : numeric
                     ? root.presentation.decimals === undefined ? String(Number(root.currentValue) * root.factor) : (Number(root.currentValue) * root.factor).toFixed(root.presentation.decimals)
                     : String(root.currentValue)
                 Binding on text {
@@ -615,6 +619,7 @@ ColumnLayout {
                 Accessible.name: root.label || root.description.title
                 background: Rectangle { radius: theme.dp(4); color: theme.field; border.color: field.invalid ? "#e56b6b" : field.activeFocus ? theme.accent : theme.border }
                 onEditingFinished: {
+                    if (!root.editorEnabled) return
                     const number = Number(text)
                     invalid = numeric ? !text.trim().length || !Number.isFinite(number) || !root.commit(root.description.kind === "integer" ? Math.round(number / root.factor) : number / root.factor) : !root.commit(text)
                     if (!invalid) text = formattedValue
@@ -622,13 +627,16 @@ ColumnLayout {
                 Connections {
                     target: root
                     function onEditorResetRequested() { field.invalid = false; field.text = field.formattedValue }
+                    function onEditorEnabledChanged() {
+                        if (root.presentation.hideDisabledValue && !root.editorEnabled) { field.invalid = false; field.text = "" }
+                    }
                 }
                 TextMetrics { id: valueMetrics; text: field.text; font: field.font }
                 Text {
                     x: field.leftPadding + valueMetrics.advanceWidth
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.presentation.suffix || ""; color: theme.foreground; font.pixelSize: theme.dp(14)
-                    visible: !field.activeFocus
+                    visible: !field.activeFocus && (!root.presentation.hideDisabledValue || root.editorEnabled)
                 }
                 onActiveFocusChanged: if (activeFocus) selectAll()
             }

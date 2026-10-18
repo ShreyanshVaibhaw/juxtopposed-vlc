@@ -68,6 +68,68 @@ TestCase {
     }
     RedesignPreferencesCatalog { id: catalog }
     QtObject {
+        id: cacheStore
+        property int revision: 0
+        property int mode: 300
+        property var values: ({"file-caching": 1000, "disc-caching": 300, "network-caching": 1000, "live-caching": 300})
+        property var writes: []
+        function value(name) { return name === "redesign-buffering" ? mode : values[name] }
+        function describe(name) {
+            return name === "redesign-buffering" ? {kind: "integer", choices: [{label: "Normal", value: 300}, {label: "Large", value: 500}, {label: "Custom", value: 0}]}
+                : {kind: "integer", minimum: 0, maximum: 60000}
+        }
+        function stage(name, number) {
+            if (name === "redesign-buffering") mode = number
+            else { const next = Object.assign({}, values); next[name] = number; values = next }
+            writes = writes.concat([name]); revision++
+            return true
+        }
+    }
+    Column {
+        id: cacheControls
+        width: 784; y: 350; z: 30; visible: false
+        Repeater {
+            model: catalog.sections.network[0].rows
+            RedesignPreferenceRow {
+                required property var modelData
+                objectName: "cacheRow_" + modelData[0]
+                width: parent.width; backend: cacheStore; optionName: modelData[0]; label: modelData[1]
+                presentation: modelData[2] || {}
+            }
+        }
+    }
+    function test_bufferPresetDisablesAndClearsOnlyTheVisibleFields() {
+        cacheControls.visible = true
+        const row = findChild(cacheControls, "cacheRow_file-caching")
+        const field = findChild(row, "preferenceTextEditor")
+        compare(cacheStore.value("file-caching"), 1000)
+        verify(!field.enabled); compare(field.text, "")
+        const choice = findChild(findChild(cacheControls, "cacheRow_redesign-buffering"), "preferenceChoiceEditor")
+        mouseClick(choice); keyClick(Qt.Key_End); keyClick(Qt.Key_Return)
+        compare(cacheStore.mode, 0); verify(field.enabled); compare(field.text, "1000")
+        field.forceActiveFocus(); field.text = "1500"; keyClick(Qt.Key_Return)
+        compare(cacheStore.value("file-caching"), 1500)
+    }
+    function test_bufferPresetDoesNotSaveAnEmptyDisabledInput() {
+        cacheControls.visible = true
+        cacheStore.stage("redesign-buffering", 0)
+        const row = findChild(cacheControls, "cacheRow_network-caching")
+        const field = findChild(row, "preferenceTextEditor")
+        field.forceActiveFocus()
+        cacheStore.writes = []
+        cacheStore.stage("redesign-buffering", 500)
+        verify(!field.enabled); compare(field.text, ""); verify(!field.invalid)
+        compare(cacheStore.writes.length, 1); compare(cacheStore.writes[0], "redesign-buffering")
+        compare(cacheStore.value("network-caching"), 1000)
+    }
+    function test_searchIncludesTheControlNeededToEnableAnOption() {
+        let result = catalog.searchResults("network streams", [{name: "network-caching", title: "Network caching"}])
+        compare(result.length, 2); compare(result[0].name, "redesign-buffering"); compare(result[1].name, "network-caching")
+        result = catalog.searchResults("http-port", [{name: "http-port", title: "HTTP port"}])
+        compare(result[0].name, "redesign-web-remote"); compare(result[1].name, "http-port")
+        compare(result.filter(row => row.name === "http-port").length, 1)
+    }
+    QtObject {
         id: sizeStore
         property int revision: 0
         property var values: ({"sub-text-size-mode": 0, "sub-text-scale": 125, "sub-text-size-pixels": 37})
@@ -388,6 +450,9 @@ TestCase {
     SignalSpy { id: confirmationAccepted; target: confirmation; signalName: "accepted" }
     SignalSpy { id: confirmationRejected; target: confirmation; signalName: "rejected" }
     function init() {
+        cacheControls.visible = false
+        cacheStore.mode = 300; cacheStore.values = {"file-caching": 1000, "disc-caching": 300, "network-caching": 1000, "live-caching": 300}
+        cacheStore.writes = []; cacheStore.revision++
         sizeControls.visible = false
         sizeStore.values = {"sub-text-size-mode": 0, "sub-text-scale": 125, "sub-text-size-pixels": 37}; sizeStore.revision++
         passthroughTestActive = false

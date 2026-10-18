@@ -144,8 +144,11 @@ QtObject {
                 ["recursive", qsTr("When opening a folder")], ["show-hiddenfiles", qsTr("Show hidden files")] ] },
             { title: qsTr("Metadata & Artwork"), rows: [ ["metadata-network-access", qsTr("Fetch titles and artwork from the internet")], ["media-library", qsTr("Use the media library")] ] } ],
         network: [
-            { title: qsTr("Buffering"), rows: [ ["file-caching", qsTr("Files (ms)")], ["disc-caching", qsTr("Discs (ms)")],
-                ["network-caching", qsTr("Network streams (ms)")], ["live-caching", qsTr("Live capture (ms)")] ] },
+            { title: qsTr("Buffering"), rows: [ ["redesign-buffering", qsTr("Buffering")],
+                ["file-caching", qsTr("Local files"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}],
+                ["disc-caching", qsTr("Discs"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}],
+                ["network-caching", qsTr("Network streams"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}],
+                ["live-caching", qsTr("Live capture"), {enabledWhenEquals: {name: "redesign-buffering", value: 0}, hideDisabledValue: true, hideHelp: true, suffix: " ms"}] ] },
             { title: qsTr("Proxy"), rows: [ ["http-proxy", qsTr("HTTP proxy")], ["http-proxy-pwd", qsTr("HTTP proxy password")] ] },
             { title: qsTr("Security"), rows: [ ["gnutls-system-trust", qsTr("Verify certificates against the system trust store")], ["gnutls-priorities", qsTr("Cipher preference")] ] } ],
         performance: [
@@ -203,6 +206,7 @@ QtObject {
     // Search uses the same controls as the settings pages. The expert list,
     // and an exact search for a hyphenated native name, retain the native option.
     readonly property var searchAliases: ({
+        "qt-buffering-custom": "redesign-buffering",
         "freetype-background-mode": "redesign-subtitle-background",
         "freetype-background-opacity": "redesign-subtitle-background-opacity",
         "sub-text-scale": "redesign-subtitle-font-size",
@@ -222,8 +226,17 @@ QtObject {
     function searchResults(query, nativeMatches) {
         const curated = {}
         for (const row of find("")) curated[row.name] = row
-        let matches = find(query)
-        const names = new Set(matches.map(row => row.name))
+        let matches = []
+        const names = new Set()
+        function append(row) {
+            if (names.has(row.name)) return
+            names.add(row.name)
+            const presentation = row.presentation || {}
+            const dependency = presentation.enabledWhen || presentation.enabledWhenEquals?.name
+            if (dependency && curated[dependency]) append(curated[dependency])
+            matches.push(row)
+        }
+        for (const row of find(query)) append(row)
         const needle = query.toLocaleLowerCase()
         for (const entry of nativeMatches) {
             const alias = searchAliases[entry.name]
@@ -237,10 +250,7 @@ QtObject {
                 continue
             }
             const row = curated[alias || entry.name] || entry
-            if (!names.has(row.name)) {
-                matches.push(row)
-                names.add(row.name)
-            }
+            append(row)
         }
         return matches
     }
