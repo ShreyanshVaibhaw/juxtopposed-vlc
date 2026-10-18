@@ -22,6 +22,11 @@ TestCase {
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
         function describe(name) {
+            if (name === "sout-chromecast-conversion-quality") return {kind: "integer", choices: [
+                {label: "Automatic", value: -1}, {label: "High (high quality and high bandwidth)", value: 0},
+                {label: "Medium (medium quality and medium bandwidth)", value: 1},
+                {label: "Low (low quality and low bandwidth)", value: 2},
+                {label: "Low CPU (low quality but high bandwidth)", value: 3}]}
             if (name === "sout-x264-preset") return {kind: "string", choices: [
                 {label: "fast", value: "fast"}, {label: "medium", value: "medium"}, {label: "slow", value: "slow"}]}
             if (name === "redesign-subtitle-background") return {kind: "integer", choices: [{label: "None", value: 0}, {label: "Box", value: 1}]}
@@ -50,7 +55,10 @@ TestCase {
             revision++
             return true
         }
-        function reset(name) { stage(name, name === "sout-x264-preset" ? "" : name === "timeout" ? 1800 : name === "resize") }
+        function reset(name) {
+            const defaults = {"sout-chromecast-conversion-quality": -1, "sout-x264-preset": "", timeout: 1800, resize: true}
+            stage(name, defaults[name] === undefined ? false : defaults[name])
+        }
     }
     QtObject {
         id: equalizerStore
@@ -112,6 +120,29 @@ TestCase {
         compare(section.rows[0][0], "qt-discover-cast-devices")
         compare(section.rows[0][1], "Discover cast devices")
         compare(section.rows[1][0], "sout-chromecast-conversion-quality")
+    }
+    function test_castQualityKeepsManualMediumAndUsesAutomaticValue() {
+        const spec = catalog.sections.recording.find(section => section.title === "Casting").rows[1]
+        store.stage(spec[0], 1)
+        const row = createTemporaryObject(inlineSliderRow, testCase,
+            {optionName: spec[0], label: spec[1], presentation: spec[2] || {}})
+        verify(row !== null)
+        const choice = findChild(row, "preferenceChoiceEditor")
+        verify(choice !== null)
+        compare(choice.displayText, "Medium")
+        compare(store.value(spec[0]), 1)
+        mouseClick(choice); keyClick(Qt.Key_Home); keyClick(Qt.Key_Return)
+        compare(store.value(spec[0]), -1)
+        compare(choice.displayText, "Automatic")
+        mouseClick(choice); keyClick(Qt.Key_End); keyClick(Qt.Key_Return)
+        compare(store.value(spec[0]), 3)
+        compare(choice.displayText, "Low CPU use")
+        mouseMove(row, 20, row.height / 2)
+        const reset = findChild(row, "preferenceResetButton")
+        tryCompare(reset, "visible", true)
+        mouseClick(reset)
+        compare(store.value(spec[0]), -1)
+        compare(choice.displayText, "Automatic")
     }
     function test_encoderPresetShowsItsEffectiveDefaultAndCanReset() {
         const spec = catalog.sections.recording.find(section => section.title === "Streaming")
