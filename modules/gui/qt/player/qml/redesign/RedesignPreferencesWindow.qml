@@ -219,6 +219,7 @@ RedesignSettingsDialog {
                     sourceComponent: RedesignAddons {
                         backend: ServicesDiscoveryModel { ctx: MainCtx }
                         scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                        onWebsiteRequested: url => Qt.openUrlExternally(url)
                     }
                 }
                 ColumnLayout {

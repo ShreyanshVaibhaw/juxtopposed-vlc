@@ -76,6 +76,11 @@ public:
         sourceUrl = QUrl( addon->psz_source_uri );
         entry = addon;
         uuid = QByteArray( reinterpret_cast<const char*>(addon->uuid), sizeof( addon_uuid_t ));
+        if (std::all_of(uuid.cbegin(), uuid.cend(), [](char value) { return value == 0; })) {
+            const auto filename = addon->files.i_size ? qfu(addon->files.p_elems[0]->psz_filename) : name;
+            identifier = QStringLiteral("local:%1:%2").arg(int(addon->e_type)).arg(filename);
+        } else
+            identifier = QString::fromLatin1(uuid.toHex());
 
         if ( addon->psz_image_data ) {
             char *cDir = config_GetUserDir( VLC_CACHE_DIR );
@@ -111,6 +116,7 @@ public:
 
 public:
     QByteArray  uuid;
+    QString identifier;
     QString name;
     QString summary;
     QString description;
@@ -130,8 +136,7 @@ using AddonItemList = std::vector<AddonItemPtr> ;
 template<>
 bool ListCache<AddonItemPtr>::compareItems(const AddonItemPtr& a, const AddonItemPtr& b)
 {
-    //just compare the pointers here
-    return a->uuid == b->uuid;
+    return a->identifier == b->identifier;
 }
 
 // AddonsModelPrivate
@@ -297,12 +302,7 @@ QVariant AddonsModel::data( const QModelIndex& index, int role ) const
         case Role::UUID:
             return item->uuid;
         case Role::IDENTIFIER:
-            if (std::all_of(item->uuid.cbegin(), item->uuid.cend(), [](char value) { return value == 0; })) {
-                vlc_mutex_locker locker{&item->entry->lock};
-                const auto filename = item->entry->files.i_size ? qfu(item->entry->files.p_elems[0]->psz_filename) : item->name;
-                return QStringLiteral("local:%1:%2").arg(int(item->entry->e_type)).arg(filename);
-            }
-            return QString::fromLatin1(item->uuid.toHex());
+            return item->identifier;
         case Role::DOWNLOAD_COUNT:
         {
             vlc_mutex_locker locker{&item->entry->lock};
@@ -468,13 +468,25 @@ QString AddonsModel::errorMessage() const
 QVariantMap AddonsModel::addonById(const QString& identifier) const
 {
     Q_D(const AddonsModel);
-    const auto uuid = QByteArray::fromHex(identifier.toLatin1());
-    if (uuid.size() != sizeof(addon_uuid_t) || QString::fromLatin1(uuid.toHex()) != identifier.toLower()) return {};
+    QString key = identifier;
+    if (!key.startsWith(QLatin1String("local:"))) {
+        const auto uuid = QByteArray::fromHex(identifier.toLatin1());
+        if (uuid.size() != sizeof(addon_uuid_t) || QString::fromLatin1(uuid.toHex()) != identifier.toLower()) return {};
+        key = identifier.toLower();
+    }
     for (const auto& item : d->m_items) {
-        if (item->uuid != uuid) continue;
+        if (item->identifier != key) continue;
         vlc_mutex_locker locker{&item->entry->lock};
+        QStringList files;
+        addon_file_t* file;
+        ARRAY_FOREACH(file, item->entry->files)
+            files.append(qfu(file->psz_filename));
         return {{QStringLiteral("identifier"), identifier}, {QStringLiteral("name"), item->name},
-            {QStringLiteral("state"), item->entry->e_state}, {QStringLiteral("pending"), d->m_pending.contains(uuid)},
+            {QStringLiteral("summary"), item->summary}, {QStringLiteral("description"), item->description},
+            {QStringLiteral("author"), item->author}, {QStringLiteral("version"), qfu(item->entry->psz_version)},
+            {QStringLiteral("typeLabel"), getLabelForType(static_cast<Type>(item->entry->e_type))},
+            {QStringLiteral("website"), item->sourceUrl}, {QStringLiteral("files"), files},
+            {QStringLiteral("state"), item->entry->e_state}, {QStringLiteral("pending"), d->m_pending.contains(item->uuid)},
             {QStringLiteral("manageable"), bool(item->entry->e_flags & ADDON_MANAGEABLE)},
             {QStringLiteral("broken"), bool(item->entry->e_flags & ADDON_BROKEN)}};
     }
@@ -484,6 +496,7 @@ QVariantMap AddonsModel::addonById(const QString& identifier) const
 bool AddonsModel::requestAddon(const QString& identifier, bool install)
 {
     Q_D(AddonsModel);
+    if (identifier.startsWith(QLatin1String("local:"))) return false;
     const auto selected = addonById(identifier);
     if (!d->m_manager || selected.isEmpty() || selected.value(QStringLiteral("pending")).toBool()
         || !selected.value(QStringLiteral("manageable")).toBool()
@@ -714,7 +727,7 @@ void AddonsModelPrivate::addonChanged( AddonPtr addon, addon_state_t state )
 {
     AddonItemPtr sdItem = std::make_shared<AddonItem>(addon);
     for (auto& item : m_items)
-        if (item->uuid == sdItem->uuid) { item = sdItem; break; }
+        if (item->identifier == sdItem->identifier) { item = sdItem; break; }
     if (state == ADDON_INSTALLING || state == ADDON_UNINSTALLING) {
         if (m_pending.contains(sdItem->uuid)) m_pending[sdItem->uuid].started = true;
     } else if (m_pending.contains(sdItem->uuid) && m_pending[sdItem->uuid].started) {

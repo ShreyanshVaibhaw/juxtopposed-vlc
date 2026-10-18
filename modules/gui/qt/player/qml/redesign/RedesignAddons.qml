@@ -12,10 +12,13 @@ ColumnLayout {
     property string selectedId: ""
     property string actionMessage: ""
     property bool discoveryRequested: false
+    signal websiteRequested(string url)
     readonly property RedesignTheme theme: RedesignTheme { scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor }
     readonly property var selectedAddon: { backend.revision; return selectedId.length ? backend.addonById(selectedId) : ({}) }
     readonly property bool canAdd: !backend.loading && selectedAddon.state === 0 && selectedAddon.manageable && !selectedAddon.broken && !selectedAddon.pending
     readonly property bool canRemove: !backend.loading && selectedAddon.state === 2 && selectedAddon.manageable && !selectedAddon.pending
+    readonly property string website: String(selectedAddon.website || "").trim()
+    readonly property bool canOpenWebsite: /^https?:\/\/[^/\s]+(?:[/?#]|$)/i.test(website)
     spacing: theme.dp(8)
     function addSelected() {
         if (canAdd) actionMessage = backend.installAddon(selectedId) ? "" : qsTr("VLC cannot add this add-on.")
@@ -114,6 +117,84 @@ ColumnLayout {
         Layout.fillWidth: true; visible: text.length > 0
         text: root.actionMessage || root.backend.errorMessage; textFormat: Text.PlainText; color: theme.danger; font.pixelSize: theme.dp(13); wrapMode: Text.WordWrap
         Accessible.role: Accessible.AlertMessage
+    }
+    Rectangle {
+        objectName: "addonDetails"
+        visible: !!root.selectedAddon.identifier
+        Layout.fillWidth: true; Layout.minimumWidth: 0
+        implicitHeight: header.implicitHeight + Math.min(detailsContent.implicitHeight, theme.dp(260)) + theme.dp(28)
+        color: theme.field; radius: theme.dp(6); border.width: theme.dp(2)
+        border.color: root.lightTheme ? theme.border : "#191919"
+        ColumnLayout {
+            anchors.fill: parent; anchors.margins: theme.dp(12); spacing: theme.dp(4)
+            RowLayout {
+                id: header
+                Layout.fillWidth: true; spacing: theme.dp(8)
+                Text {
+                    objectName: "addonDetailsName"
+                    Layout.fillWidth: true; Layout.minimumWidth: 0
+                    text: root.selectedAddon.name || ""; textFormat: Text.PlainText
+                    color: theme.settingsHeading; font.pixelSize: theme.dp(16); wrapMode: Text.WrapAnywhere
+                }
+                RedesignButton {
+                    objectName: "addonDetailsClose"
+                    scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                    iconName: "close"; text: qsTr("Close add-on details")
+                    onClicked: { root.selectedId = ""; list.currentIndex = -1; list.forceActiveFocus() }
+                }
+            }
+            C.ScrollView {
+                id: detailsScroll
+                objectName: "addonDetailsScroll"
+                Layout.fillWidth: true; Layout.fillHeight: true
+                clip: true; contentWidth: availableWidth
+                C.ScrollBar.horizontal.policy: C.ScrollBar.AlwaysOff
+                ColumnLayout {
+                    id: detailsContent
+                    width: detailsScroll.availableWidth; spacing: theme.dp(10)
+                    Repeater {
+                        model: [
+                            [qsTr("Type"), root.selectedAddon.typeLabel || ""],
+                            [qsTr("Version"), root.selectedAddon.version || ""],
+                            [qsTr("Author"), root.selectedAddon.author || ""]].filter(field => field[1].length > 0)
+                        RowLayout {
+                            required property var modelData
+                            Layout.fillWidth: true; spacing: theme.dp(10)
+                            Text { Layout.preferredWidth: theme.dp(64); text: modelData[0]; color: theme.playerLabel; font.pixelSize: theme.dp(13); wrapMode: Text.WrapAnywhere }
+                            DetailText { Layout.fillWidth: true; Layout.minimumWidth: 0; text: modelData[1] }
+                        }
+                    }
+                    DetailText {
+                        objectName: "addonDetailsDescription"
+                        Layout.fillWidth: true
+                        text: [root.selectedAddon.summary || "", root.selectedAddon.description !== root.selectedAddon.summary ? root.selectedAddon.description || "" : ""].filter(Boolean).join("\n\n")
+                        visible: text.length > 0
+                    }
+                    DetailText {
+                        objectName: "addonDetailsManual"
+                        Layout.fillWidth: true; visible: root.selectedAddon.manageable === false
+                        text: qsTr("VLC cannot change this add-on because it was added manually.")
+                    }
+                    ColumnLayout {
+                        Layout.fillWidth: true; visible: (root.selectedAddon.files || []).length > 0; spacing: theme.dp(4)
+                        Text { text: qsTr("Files"); color: theme.playerLabel; font.pixelSize: theme.dp(13) }
+                        DetailText { objectName: "addonDetailsFiles"; Layout.fillWidth: true; text: (root.selectedAddon.files || []).join("\n") }
+                    }
+                    ActionButton {
+                        objectName: "addonDetailsWebsite"
+                        visible: root.canOpenWebsite; Layout.preferredWidth: theme.dp(140)
+                        caption: qsTr("Open website"); text: root.website; tooltipTextFormat: Text.PlainText
+                        onClicked: root.websiteRequested(root.website)
+                    }
+                }
+            }
+        }
+    }
+    component DetailText: TextEdit {
+        readOnly: true; selectByMouse: true; textFormat: TextEdit.PlainText; wrapMode: TextEdit.WrapAnywhere
+        color: theme.foreground; font.pixelSize: theme.dp(13)
+        selectionColor: theme.accent; selectedTextColor: theme.field
+        Layout.preferredHeight: contentHeight
     }
     component ActionButton: RedesignButton {
         Layout.preferredWidth: theme.dp(100); implicitHeight: theme.dp(32)

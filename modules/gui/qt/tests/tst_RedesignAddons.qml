@@ -5,7 +5,7 @@ import "../player/qml/redesign"
 
 TestCase {
     name: "JuxtopposedAddons"
-    width: 900; height: 500; visible: true; when: windowShown
+    width: 900; height: 1000; visible: true; when: windowShown
     ListModel {
         id: store
         property int revision: 0
@@ -40,9 +40,10 @@ TestCase {
         onSearchPatternChanged: rebuild()
     }
     RedesignAddons { id: page; width: 784; backend: store }
+    SignalSpy { id: websiteSpy; target: page; signalName: "websiteRequested" }
     function item(name) { return findChild(page, name) }
     function init() {
-        page.width = 784; store.errorMessage = ""
+        page.width = 784; page.lightTheme = false; store.errorMessage = ""; websiteSpy.clear()
         store.loading = false; store.searchPattern = ""
         store.discoveryCalls = 0; store.installCalls = 0; store.removeCalls = 0; store.lastId = ""; store.acceptAction = true
         store.records = [
@@ -114,5 +115,52 @@ TestCase {
         compare(message.text, store.errorMessage)
         compare(message.textFormat, Text.PlainText)
         verify(message.visible)
+    }
+    function test_detailsUseTheStableIdAndKeepMetadataLiteral() {
+        store.records[0] = Object.assign({}, store.records[0], {
+            name: "<Title>", author: "<Author>", version: "1.2", typeLabel: "Extensions",
+            summary: "Summary", description: "<Description>", files: ["<one>.lua", "two.lua"], website: "https://example.test/addon"})
+        store.rebuild(); wait(20)
+        verify(!item("addonDetails").visible)
+        mouseClick(item("addonRow_0")); wait(20)
+        verify(item("addonDetails").visible)
+        compare(item("addonDetailsName").text, "<Title>")
+        compare(item("addonDetailsName").textFormat, Text.PlainText)
+        compare(item("addonDetailsDescription").text, "Summary\n\n<Description>")
+        compare(item("addonDetailsDescription").textFormat, TextEdit.PlainText)
+        compare(item("addonDetailsFiles").text, "<one>.lua\ntwo.lua")
+        verify(item("addonDetailsDescription").readOnly)
+        store.records = [store.records[1], store.records[0], store.records[2]]; store.rebuild(); wait(20)
+        compare(item("addonDetailsName").text, "<Title>")
+        mouseClick(item("addonDetailsClose")); verify(!item("addonDetails").visible)
+        compare(page.selectedId, ""); compare(store.installCalls, 0); compare(store.removeCalls, 0)
+    }
+    function test_manualDetailsExplainWhyActionsAreDisabled() {
+        mouseClick(item("addonRow_2")); wait(20)
+        verify(item("addonDetails").visible); verify(item("addonDetailsManual").visible)
+        verify(!item("addonsAdd").enabled); verify(!item("addonsRemove").enabled)
+    }
+    function test_websiteNeedsAnExplicitClickAndAWebAddress() {
+        page.selectedId = store.records[0].identifier
+        for (const url of ["file:///tmp/test", "javascript:alert(1)", "", "https://example.test/addon", "http://example.test/addon"]) {
+            store.records[0].website = url; store.rebuild(); wait(20)
+            const web = url.startsWith("http")
+            compare(page.canOpenWebsite, web); compare(item("addonDetailsWebsite").visible, web)
+            compare(websiteSpy.count, 0)
+            if (web) {
+                mouseClick(item("addonDetailsWebsite")); compare(websiteSpy.count, 1)
+                compare(websiteSpy.signalArguments[0][0], url); websiteSpy.clear()
+            }
+        }
+    }
+    function test_longDetailsFitNarrowPagesInBothThemes() {
+        store.records[0] = Object.assign({}, store.records[0], {name: "A".repeat(100), description: "Long detail ".repeat(500), author: "B".repeat(100)})
+        store.rebuild(); page.selectedId = store.records[0].identifier; page.width = 244
+        for (const light of [false, true]) {
+            page.lightTheme = light; wait(30)
+            const card = item("addonDetails"), description = item("addonDetailsDescription")
+            verify(card.width <= page.width + 1); verify(card.height < 500)
+            verify(description.width < card.width); verify(description.contentHeight > item("addonDetailsScroll").height)
+        }
     }
 }
