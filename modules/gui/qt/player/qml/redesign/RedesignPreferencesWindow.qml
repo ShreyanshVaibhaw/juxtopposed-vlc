@@ -71,6 +71,11 @@ RedesignSettingsDialog {
     }
     function runAction(action) {
         if (action === "redesign-reset-all") { resetDialog.open(); return }
+        if (action === "redesign-reset-picture") {
+            for (const name of ["hue", "brightness", "contrast", "saturation", "gamma"])
+                preferenceStore.reset(name)
+            return
+        }
         if (action !== "redesign-config-folder") return
         actionMessageIsError = true
         const folder = preferenceStore.configurationFolder()

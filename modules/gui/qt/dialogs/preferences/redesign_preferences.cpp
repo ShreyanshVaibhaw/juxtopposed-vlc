@@ -805,6 +805,13 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-snapshot-size")) {
+        const int width = value(QStringLiteral("snapshot-width")).toInt();
+        const int height = value(QStringLiteral("snapshot-height")).toInt();
+        if (width == -1 && height == -1) return QStringLiteral("source");
+        if (height == 0 && (width == 640 || width == 1280 || width == 1920)) return QString::number(width);
+        return QStringLiteral("custom");
+    }
     if (name == QLatin1String("redesign-audio-passthrough")) {
         const auto option = audioPassthroughOption(audioOutputModule());
         if (option.isEmpty()) return {};
@@ -902,6 +909,8 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-snapshot-size"))
+        return m_edits.contains(QStringLiteral("snapshot-width")) || m_edits.contains(QStringLiteral("snapshot-height"));
     if (name == QLatin1String("redesign-audio-passthrough"))
         return m_edits.contains(audioPassthroughOption(audioOutputModule()));
     if (name == QLatin1String("redesign-resampling-quality")) {
@@ -919,6 +928,23 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-snapshot-size")) {
+        QVariantList choices{
+            QVariantMap{{QStringLiteral("label"), qtr("Same as video")}, {QStringLiteral("value"), QStringLiteral("source")}}
+        };
+        for (const int width : {640, 1280, 1920})
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("%1 px wide").arg(width)}, {QStringLiteral("value"), QString::number(width)}});
+        const auto current = value(name);
+        if (current == QLatin1String("custom"))
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom")}, {QStringLiteral("value"), current}});
+        return {{QStringLiteral("kind"), QStringLiteral("string")}, {QStringLiteral("choices"), choices},
+            {QStringLiteral("defaultValue"), QStringLiteral("source")}, {QStringLiteral("value"), current},
+            {QStringLiteral("help"), qtr("Set the snapshot width. The height changes to keep the video's aspect ratio. Custom uses your saved width and height.")}};
+    }
+    if (name == QLatin1String("redesign-reset-picture"))
+        return {{QStringLiteral("kind"), QStringLiteral("action")}, {QStringLiteral("editor"), QStringLiteral("action")},
+            {QStringLiteral("buttonLabel"), qtr("Reset")},
+            {QStringLiteral("help"), qtr("Set hue, brightness, contrast, saturation and gamma to their default values.")}};
     if (name == QLatin1String("redesign-audio-passthrough")) {
         const auto option = audioPassthroughOption(audioOutputModule());
         if (option.isEmpty()) return {};
@@ -1102,6 +1128,17 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         for (int i = 0; i < screens.size(); ++i)
             choices.append(QVariantMap{{QStringLiteral("label"), screens[i]->name()}, {QStringLiteral("value"), i}});
     }
+    if (name == QLatin1String("input-timeshift-granularity")) {
+        choices = {
+            QVariantMap{{QStringLiteral("label"), qtr("Small")}, {QStringLiteral("value"), 10 * 1024 * 1024}},
+            QVariantMap{{QStringLiteral("label"), qtr("Medium")}, {QStringLiteral("value"), -1}},
+            QVariantMap{{QStringLiteral("label"), qtr("Large")}, {QStringLiteral("value"), 100 * 1024 * 1024}}
+        };
+        const auto current = value(name).toLongLong();
+        if (current != -1 && current != 10 * 1024 * 1024 && current != 100 * 1024 * 1024)
+            choices.append(QVariantMap{{QStringLiteral("label"), qtr("Custom (%1 MiB)").arg(current / (1024. * 1024.), 0, 'g', 4)}, {QStringLiteral("value"), current}});
+        result.insert(QStringLiteral("help"), qtr("Set the maximum size of each temporary file used for time-shift playback. Small uses 10 MiB, Medium uses 50 MiB and Large uses 100 MiB."));
+    }
     if (name == QLatin1String("equalizer-preset")) {
         choices.clear();
         choices.append(QVariantMap{{QStringLiteral("label"), qtr("None")}, {QStringLiteral("value"), QString()}});
@@ -1121,6 +1158,14 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-snapshot-size")) {
+        const auto size = proposed.toString();
+        if (size == QLatin1String("custom")) return value(name) == size;
+        if (size != QLatin1String("source") && size != QLatin1String("640")
+            && size != QLatin1String("1280") && size != QLatin1String("1920")) return false;
+        return stage(QStringLiteral("snapshot-width"), size == QLatin1String("source") ? -1 : size.toInt())
+            && stage(QStringLiteral("snapshot-height"), size == QLatin1String("source") ? -1 : 0);
+    }
     if (name == QLatin1String("redesign-audio-passthrough")) {
         const auto option = audioPassthroughOption(audioOutputModule());
         if (option.isEmpty()) return false;
