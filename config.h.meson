@@ -92,6 +92,9 @@
 /* Define if CSS engine is built */
 #mesondefine HAVE_CSS
 
+/* Define if D-Bus support is built. */
+#mesondefine HAVE_DBUS
+
 /* Define to 1 if C++ headers define locale_t */
 #mesondefine HAVE_CXX_LOCALE_T
 

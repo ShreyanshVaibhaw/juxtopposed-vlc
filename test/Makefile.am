@@ -444,6 +444,10 @@ test_src_misc_addons_SOURCES = src/misc/addons.c
 test_src_misc_addons_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_instance_policy_SOURCES = src/misc/instance_policy.c
 test_src_misc_instance_policy_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_instance_policy_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_DBUS
+test_src_misc_instance_policy_CPPFLAGS += -DHAVE_DBUS
+endif
 
 test_modules_lua_extension_SOURCES = modules/lua/extension.c
 test_modules_lua_extension_LDADD = $(LIBVLCCORE) $(LIBVLC)

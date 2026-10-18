@@ -71,7 +71,6 @@ vlc_motion_lib = static_library('vlc_motion',
 )
 
 # DBUS
-dbus_dep = dependency('dbus-1', version: '>= 1.6.0', required: get_option('dbus'))
 if dbus_dep.found()
     vlc_modules += {
         'name' : 'dbus',

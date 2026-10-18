@@ -42,6 +42,9 @@ anl_lib = cc.find_library('anl', required: false)
 libvlccore_deps = [
     m_lib, dl_lib, threads_dep, intl_dep, socket_libs, iconv_dep, anl_lib, idn_dep
 ]
+if dbus_dep.found()
+    libvlccore_deps += dbus_dep
+endif
 
 vlccore_cargs = [ '-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ]
 libvlccore_link_args = []

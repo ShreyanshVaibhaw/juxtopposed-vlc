@@ -1159,6 +1159,12 @@ if gcrypt_dep.found()
     cdata.set('HAVE_GCRYPT', 1)
 endif
 
+# The core and launcher also use D-Bus for single-instance forwarding.
+dbus_dep = dependency('dbus-1', version: '>= 1.6.0', required: get_option('dbus'))
+if dbus_dep.found()
+    cdata.set('HAVE_DBUS', 1)
+endif
+
 # Flex/Bison support
 # This defines the `bison_gen` and `flex_gen` generator variables to be used
 # to process Bison and Flex files respectively.
