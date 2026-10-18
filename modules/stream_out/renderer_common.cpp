@@ -148,6 +148,7 @@ vlc_sout_renderer_GetVcodecOption(sout_stream_t *p_stream,
         std::vector<vlc_fourcc_t> codecs,
         vlc_fourcc_t *out_codec, const video_format_t *p_vid, int i_quality)
 {
+    i_quality = vlc_sout_renderer_ResolveConversionQuality(i_quality);
     std::stringstream ssout;
     static const char video_maxres_hd[] = "maxwidth=1920,maxheight=1080";
     static const char video_maxres_720p[] = "maxwidth=1280,maxheight=720";

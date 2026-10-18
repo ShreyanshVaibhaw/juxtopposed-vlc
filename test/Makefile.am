@@ -117,6 +117,7 @@ check_PROGRAMS = \
 	test_modules_demux_ts_pes \
 	test_modules_playlist_m3u \
 	test_modules_stream_out_pcr_sync \
+	test_modules_stream_out_renderer_quality \
 	test_modules_stream_out_sdi \
 	test_modules_tls \
 	test_modules_stream_out_transcode \
@@ -604,6 +605,10 @@ test_modules_stream_out_pcr_sync_SOURCES = modules/stream_out/pcr_sync.c \
 	../modules/stream_out/transcode/pcr_helper.h \
 	../modules/stream_out/transcode/pcr_helper.c
 test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
+
+test_modules_stream_out_renderer_quality_SOURCES = modules/stream_out/renderer_quality.cpp \
+	modules/stream_out/renderer_quality_profiles.h
+test_modules_stream_out_renderer_quality_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_modules_stream_out_sdi_SOURCES = modules/stream_out/sdi.cpp \
 	../modules/stream_out/sdi/SDIStream.cpp \

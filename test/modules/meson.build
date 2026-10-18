@@ -1,4 +1,11 @@
 vlc_tests += {
+    'name': 'test_modules_stream_out_renderer_quality',
+    'sources': files('stream_out/renderer_quality.cpp'),
+    'suite': ['modules', 'test_modules'],
+    'link_with': [libvlc, libvlccore],
+}
+
+vlc_tests += {
     'name': 'test_modules_text_renderer_freetype',
     'sources': files('text_renderer/freetype.c'),
     'suite': ['modules', 'test_modules'],

@@ -37,7 +37,8 @@
 #define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
 #define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®." )
 #define CONVERSION_QUALITY_TEXT N_( "Conversion quality" )
-#define CONVERSION_QUALITY_LONGTEXT N_( "Change conversion speed or quality." )
+#define CONVERSION_QUALITY_LONGTEXT N_( "Select the conversion quality. " \
+    "Automatic uses the default quality for this device." )
 
 #if defined (__ANDROID__) || defined (__arm__) || (defined (TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
 # define CONVERSION_QUALITY_DEFAULT CONVERSION_QUALITY_LOW
@@ -53,11 +54,12 @@
         change_private() \
     add_bool(prefix "audio-passthrough", false, \
             AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT ) \
-    add_integer(prefix "conversion-quality", CONVERSION_QUALITY_DEFAULT, \
+    add_integer(prefix "conversion-quality", CONVERSION_QUALITY_AUTO, \
                 CONVERSION_QUALITY_TEXT, CONVERSION_QUALITY_LONGTEXT ); \
         change_integer_list(conversion_quality_list, conversion_quality_list_text)
 
 static const char *const conversion_quality_list_text[] = {
+    N_( "Automatic" ),
     N_( "High (high quality and high bandwidth)" ),
     N_( "Medium (medium quality and medium bandwidth)" ),
     N_( "Low (low quality and low bandwidth)" ),
@@ -65,6 +67,7 @@ static const char *const conversion_quality_list_text[] = {
 };
 
 enum {
+    CONVERSION_QUALITY_AUTO = -1,
     CONVERSION_QUALITY_HIGH = 0,
     CONVERSION_QUALITY_MEDIUM = 1,
     CONVERSION_QUALITY_LOW = 2,
@@ -72,11 +75,17 @@ enum {
 };
 
 static const int conversion_quality_list[] = {
+    CONVERSION_QUALITY_AUTO,
     CONVERSION_QUALITY_HIGH,
     CONVERSION_QUALITY_MEDIUM,
     CONVERSION_QUALITY_LOW,
     CONVERSION_QUALITY_LOWCPU,
 };
+
+static inline int vlc_sout_renderer_ResolveConversionQuality(int quality)
+{
+    return quality == CONVERSION_QUALITY_AUTO ? CONVERSION_QUALITY_DEFAULT : quality;
+}
 
 std::string
 vlc_sout_renderer_GetVcodecOption(sout_stream_t *p_stream,

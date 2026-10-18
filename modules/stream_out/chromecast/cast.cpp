@@ -1100,7 +1100,8 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 config_PutInt(RENDERER_CFG_PREFIX "show-perf-warning", 0 );
         }
 
-        const int i_quality = var_InheritInteger( p_stream, SOUT_CFG_PREFIX "conversion-quality" );
+        const int i_quality = vlc_sout_renderer_ResolveConversionQuality(
+            var_InheritInteger( p_stream, SOUT_CFG_PREFIX "conversion-quality" ) );
 
         /* TODO: provide audio samplerate and channels */
         ssout << "transcode{";
