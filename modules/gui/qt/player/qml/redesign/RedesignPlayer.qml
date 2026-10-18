@@ -338,6 +338,7 @@ FocusScope {
         }
         trackPopup: tracksPopup
         onMenuRequested: anchor => mediaMenu.toggleFrom(anchor, view)
+        onContextMenuRequested: globalPosition => audioContextMenu.popup(globalPosition)
         onResumeRequested: resume => {
             rootPlayer.resumeAvailable = false
             if (resume) Player.restorePlaybackPos()
@@ -532,11 +533,6 @@ FocusScope {
     }
     // VideoSurface continues to provide VLC's native context menu and hotkeys.
     QmlAudioContextMenu { id: audioContextMenu; ctx: MainCtx }
-    TapHandler {
-        enabled: !MainCtx.hasEmbededVideo
-        acceptedButtons: Qt.RightButton
-        onTapped: point => audioContextMenu.popup(point.globalPosition)
-    }
     Connections {
         target: MainCtx
         function onAskShow() { view.revealControls() }

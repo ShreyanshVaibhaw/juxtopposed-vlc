@@ -127,6 +127,7 @@ FocusScope {
     signal audioTracksRequested(Item anchor)
     signal subtitleTracksRequested(Item anchor)
     signal menuRequested(Item anchor)
+    signal contextMenuRequested(point globalPosition)
     signal openRequested()
     signal preferencesRequested()
     signal fullLibraryRequested()
@@ -147,6 +148,16 @@ FocusScope {
         enabled: root.presentationOnly; visible: enabled
         acceptedButtons: Qt.AllButtons
         onWheel: wheel => wheel.accepted = true
+    }
+
+    // Panels consume right-clicks before they reach this background fallback.
+    // A passive handler on the player would also observe their context clicks.
+    MouseArea {
+        anchors.fill: parent
+        z: -1
+        enabled: !root.hasVideo
+        acceptedButtons: Qt.RightButton
+        onClicked: mouse => root.contextMenuRequested(mapToGlobal(mouse.x, mouse.y))
     }
 
     function revealControls() { revealTimer.restart() }

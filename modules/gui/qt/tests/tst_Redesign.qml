@@ -159,6 +159,7 @@ TestCase {
     SignalSpy { id: previewSpy; target: player; signalName: "seekPreviewRequested" }
     SignalSpy { id: previewEndSpy; target: player; signalName: "seekPreviewEnded" }
     SignalSpy { id: audioSpy; target: player; signalName: "audioTracksRequested" }
+    SignalSpy { id: contextMenuSpy; target: player; signalName: "contextMenuRequested" }
     SignalSpy { id: subtitleSpy; target: player; signalName: "subtitleTracksRequested" }
     SignalSpy { id: toolbarVisibilitySpy; target: player; signalName: "bottomVisibleChanged" }
     SignalSpy { id: folderSpy; target: player; signalName: "mediaFolderRequested" }
@@ -184,6 +185,7 @@ TestCase {
     }
 
     function init() {
+        contextMenuSpy.clear()
         tracks.refreshCount = 0
         consumeVideoHover = false
         settingControl.visible = false
@@ -251,6 +253,55 @@ TestCase {
         subtitleSpy.clear()
         tryCompare(findChild(player, "redesignLibraryPanel"), "reveal", 0)
         wait(20)
+    }
+    function test_queueContextClickDoesNotOpenAppMenu_data() {
+        return [
+            { tag: "item", item: true, floating: false },
+            { tag: "container", item: false, floating: false },
+            { tag: "floating item", item: true, floating: true },
+            { tag: "floating container", item: false, floating: true }
+        ]
+    }
+    function test_queueContextClickDoesNotOpenAppMenu(data) {
+        player.hasVideo = false
+        player.libraryOpen = data.floating
+        player.libraryExpanded = data.floating
+        player.queueOpen = true
+        tryVerify(() => player.queueItem !== null)
+        const queue = player.queueItem
+        const target = findChild(queue, data.item ? "queueItem_0" : "queueList")
+        const menu = findChild(queue, "queueActionsMenu")
+        verify(target !== null)
+        wait(200)
+        mouseClick(target, target.width / 2, data.item ? target.height / 2 : target.height - 25, Qt.RightButton)
+        tryCompare(menu, "opened", true)
+        compare(contextMenuSpy.count, 0)
+        compare(queue.selectedIndex, data.item ? 0 : -1)
+        menu.close()
+    }
+    function test_backgroundContextClickRespectsVideoAndOverlays() {
+        player.hasVideo = false
+        const viewport = findChild(player, "redesignViewport")
+        mouseClick(viewport, 35, 35, Qt.RightButton)
+        compare(contextMenuSpy.count, 1)
+        compare(contextMenuSpy.signalArguments[0][0], viewport.mapToGlobal(35, 35))
+        contextMenuSpy.clear()
+        player.settingsPage = "playback"
+        const panel = findChild(player, "redesignRightPanel")
+        mouseClick(panel, panel.width / 2, panel.height / 2, Qt.RightButton)
+        compare(contextMenuSpy.count, 0)
+        player.settingsPage = ""
+        player.libraryOpen = true
+        wait(200)
+        const library = findChild(player, "redesignLibraryPanel")
+        mouseClick(library, library.width / 2, library.height - 20, Qt.RightButton)
+        compare(contextMenuSpy.count, 0)
+        player.libraryOpen = false
+        wait(200)
+        player.hasVideo = true
+        consumeVideoHover = true
+        mouseClick(viewport, 35, 35, Qt.RightButton)
+        compare(contextMenuSpy.count, 0)
     }
     function test_toolbarTimelineGeometry_data() {
         return [{tag: "dark", width: 1920, height: 1080, scale: 1},
