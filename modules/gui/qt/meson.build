@@ -1097,6 +1097,7 @@ qml_tests = {
     'tst_RedesignAddToPlaylist': files('tests/tst_RedesignAddToPlaylist.qml'),
     'tst_RedesignPlayerLayout': files('tests/tst_RedesignPlayerLayout.qml'),
     'tst_RedesignPlayerChrome': files('tests/tst_RedesignPlayerChrome.qml'),
+    'tst_RedesignCursor': files('tests/tst_RedesignCursor.qml'),
     'tst_RedesignTheme': files('tests/tst_RedesignTheme.qml'),
     'tst_RedesignSliders': files('tests/tst_RedesignSliders.qml'),
     'tst_RedesignActionMenu': files('tests/tst_RedesignActionMenu.qml'),

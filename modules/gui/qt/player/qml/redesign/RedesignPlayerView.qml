@@ -28,6 +28,8 @@ FocusScope {
     property bool fullscreen: false
     property int autoHideMode: 1
     property int controlsHideTimeout: 1800
+    property int cursorHideTimeout: 1000
+    readonly property bool videoCursorVisible: !fullscreen || cursorHideTimer.running
     property bool showFullscreenControls: true
     property real fullscreenControlsOpacity: 1
     property int fullscreenControlsSensitivity: 3
@@ -148,6 +150,7 @@ FocusScope {
     }
 
     function revealControls() { revealTimer.restart() }
+    function revealCursor() { if (fullscreen) cursorHideTimer.restart() }
     function toggleSettings(page: string) {
         if (trackPopup) trackPopup.close()
         queueOpen = false
@@ -184,11 +187,14 @@ FocusScope {
         keyPressed(event)
     }
     Timer { id: revealTimer; interval: root.controlsHideTimeout; running: root.fullscreen }
+    Timer { id: cursorHideTimer; interval: Math.max(0, root.cursorHideTimeout) }
     onFullscreenChanged: {
         _lastControlMotion = Qt.point(-1, -1)
         _headerRevealed = false
         _toolbarRevealed = false
         revealControls()
+        if (fullscreen) revealCursor()
+        else cursorHideTimer.stop()
     }
     function observeControlMotion(position: point) {
         const first = _lastControlMotion.x < 0
@@ -205,9 +211,15 @@ FocusScope {
     HoverHandler {
         enabled: root.fullscreen
         blocking: false
-        onPointChanged: if (hovered) root.observeControlMotion(point.position)
+        onPointChanged: if (hovered) {
+            root.revealCursor()
+            root.observeControlMotion(point.position)
+        }
         onHoveredChanged: {
-            if (hovered) root.observeControlMotion(point.position)
+            if (hovered) {
+                root.revealCursor()
+                root.observeControlMotion(point.position)
+            }
             else {
                 root._lastControlMotion = Qt.point(-1, -1)
                 root._headerRevealed = false

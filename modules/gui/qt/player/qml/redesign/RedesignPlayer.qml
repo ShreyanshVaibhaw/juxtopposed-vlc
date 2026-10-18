@@ -243,6 +243,7 @@ FocusScope {
         minimalView: MainCtx.minimalView
         autoHideMode: MainCtx.redesignPlayerPreferences.autoHide
         controlsHideTimeout: MainCtx.redesignPlayerPreferences.hideTimeout
+        cursorHideTimeout: MainCtx.mouseHideTimeout
         showFullscreenControls: MainCtx.redesignPlayerPreferences.fullscreenControls
         fullscreenControlsOpacity: MainCtx.pinOpacity
         fullscreenControlsSensitivity: MainCtx.redesignPlayerPreferences.fullscreenSensitivity
@@ -360,7 +361,10 @@ FocusScope {
                 renderingEnabled: true
                 visible: MainCtx.hasEmbededVideo
                 focus: visible
-                cursorShape: view.fullscreen && !view.topVisible && !view.bottomVisible ? Qt.BlankCursor : Qt.ArrowCursor
+                cursorShape: view.videoCursorVisible ? Qt.ArrowCursor : Qt.BlankCursor
+                onMouseMoved: view.revealCursor()
+                onMousePressed: view.revealCursor()
+                onMouseReleased: view.revealCursor()
             }
         }
         Connections {
