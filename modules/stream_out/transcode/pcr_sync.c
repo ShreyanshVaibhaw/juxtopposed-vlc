@@ -46,7 +46,6 @@ typedef struct
     vlc_tick_t pcr;
     struct VLC_VECTOR(struct es_dts_entry) es_last_dts_entries;
     size_t entries_left;
-    bool no_frame_before;
 
     struct vlc_list node;
 } pcr_event_t;
@@ -116,29 +115,6 @@ static bool pcr_sync_ShouldFastForwardPCR(vlc_pcr_sync_t *pcr_sync)
     return vlc_list_is_empty(&pcr_sync->pcr_events);
 }
 
-static bool pcr_sync_HadFrameInputSinceLastPCR(vlc_pcr_sync_t *pcr_sync)
-{
-    const pcr_event_t *pcr_event =
-        vlc_list_last_entry_or_null(&pcr_sync->pcr_events, pcr_event_t, node);
-
-    if (pcr_event == NULL)
-        return true;
-
-    for (unsigned int i = 0; i < pcr_sync->es_data.size; ++i)
-    {
-        const struct es_data *curr = &pcr_sync->es_data.data[i];
-        if (curr->is_deleted || curr->last_input_dts == VLC_TICK_INVALID)
-            continue;
-
-        const bool is_oob = i >= pcr_event->es_last_dts_entries.size;
-        if (!is_oob && curr->last_input_dts != pcr_event->es_last_dts_entries.data[i].dts)
-            return true;
-        else if (is_oob)
-            return true;
-    }
-    return false;
-}
-
 static int pcr_sync_SignalPCRLocked(vlc_pcr_sync_t *pcr_sync, vlc_tick_t pcr)
 {
     if (pcr_sync_ShouldFastForwardPCR(pcr_sync))
@@ -158,23 +134,25 @@ static int pcr_sync_SignalPCRLocked(vlc_pcr_sync_t *pcr_sync, vlc_tick_t pcr)
     }
 
     size_t entries_left = 0;
-    struct es_data data;
-    vlc_vector_foreach(data, &pcr_sync->es_data)
+    for (size_t i = 0; i < pcr_sync->es_data.size; ++i)
     {
-        if (!data.is_deleted)
-        {
-            vlc_vector_push(&event->es_last_dts_entries,
-                            ((struct es_dts_entry){.dts = data.last_input_dts,
-                                                   .discontinuity = data.discontinuity}));
-            if (data.last_input_dts != VLC_TICK_INVALID)
-                ++entries_left;
-            data.discontinuity = VLC_TICK_INVALID;
-        }
+        struct es_data *data = &pcr_sync->es_data.data[i];
+        const bool passed = data->is_deleted
+                         || data->last_input_dts == VLC_TICK_INVALID
+                         || data->last_output_dts == data->last_input_dts;
+        /* Preserve ES IDs, including vacant slots. Only frames that are still
+         * in the processing unit can delay this PCR. */
+        vlc_vector_push(&event->es_last_dts_entries,
+                        ((struct es_dts_entry){.dts = data->last_input_dts,
+                                               .passed = passed,
+                                               .discontinuity = data->discontinuity}));
+        if (!passed)
+            ++entries_left;
+        data->discontinuity = VLC_TICK_INVALID;
     }
 
     event->pcr = pcr;
     event->entries_left = entries_left;
-    event->no_frame_before = !pcr_sync_HadFrameInputSinceLastPCR(pcr_sync);
 
     vlc_list_append(&event->node, &pcr_sync->pcr_events);
 
@@ -240,7 +218,23 @@ void vlc_pcr_sync_DelESID(vlc_pcr_sync_t *pcr_sync, unsigned int id)
     vlc_mutex_lock(&pcr_sync->lock);
 
     assert(id < pcr_sync->es_data.size);
+    assert(!pcr_sync->es_data.data[id].is_deleted);
     pcr_sync->es_data.data[id].is_deleted = true;
+    pcr_sync->es_data.data[id].last_pcr_event = NULL;
+
+    /* Queued events must no longer wait for this track. Mark its old slots
+     * before the ID can be reused for a different track. */
+    pcr_event_t *event;
+    vlc_list_foreach(event, &pcr_sync->pcr_events, node)
+    {
+        if (id < event->es_last_dts_entries.size
+            && !event->es_last_dts_entries.data[id].passed)
+        {
+            event->es_last_dts_entries.data[id].passed = true;
+            assert(event->entries_left != 0);
+            --event->entries_left;
+        }
+    }
 
     vlc_mutex_unlock(&pcr_sync->lock);
 }
@@ -255,52 +249,54 @@ vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const 
 {
     vlc_mutex_lock(&pcr_sync->lock);
 
+    assert(id < pcr_sync->es_data.size);
     struct es_data *es = &pcr_sync->es_data.data[id];
     assert(!es->is_deleted);
     es->last_output_dts = frame->i_dts;
 
-    pcr_event_t *pcr_event = (es->last_pcr_event == NULL)
-                                 ? pcr_event_FirstEntry(&pcr_sync->pcr_events)
-                                 : es->last_pcr_event;
-    if (pcr_event == NULL)
-        goto no_pcr;
-
-    assert(id < pcr_event->es_last_dts_entries.size);
-
-    const vlc_tick_t pcr = pcr_event->pcr;
-
-    if (pcr_event->no_frame_before)
+    pcr_event_t *event = es->last_pcr_event == NULL
+                      ? pcr_event_FirstEntry(&pcr_sync->pcr_events)
+                      : es->last_pcr_event;
+    for (; event != NULL; event = es->last_pcr_event)
     {
-        es->last_pcr_event = pcr_event_NextEntry(&pcr_sync->pcr_events, pcr_event);
-        goto return_pcr;
+        pcr_event_t *next = pcr_event_NextEntry(&pcr_sync->pcr_events, event);
+        /* A new track cannot acknowledge frames from before it was added. */
+        if (id < event->es_last_dts_entries.size)
+        {
+            struct es_dts_entry *entry = &event->es_last_dts_entries.data[id];
+            if (!entry->passed)
+            {
+                if (entry->discontinuity != VLC_TICK_INVALID
+                    && frame->i_dts > entry->discontinuity)
+                    break;
+                if (frame->i_dts < entry->dts)
+                    break;
+
+                entry->passed = true;
+                assert(event->entries_left != 0);
+                --event->entries_left;
+            }
+        }
+        es->last_pcr_event = next;
     }
 
-    assert(pcr_event->entries_left != 0);
+    /* A fast track can finish a later event first. Keep PCRs in input order,
+     * including consecutive PCRs with no intervening frames. */
+    event = pcr_event_FirstEntry(&pcr_sync->pcr_events);
+    if (event == NULL || event->entries_left != 0)
+    {
+        vlc_mutex_unlock(&pcr_sync->lock);
+        return VLC_TICK_INVALID;
+    }
 
-    struct es_dts_entry *dts_entry = &pcr_event->es_last_dts_entries.data[id];
-
-    if (dts_entry->discontinuity != VLC_TICK_INVALID && frame->i_dts > dts_entry->discontinuity)
-        goto no_pcr;
-
-    if (frame->i_dts < dts_entry->dts)
-        goto no_pcr;
-
-    if (dts_entry->passed)
-        goto no_pcr;
-
-    dts_entry->passed = true;
-    es->last_pcr_event = pcr_event_NextEntry(&pcr_sync->pcr_events, pcr_event);
-    if (--pcr_event->entries_left != 0)
-        goto no_pcr;
-
-return_pcr:
-    vlc_list_remove(&pcr_event->node);
-    pcr_event_Delete(pcr_event);
+    const vlc_tick_t pcr = event->pcr;
+    pcr_event_t *next = pcr_event_NextEntry(&pcr_sync->pcr_events, event);
+    for (size_t i = 0; i < pcr_sync->es_data.size; ++i)
+        if (pcr_sync->es_data.data[i].last_pcr_event == event)
+            pcr_sync->es_data.data[i].last_pcr_event = next;
+    vlc_list_remove(&event->node);
+    pcr_event_Delete(event);
 
     vlc_mutex_unlock(&pcr_sync->lock);
     return pcr;
-
-no_pcr:
-    vlc_mutex_unlock(&pcr_sync->lock);
-    return VLC_TICK_INVALID;
 }

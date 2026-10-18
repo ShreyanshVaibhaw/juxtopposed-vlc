@@ -322,6 +322,104 @@ static void test_LateTrack(vlc_pcr_sync_t *sync)
     vlc_pcr_sync_DelESID(sync, video);
 }
 
+/* Tracks can be discovered after PCRs have already entered the transcode filter. */
+static void test_TrackAddedAfterPCR(vlc_pcr_sync_t *sync)
+{
+    unsigned video, audio;
+    const vlc_frame_t first = {.i_dts = 1};
+    const vlc_frame_t second = {.i_dts = 2};
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, video, &first);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_NewESID(sync, &audio) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, audio, &second);
+    vlc_pcr_sync_SignalFrame(sync, video, &second);
+    assert(vlc_pcr_sync_SignalPCR(sync, 20) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, audio, &second) == VLC_TICK_INVALID);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &first) == 10);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &second) == 20);
+}
+
+static void test_DeletedTrackSlot(vlc_pcr_sync_t *sync)
+{
+    unsigned removed, video;
+    const vlc_frame_t frame = {.i_dts = 1};
+    assert(vlc_pcr_sync_NewESID(sync, &removed) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+    vlc_pcr_sync_DelESID(sync, removed);
+    vlc_pcr_sync_SignalFrame(sync, video, &frame);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &frame) == 10);
+}
+
+static void test_TrackStartsAfterPCR(vlc_pcr_sync_t *sync)
+{
+    unsigned video, audio;
+    const vlc_frame_t frame = {.i_dts = 1};
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_NewESID(sync, &audio) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, video, &frame);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, audio, &frame);
+    /* This track was registered, but did not contribute to the queued PCR. */
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, audio, &frame) == VLC_TICK_INVALID);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &frame) == 10);
+}
+
+static void test_DeletedPendingTrackReused(vlc_pcr_sync_t *sync)
+{
+    unsigned video, audio, replacement;
+    const vlc_frame_t frame = {.i_dts = 1};
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_NewESID(sync, &audio) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, video, &frame);
+    vlc_pcr_sync_SignalFrame(sync, audio, &frame);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10) == VLC_SUCCESS);
+    vlc_pcr_sync_DelESID(sync, audio);
+    assert(vlc_pcr_sync_NewESID(sync, &replacement) == VLC_SUCCESS);
+    assert(replacement == audio);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &frame) == 10);
+    vlc_pcr_sync_SignalFrame(sync, replacement, &frame);
+    assert(vlc_pcr_sync_SignalPCR(sync, 20) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, replacement, &frame) == 20);
+}
+
+static void test_SubsequentPCRWaitsForAllTracks(vlc_pcr_sync_t *sync)
+{
+    unsigned video, audio;
+    const vlc_frame_t frame = {.i_dts = 1};
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_NewESID(sync, &audio) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, video, &frame);
+    vlc_pcr_sync_SignalFrame(sync, audio, &frame);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalPCR(sync, 20) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalPCR(sync, 30) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, audio, &frame) == VLC_TICK_INVALID);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, audio, &frame) == VLC_TICK_INVALID);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &frame) == 10);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &frame) == 20);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &frame) == 30);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, audio, &frame) == VLC_TICK_INVALID);
+}
+
+static void test_DiscontinuityAcrossPCRs(vlc_pcr_sync_t *sync)
+{
+    unsigned video;
+    const vlc_frame_t old = {.i_dts = 200};
+    const vlc_frame_t reset = {.i_dts = 1, .i_flags = VLC_FRAME_FLAG_DISCONTINUITY};
+    const vlc_frame_t later = {.i_dts = 10};
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, video, &old);
+    vlc_pcr_sync_SignalFrame(sync, video, &reset);
+    assert(vlc_pcr_sync_SignalPCR(sync, 5) == VLC_SUCCESS);
+    vlc_pcr_sync_SignalFrame(sync, video, &later);
+    assert(vlc_pcr_sync_SignalPCR(sync, 15) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &old) == VLC_TICK_INVALID);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &reset) == 5);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, video, &later) == 15);
+}
+
 static void test_PCRHelper(void (*test)(vlc_pcr_sync_t *,
                                         transcode_track_pcr_helper_t *))
 {
@@ -497,6 +595,12 @@ static void test_PCRHelperIOMismatch(vlc_pcr_sync_t *sync,
 
 int main(void)
 {
+    test_Run(test_TrackAddedAfterPCR);
+    test_Run(test_DeletedTrackSlot);
+    test_Run(test_TrackStartsAfterPCR);
+    test_Run(test_DeletedPendingTrackReused);
+    test_Run(test_SubsequentPCRWaitsForAllTracks);
+    test_Run(test_DiscontinuityAcrossPCRs);
     test_Run(test_Simple);
     test_Run(test_MultipleTracks);
     test_Run(test_MultipleTracksButOnlyOneSends);
