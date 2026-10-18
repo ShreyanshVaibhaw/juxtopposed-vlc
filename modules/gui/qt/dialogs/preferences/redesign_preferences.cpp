@@ -16,6 +16,7 @@
 #include <cmath>
 #include <climits>
 #include <algorithm>
+#include <utility>
 #include <QFileDialog>
 #include <QColorDialog>
 #include <QGuiApplication>
@@ -873,6 +874,12 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-hardware-decoding")) {
+        const auto device = value(QStringLiteral("dec-dev")).toString();
+        if (!value(QStringLiteral("hw-dec")).toBool() || device == QLatin1String("none"))
+            return QStringLiteral("none");
+        return device.isEmpty() ? QStringLiteral("any") : device;
+    }
     if (name == QLatin1String("redesign-subtitle-encoding"))
         return QString((value(QStringLiteral("subsdec-autodetect-utf8")).toBool()
             ? QStringLiteral("auto:") : QStringLiteral("fixed:"))
@@ -1011,6 +1018,8 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-hardware-decoding"))
+        return m_edits.contains(QStringLiteral("hw-dec")) || m_edits.contains(QStringLiteral("dec-dev"));
     if (name == QLatin1String("redesign-subtitle-encoding"))
         return m_edits.contains(QStringLiteral("subsdec-encoding"))
             || m_edits.contains(QStringLiteral("subsdec-autodetect-utf8"));
@@ -1043,6 +1052,36 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-hardware-decoding")) {
+        auto description = describe(QStringLiteral("dec-dev"));
+        const auto enabled = describe(QStringLiteral("hw-dec"));
+        if (description.isEmpty() || enabled.isEmpty()) return {};
+        auto choices = description.value(QStringLiteral("choices")).toList();
+        for (const auto& entry : {std::pair{QStringLiteral("any"), qtr("Automatic")},
+                                  std::pair{QStringLiteral("none"), qtr("Off")}}) {
+            auto it = std::find_if(choices.begin(), choices.end(), [&](const auto& row) {
+                return row.toMap().value(QStringLiteral("value")).toString() == entry.first;
+            });
+            const QVariantMap row{{QStringLiteral("value"), entry.first}, {QStringLiteral("label"), entry.second}};
+            if (it == choices.end()) choices.append(row);
+            else *it = row;
+        }
+        const auto saved = value(QStringLiteral("dec-dev")).toString();
+        if (!saved.isEmpty() && std::none_of(choices.cbegin(), choices.cend(), [&](const auto& row) {
+            return row.toMap().value(QStringLiteral("value")).toString() == saved;
+        })) choices.append(QVariantMap{{QStringLiteral("value"), saved},
+            {QStringLiteral("label"), qtr("Saved device (%1)").arg(saved)}});
+        const auto deviceDefault = description.value(QStringLiteral("defaultValue")).toString();
+        description.insert(QStringLiteral("name"), name);
+        description.insert(QStringLiteral("title"), qtr("Hardware-accelerated decoding"));
+        description.insert(QStringLiteral("choices"), choices);
+        description.insert(QStringLiteral("value"), value(name));
+        description.insert(QStringLiteral("defaultValue"),
+            !enabled.value(QStringLiteral("defaultValue")).toBool() || deviceDefault == QLatin1String("none")
+                ? QStringLiteral("none") : deviceDefault.isEmpty() ? QStringLiteral("any") : deviceDefault);
+        description.insert(QStringLiteral("help"), qtr("Automatic lets VLC select a decoder device. Off uses software decoding and keeps your saved device choice. Reopen the video after a change."));
+        return description;
+    }
     if (name == QLatin1String("redesign-subtitle-encoding")) {
         auto description = describe(QStringLiteral("subsdec-encoding"));
         const auto detection = describe(QStringLiteral("subsdec-autodetect-utf8"));
@@ -1462,6 +1501,17 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-hardware-decoding")) {
+        if (proposed.metaType().id() != QMetaType::QString) return false;
+        const auto selection = proposed.toString();
+        const auto choices = describe(name).value(QStringLiteral("choices")).toList();
+        if (std::none_of(choices.cbegin(), choices.cend(), [&](const auto& row) {
+            return row.toMap().value(QStringLiteral("value")).toString() == selection;
+        })) return false;
+        if (selection == QLatin1String("none"))
+            return stage(QStringLiteral("hw-dec"), false);
+        return stage(QStringLiteral("dec-dev"), selection) && stage(QStringLiteral("hw-dec"), true);
+    }
     if (name == QLatin1String("redesign-subtitle-encoding")) {
         if (proposed.metaType().id() != QMetaType::QString) return false;
         const auto selection = proposed.toString();
@@ -1792,6 +1842,11 @@ void RedesignPreferences::cancelLanguageEdit(const QString& name)
 
 void RedesignPreferences::reset(const QString& name)
 {
+    if (name == QLatin1String("redesign-hardware-decoding")) {
+        reset(QStringLiteral("dec-dev"));
+        reset(QStringLiteral("hw-dec"));
+        return;
+    }
     const auto data = describe(name);
     if (!data.isEmpty()) stage(name, data.value(QStringLiteral("defaultValue")));
 }
