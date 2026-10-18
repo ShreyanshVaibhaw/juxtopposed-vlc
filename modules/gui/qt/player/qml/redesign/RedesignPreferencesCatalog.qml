@@ -119,7 +119,7 @@ QtObject {
             { title: qsTr("Tracks"), rows: [ ["redesign-audio-language", qsTr("Preferred audio language")], ["audio-desync", qsTr("Audio delay"), {factor: 0.001, decimals: 2, suffix: " s"}] ] },
             { title: qsTr("Visualization"), rows: [ ["audio-visual", qsTr("Visualizer"), {choiceLabels: {none: qsTr("Disabled")}}] ] } ],
         subtitles: [
-            { title: qsTr("Tracks & Languages"), rows: [ ["spu", qsTr("Enable subtitles")], ["redesign-sub-language", qsTr("Preferred language")], ["subsdec-encoding", qsTr("Text encoding")] ] },
+            { title: qsTr("Tracks & Languages"), rows: [ ["spu", qsTr("Enable subtitles")], ["redesign-sub-language", qsTr("Preferred language")], ["redesign-subtitle-encoding", qsTr("Text encoding"), {dynamicChoices: true}] ] },
             { title: qsTr("Loading Subtitles"), rows: [ ["sub-autodetect-file", qsTr("Load subtitle files automatically")], ["sub-autodetect-fuzzy", qsTr("File name matching"), {dynamicChoices: true}] ] },
             { title: qsTr("Appearance"), rows: [ ["freetype-font", qsTr("Font")],
                 ["sub-text-size-mode", qsTr("Size values"), {editor: "segmented"}],
@@ -206,6 +206,8 @@ QtObject {
     // Search uses the same controls as the settings pages. The expert list,
     // and an exact search for a hyphenated native name, retain the native option.
     readonly property var searchAliases: ({
+        "subsdec-encoding": "redesign-subtitle-encoding",
+        "subsdec-autodetect-utf8": "redesign-subtitle-encoding",
         "media-library": "media-library-startup",
         "qt-buffering-custom": "redesign-buffering",
         "freetype-background-mode": "redesign-subtitle-background",

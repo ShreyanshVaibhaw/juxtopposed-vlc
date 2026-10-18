@@ -71,6 +71,7 @@ check_PROGRAMS = \
 	test_src_input_decoder \
 	test_src_input_subtitle_style \
 	test_src_input_subtitle_duration \
+	test_src_input_subtitle_encoding \
 	test_src_input_overlay_opacity \
 	test_src_input_subtitle_ass_text \
 	test_src_input_item_update \
@@ -330,6 +331,8 @@ test_src_input_overlay_opacity_SOURCES = src/input/overlay_opacity.c
 test_src_input_overlay_opacity_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_input_subtitle_duration_SOURCES = src/input/subtitle_duration.c
 test_src_input_subtitle_duration_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_input_subtitle_encoding_SOURCES = src/input/subtitle_encoding.c
+test_src_input_subtitle_encoding_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_input_subtitle_ass_text_SOURCES = src/input/subtitle_ass_text.c
 test_src_input_item_update_SOURCES = src/input/item_update.c
 test_src_input_item_update_LDADD = $(LIBVLCCORE) $(LIBVLC)

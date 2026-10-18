@@ -324,6 +324,18 @@ TestCase {
         compare(findChild(fontSizeRow, "preferenceChoiceEditor").currentText, "125 %")
         compare(sizeStore.value("sub-text-scale"), 125)
     }
+    function test_encodingSearchCombinesDetectionAndFallback() {
+        const results = catalog.searchResults("encoding", [
+            {name: "subsdec-encoding", title: "Subtitle text encoding"},
+            {name: "subsdec-autodetect-utf8", title: "UTF-8 subtitle autodetection"}
+        ])
+        const encoding = results.filter(row => row.name === "redesign-subtitle-encoding")
+        compare(encoding.length, 1)
+        verify(!results.some(row => row.name === "subsdec-encoding" || row.name === "subsdec-autodetect-utf8"))
+        compare(encoding[0].title, "Text encoding")
+        verify(encoding[0].presentation.dynamicChoices)
+        compare(catalog.sections.subtitles[0].rows[2][0], encoding[0].name)
+    }
     function test_searchUsesPageControlsWithoutNativeDuplicates() {
         const results = catalog.searchResults("background", [
             {name: "freetype-background-mode", title: "Text background"},
@@ -354,7 +366,7 @@ TestCase {
         compare(results[1].presentation.suffix, " s")
     }
     function test_exactNativeAliasSearchRetainsExpertControl() {
-        for (const name of ["freetype-background-mode", "freetype-background-opacity", "snapshot-width"]) {
+        for (const name of ["freetype-background-mode", "freetype-background-opacity", "snapshot-width", "subsdec-encoding", "subsdec-autodetect-utf8"]) {
             const results = catalog.searchResults(name.toUpperCase(), [{name: name, title: "Native option"}])
             compare(results.length, 1)
             compare(results[0].name, name)

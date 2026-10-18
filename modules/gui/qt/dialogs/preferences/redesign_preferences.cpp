@@ -873,6 +873,10 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-subtitle-encoding"))
+        return QString((value(QStringLiteral("subsdec-autodetect-utf8")).toBool()
+            ? QStringLiteral("auto:") : QStringLiteral("fixed:"))
+            + value(QStringLiteral("subsdec-encoding")).toString());
     if (name == QLatin1String("redesign-buffering")) {
         if (value(QStringLiteral("qt-buffering-custom")).toBool()) return 0;
         for (int level : bufferingLevels)
@@ -1005,6 +1009,9 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-subtitle-encoding"))
+        return m_edits.contains(QStringLiteral("subsdec-encoding"))
+            || m_edits.contains(QStringLiteral("subsdec-autodetect-utf8"));
     if (name == QLatin1String("redesign-buffering"))
         return m_edits.contains(QStringLiteral("qt-buffering-custom"))
             || std::any_of(std::begin(bufferingOptions), std::end(bufferingOptions), [&](const char *option) { return m_edits.contains(qfu(option)); });
@@ -1034,6 +1041,37 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-subtitle-encoding")) {
+        auto description = describe(QStringLiteral("subsdec-encoding"));
+        const auto detection = describe(QStringLiteral("subsdec-autodetect-utf8"));
+        if (description.isEmpty() || detection.isEmpty()) return {};
+        QVariantList choices{
+            QVariantMap{{QStringLiteral("label"), qtr("Automatic")}, {QStringLiteral("value"), QStringLiteral("auto:")}}};
+        for (const auto& choice : description.value(QStringLiteral("choices")).toList()) {
+            auto row = choice.toMap();
+            row.insert(QStringLiteral("value"), QString(QStringLiteral("fixed:") + row.value(QStringLiteral("value")).toString()));
+            choices.append(row);
+        }
+        const auto current = value(name).toString();
+        const auto encoding = value(QStringLiteral("subsdec-encoding")).toString();
+        if (std::none_of(choices.cbegin(), choices.cend(), [&](const auto& row) {
+            return row.toMap().value(QStringLiteral("value")).toString() == current;
+        })) choices.append(QVariantMap{
+            {QStringLiteral("label"), current.startsWith(QLatin1String("auto:"))
+                ? qtr("Automatic (fallback: %1)").arg(encoding) : qtr("Custom (%1)").arg(encoding)},
+            {QStringLiteral("value"), current}});
+        description.insert(QStringLiteral("title"), qtr("Text encoding"));
+        description.insert(QStringLiteral("choices"), choices);
+        description.insert(QStringLiteral("value"), current);
+        description.insert(QStringLiteral("defaultValue"),
+            QString((detection.value(QStringLiteral("defaultValue")).toBool() ? QStringLiteral("auto:") : QStringLiteral("fixed:"))
+            + description.value(QStringLiteral("defaultValue")).toString()));
+        description.insert(QStringLiteral("help"), qtr("Automatic detects UTF-8 text first. If detection fails, VLC uses the default text encoding. Select a specific encoding to turn off this detection. Reopen the subtitle file after a change."));
+        if (current.startsWith(QLatin1String("auto:")) && !encoding.isEmpty())
+            description.insert(QStringLiteral("help"), QString(description.value(QStringLiteral("help")).toString()
+                + QLatin1Char(' ') + qtr("The current automatic fallback is %1.").arg(encoding)));
+        return description;
+    }
     if (name == QLatin1String("redesign-buffering")) {
         QVariantList choices;
         const int levels[] = {100, 200, 300, 500, 1000, 0};
@@ -1395,6 +1433,19 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-subtitle-encoding")) {
+        if (proposed.metaType().id() != QMetaType::QString) return false;
+        const auto selection = proposed.toString();
+        const auto choices = describe(name).value(QStringLiteral("choices")).toList();
+        if (std::none_of(choices.cbegin(), choices.cend(), [&](const auto& row) {
+            return row.toMap().value(QStringLiteral("value")).toString() == selection;
+        })) return false;
+        if (selection == value(name).toString()) return true;
+        const bool automatic = selection.startsWith(QLatin1String("auto:"));
+        const auto encoding = selection.mid(automatic ? 5 : 6);
+        return stage(QStringLiteral("subsdec-encoding"), encoding)
+            && stage(QStringLiteral("subsdec-autodetect-utf8"), automatic);
+    }
     if (name == QLatin1String("redesign-buffering")) {
         bool valid = false;
         const int level = proposed.toInt(&valid);
