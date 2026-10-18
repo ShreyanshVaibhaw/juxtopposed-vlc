@@ -178,6 +178,7 @@ moc_headers = files(
     'widgets/native/animators.hpp',
     'widgets/native/csdthemeimage.hpp',
     'widgets/native/customwidgets.hpp',
+    'widgets/native/embedded_file_browser.hpp',
     'widgets/native/interface_widgets.hpp',
     'widgets/native/navigation_attached.hpp',
     'widgets/native/mlfolderseditor.hpp',
@@ -565,6 +566,8 @@ qt_plugin_sources = files(
     'util/pointingtooltipattached.hpp',
     'widgets/native/animators.cpp',
     'widgets/native/animators.hpp',
+    'widgets/native/embedded_file_browser.cpp',
+    'widgets/native/embedded_file_browser.hpp',
     'widgets/native/customwidgets.cpp',
     'widgets/native/customwidgets.hpp',
     'widgets/native/csdthemeimage.cpp',
@@ -1797,6 +1800,17 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_embedded_file_browser',
+            'sources': files('tests/test_embedded_file_browser.cpp', 'widgets/native/embedded_file_browser.cpp'),
+            'moc_sources': files('tests/test_embedded_file_browser.cpp'),
+            'moc_headers': files('widgets/native/embedded_file_browser.hpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
         }
 
         vlc_tests += {

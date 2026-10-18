@@ -406,6 +406,7 @@ libqt_plugin_la_SOURCES = \
 	widgets/native/animators.cpp \
 	widgets/native/animators.hpp \
 	widgets/native/customwidgets.cpp widgets/native/customwidgets.hpp \
+	widgets/native/embedded_file_browser.cpp widgets/native/embedded_file_browser.hpp \
 	widgets/native/csdthemeimage.cpp \
 	widgets/native/csdthemeimage.hpp \
 	widgets/native/interface_widgets.cpp \
@@ -578,6 +579,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	widgets/native/animators.moc.cpp \
 	widgets/native/csdthemeimage.moc.cpp \
 	widgets/native/customwidgets.moc.cpp \
+	widgets/native/embedded_file_browser.moc.cpp \
 	widgets/native/interface_widgets.moc.cpp \
 	widgets/native/navigation_attached.moc.cpp \
 	widgets/native/mlfolderseditor.moc.cpp \
@@ -2157,6 +2159,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_embedded_file_browser
+
+test_embedded_file_browser_SOURCES = tests/test_embedded_file_browser.cpp widgets/native/embedded_file_browser.hpp widgets/native/embedded_file_browser.cpp
+nodist_test_embedded_file_browser_SOURCES = tests/test_embedded_file_browser.moc widgets/native/embedded_file_browser.moc.cpp
+BUILT_SOURCES += tests/test_embedded_file_browser.moc
+CLEANFILES += tests/test_embedded_file_browser.moc
+test_embedded_file_browser_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_embedded_file_browser_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_embedded_file_browser_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_embedded_file_browser_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_embedded_file_browser
+TESTS += test_embedded_file_browser
 
 # test_playlist_tree_model
 
