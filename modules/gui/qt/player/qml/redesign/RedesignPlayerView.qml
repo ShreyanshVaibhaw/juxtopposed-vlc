@@ -530,7 +530,8 @@ FocusScope {
             readonly property bool inHeader: parent === header || !!parent && parent.objectName.startsWith("customHeader")
             visible: inHeader || root.width > theme.dp(1200)
             anchors.centerIn: parent === header ? header : undefined
-            width: parent === header ? Math.max(0, header.width - Math.max(headerLeft.width, windowControls.width) * 2 - theme.dp(32)) : implicitWidth
+            width: parent === header ? Math.max(0, header.width - Math.max(headerLeft.width,
+                windowControls.width - (closeButton.flushToCorner ? theme.dp(6) : 0)) * 2 - theme.dp(32)) : implicitWidth
             implicitWidth: Math.min(theme.dp(220), titleLabel.implicitWidth)
             implicitHeight: theme.dp(36)
             Layout.fillWidth: true
@@ -545,10 +546,11 @@ FocusScope {
         }
         Row {
             id: windowControls
-            anchors.right: parent.right; anchors.rightMargin: theme.dp(6)
+            anchors.right: parent.right; anchors.rightMargin: closeButton.flushToCorner ? 0 : theme.dp(6)
             anchors.verticalCenter: parent.verticalCenter
             ChromeButton {
                 id: minimizeButton
+                anchors.verticalCenter: parent === windowControls ? parent.verticalCenter : undefined
                 visible: root.showWindowButtons
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "minimize"; text: qsTr("Minimize")
@@ -556,6 +558,7 @@ FocusScope {
             }
             ChromeButton {
                 id: maximizeButton
+                anchors.verticalCenter: parent === windowControls ? parent.verticalCenter : undefined
                 visible: root.showWindowButtons
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "maximize"; text: root.maximized ? qsTr("Restore window") : qsTr("Maximize")
@@ -563,6 +566,7 @@ FocusScope {
             }
             ChromeButton {
                 id: fullscreenButton
+                anchors.verticalCenter: parent === windowControls ? parent.verticalCenter : undefined
                 objectName: "fullscreenButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "fullscreen"; text: root.fullscreen ? qsTr("Exit fullscreen") : qsTr("Fullscreen")
@@ -570,6 +574,13 @@ FocusScope {
             }
             ChromeButton {
                 id: closeButton
+                objectName: "windowCloseButton"
+                readonly property bool flushToCorner: root.showWindowButtons && (root.maximized || root.fullscreen) && !chromeLayout.editing
+                    && (parent === windowControls || !!parent && parent.objectName === "customHeaderRight"
+                        && chrome.renderedLayout && chrome.renderedLayout.zones.headerRight.slice(-1)[0] === "close")
+                implicitWidth: theme.dp(flushToCorner ? 42 : 36)
+                implicitHeight: theme.dp(flushToCorner ? 40 : 36)
+                rightPadding: flushToCorner ? theme.dp(6) : 0
                 visible: root.showWindowButtons
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 iconName: "close"; text: qsTr("Close")

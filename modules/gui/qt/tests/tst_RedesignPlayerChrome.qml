@@ -20,6 +20,7 @@ TestCase {
     SignalSpy { id: playSpy; target: player; signalName: "togglePlayback" }
     SignalSpy { id: volumeSpy; target: player; signalName: "volumeRequested" }
     SignalSpy { id: fullscreenSpy; target: player; signalName: "fullscreenRequested" }
+    SignalSpy { id: closeSpy; target: player; signalName: "closeRequested" }
     function item(name) { return findChild(player, name) }
     function point(name) { return item(name).mapToItem(player, 0, 0) }
     function settledDefault() {
@@ -32,10 +33,12 @@ TestCase {
         player.scaleFactor = 1; player.lightTheme = false
         player.libraryOpen = false; player.libraryExpanded = false
         player.fullscreen = false; player.controlsHideTimeout = 1800
+        player.maximized = false
+        player.showWindowButtons = true
         player.customMenuOpen = false
         testCase.width = 1920; testCase.height = 1080
         player.mediaTitle = "The Wand S01E11"; player.mediaFolderTitle = "S01"
-        playSpy.clear(); volumeSpy.clear(); fullscreenSpy.clear()
+        playSpy.clear(); volumeSpy.clear(); fullscreenSpy.clear(); closeSpy.clear()
         settledDefault()
     }
     function alternate() {
@@ -46,6 +49,54 @@ TestCase {
         model.move("fullscreen", "footerRight", model.layout.zones.footerRight.length)
         tryVerify(() => item("mainMenuButton").parent.objectName === "customFooterLeft")
         tryVerify(() => Math.abs(point("seekBar").x - 104) < 1 && Math.abs(point("seekBar").y - 986) < 1)
+    }
+    function test_closeReachesScreenCornerWithoutMovingIcon_data() {
+        return [{tag: "maximized", max: true, scale: 1},
+                {tag: "fullscreen", full: true, scale: 1},
+                {tag: "scaled", max: true, scale: 1.5}]
+    }
+    function test_closeReachesScreenCornerWithoutMovingIcon(data) {
+        player.scaleFactor = data.scale
+        const close = item("windowCloseButton")
+        verify(close !== null)
+        const icon = findChild(close, "redesignButtonIcon")
+        tryVerify(() => close.visible && close.mapToItem(player, close.width, 0).x === player.width - player.theme.dp(6))
+        const before = icon.mapToItem(player, 0, 0)
+        const titleWidth = item("mediaTitleControl").width
+        player.maximized = !!data.max; player.fullscreen = !!data.full
+        tryVerify(() => close.mapToItem(player, close.width, 0).x === player.width && close.mapToItem(player, 0, 0).y === 0)
+        compare(close.mapToItem(player, close.width, 0).x, player.width)
+        compare(close.mapToItem(player, 0, 0).y, 0)
+        compare(icon.mapToItem(player, 0, 0), before)
+        compare(item("mediaTitleControl").width, titleWidth)
+        mouseClick(player, player.width - 1, 0)
+        compare(closeSpy.count, 1)
+        close.forceActiveFocus(); keyClick(Qt.Key_Space)
+        compare(closeSpy.count, 2)
+    }
+    function test_customCloseCornerFollowsTheActualControl() {
+        player.maximized = true
+        alternate()
+        player.playerLayout = player.layoutModel.serialize()
+        tryVerify(() => !player.layoutModel.editing)
+        verify(waitForRendering(player))
+        mouseClick(player, player.width - 1, 0)
+        compare(closeSpy.count, 1)
+        player.layoutModel.begin()
+        player.layoutModel.move("close", "footerRight", player.layoutModel.layout.zones.footerRight.length)
+        player.playerLayout = player.layoutModel.serialize()
+        tryVerify(() => item("windowCloseButton").parent.objectName === "customFooterRight")
+        mouseClick(player, player.width - 1, 0)
+        compare(closeSpy.count, 1)
+        mouseClick(item("windowCloseButton"))
+        compare(closeSpy.count, 2)
+    }
+    function test_hiddenWindowButtonsKeepTheirOuterMargin() {
+        player.showWindowButtons = false; player.maximized = true
+        const fullscreen = item("fullscreenButton")
+        tryVerify(() => fullscreen.mapToItem(player, fullscreen.width, 0).x === player.width - player.theme.dp(6))
+        mouseClick(player, player.width - 1, 0)
+        compare(closeSpy.count, 0)
     }
     function test_referenceAlternateMovesRealControls_data() {
         return [{tag: "dark"}, {tag: "light", light: true}]

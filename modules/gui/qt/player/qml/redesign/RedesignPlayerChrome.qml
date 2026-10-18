@@ -90,7 +90,7 @@ Item {
         RowLayout {
             id: headerRight
             objectName: "customHeaderRight"
-            anchors.right: parent.right; anchors.rightMargin: root.theme.dp(6)
+            anchors.right: parent.right; anchors.rightMargin: root.allControls.close && root.allControls.close.flushToCorner ? 0 : root.theme.dp(6)
             anchors.verticalCenter: parent.verticalCenter
             spacing: 0
         }
