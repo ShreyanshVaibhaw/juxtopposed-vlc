@@ -22,9 +22,7 @@ QtObject {
                 ["qt-updates-notif", qsTr("Check for updates automatically")] ] },
             { title: qsTr("Diagnostics"), rows: [
                 ["qt-verbose", qsTr("Developer mode")], ["file-logging", qsTr("Save a log")], ["logfile", qsTr("Log file"), {enabledWhen: "file-logging"}],
-                ["verbose", qsTr("Log details"), { choices: [
-                    {label: qsTr("Errors only"), value: 0}, {label: qsTr("Warnings"), value: 1},
-                    {label: qsTr("Debug"), value: 2}, {label: qsTr("Silent"), value: -1} ] }] ] } ],
+                ["redesign-log-details", qsTr("Log details"), {dynamicChoices: true}] ] } ],
         interface: [
             { title: qsTr("Skin"), rows: [ ["skins2-last", qsTr("Skin file")] ] },
             { title: qsTr("Window"), rows: [
@@ -224,6 +222,8 @@ QtObject {
     // Search uses the same controls as the settings pages. The expert list,
     // and an exact search for a hyphenated native name, retain the native option.
     readonly property var searchAliases: ({
+        "log-level": "redesign-log-details",
+        "log-verbose": "redesign-log-details",
         "subsdec-encoding": "redesign-subtitle-encoding",
         "subsdec-autodetect-utf8": "redesign-subtitle-encoding",
         "media-library": "media-library-startup",

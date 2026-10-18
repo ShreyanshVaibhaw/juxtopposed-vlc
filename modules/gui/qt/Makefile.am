@@ -370,6 +370,7 @@ libqt_plugin_la_SOURCES = \
 	util/variables.cpp util/variables.hpp \
 	util/vlchotkeyconverter.cpp util/vlchotkeyconverter.hpp \
 	util/postprocessing_preferences.hpp \
+	util/file_log_preferences.hpp \
 	util/vlctick.cpp \
 	util/vlctick.hpp \
 	util/shared_input_item.hpp \
@@ -2151,6 +2152,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_file_log_preferences
+
+test_file_log_preferences_SOURCES = tests/test_file_log_preferences.cpp util/file_log_preferences.hpp
+nodist_test_file_log_preferences_SOURCES = tests/test_file_log_preferences.moc
+BUILT_SOURCES += tests/test_file_log_preferences.moc
+CLEANFILES += tests/test_file_log_preferences.moc
+test_file_log_preferences_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_file_log_preferences_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_file_log_preferences_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_file_log_preferences_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_file_log_preferences
+TESTS += test_file_log_preferences
 
 # test_warning_log_buffer
 

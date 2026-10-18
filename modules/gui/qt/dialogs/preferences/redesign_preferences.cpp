@@ -4,6 +4,7 @@
 #include "player/stereo_test_player.hpp"
 #include "player/player_controller.hpp"
 #include "util/renderer_manager.hpp"
+#include "util/file_log_preferences.hpp"
 #include "util/vlcqtmessagehandler.hpp"
 #include <vlc_configuration.h>
 #include <vlc_modules.h>
@@ -1138,6 +1139,11 @@ QVariant RedesignPreferences::value(const QString& name) const
         return 100;
     }
 
+    if (name == QLatin1String("redesign-log-details"))
+        return vlc::filelog::selection(value(QStringLiteral("log-level")).toString(),
+            value(QStringLiteral("file-logging")).toBool(), value(QStringLiteral("log-verbose")).toLongLong(),
+            value(QStringLiteral("verbose")).toLongLong());
+
     if (name == QLatin1String("redesign-web-remote")) {
         const auto interfaces = value(QStringLiteral("extraintf")).toString().split(QLatin1Char(':'), Qt::SkipEmptyParts);
         return std::any_of(interfaces.cbegin(), interfaces.cend(), [](const auto& entry) {
@@ -1192,6 +1198,11 @@ QVariant RedesignPreferences::videoValue(const QString& name) const
 
 bool RedesignPreferences::isStaged(const QString& name) const
 {
+    if (name == QLatin1String("redesign-log-details"))
+        return m_edits.contains(QStringLiteral("log-level"))
+            || (value(QStringLiteral("log-level")).toString().isEmpty()
+                && (m_edits.contains(QStringLiteral("file-logging")) || m_edits.contains(QStringLiteral("log-verbose"))
+                    || m_edits.contains(QStringLiteral("verbose"))));
     if (name == QLatin1String("redesign-postprocessing"))
         return m_edits.contains(QStringLiteral("postproc-q")) || m_edits.contains(QStringLiteral("video-filter"));
     if (name == QLatin1String("redesign-hardware-decoding"))
@@ -1228,6 +1239,28 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-log-details")) {
+        auto description = describe(QStringLiteral("log-level"));
+        if (description.isEmpty()) return {};
+        auto choices = description.value(QStringLiteral("choices")).toList();
+        choices.erase(std::remove_if(choices.begin(), choices.end(), [](const auto& choice) {
+            return choice.toMap().value(QStringLiteral("value")).toString().isEmpty();
+        }), choices.end());
+        const auto current = value(name).toString();
+        if (std::none_of(choices.cbegin(), choices.cend(), [&](const auto& choice) {
+            return choice.toMap().value(QStringLiteral("value")).toString() == current;
+        }))
+            choices.append(QVariantMap{{QStringLiteral("value"), current}, {QStringLiteral("label"),
+                current == QLatin1String("native-info-errors") ? qtr("Errors and information") : qtr("Saved value (%1)").arg(current)}});
+        description.insert(QStringLiteral("name"), name);
+        description.insert(QStringLiteral("title"), qtr("Log details"));
+        description.insert(QStringLiteral("editor"), QStringLiteral("choice"));
+        description.insert(QStringLiteral("choices"), choices);
+        description.insert(QStringLiteral("value"), current);
+        description.insert(QStringLiteral("defaultValue"), QStringLiteral("errors"));
+        description.insert(QStringLiteral("help"), qtr("Choose the messages to save in the log file. Restart VLC after a change."));
+        return description;
+    }
     if (!VLC_SKINS_ENABLED && name == QLatin1String("skins2-last"))
         return {};
     if (name == QLatin1String("redesign-rescan-plugins")) {
@@ -1674,7 +1707,7 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
     if (name == QLatin1String("logmode"))
         result.insert(QStringLiteral("help"), qtr("Choose plain text or HTML for the log file. Restart VLC after a change."));
     if (name == QLatin1String("verbose"))
-        result.insert(QStringLiteral("help"), qtr("Choose the messages to save in the log. Restart VLC after a change."));
+        result.insert(QStringLiteral("help"), qtr("Choose the VLC log level. File logs can use this level or a separate file log level. Restart VLC after a change."));
     if (name == QLatin1String("qt-verbose"))
         result.insert(QStringLiteral("help"), qtr("Add internal interface information, warnings and errors to the VLC log. Use Log details to choose which messages to save."));
     if (name == QLatin1String("qt-error-dialogs"))
@@ -1757,6 +1790,22 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-log-details")) {
+        if (proposed.metaType().id() != QMetaType::QString) return false;
+        const auto selection = proposed.toString();
+        if (selection.isEmpty()) return false;
+        const auto choices = describe(QStringLiteral("log-level")).value(QStringLiteral("choices")).toList();
+        if (std::none_of(choices.cbegin(), choices.cend(), [&](const auto& choice) {
+            return choice.toMap().value(QStringLiteral("value")).toString() == selection;
+        })) return selection == value(name).toString();
+        return stage(QStringLiteral("log-level"), selection);
+    }
+    if (name == QLatin1String("file-logging") && proposed.toBool() && !value(name).toBool()
+        && value(QStringLiteral("log-level")).toString().isEmpty() && config_FindConfig("log-level")) {
+        // The untouched design choice is Errors only. Apply it when a user
+        // first enables file logging; native callers can still inherit verbosity.
+        if (!stage(QStringLiteral("log-level"), QStringLiteral("errors"))) return false;
+    }
     if (name == QLatin1String("redesign-postprocessing")) {
         const auto *cfg = config_FindConfig("postproc-q");
         bool valid = false;
