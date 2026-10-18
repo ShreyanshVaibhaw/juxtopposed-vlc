@@ -4,6 +4,7 @@ This fork adapts [Juxtopposed’s VLC redesign](https://www.figma.com/community/
 for VLC’s native interface. The interface and settings workflow are in active development.
 See the [Releases page](https://github.com/dsojevic/juxtopposed-vlc/releases) for Windows beta builds.
 For building on Linux from source, see [doc/BUILD-linux.md](doc/BUILD-linux.md).
+For building on macOS from source, see [doc/BUILD-macos.md](doc/BUILD-macos.md).
 
 ![Simple player with the pixel-cat video](doc/images/redesign/player.png)
 
