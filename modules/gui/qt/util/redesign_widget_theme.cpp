@@ -12,11 +12,14 @@
 #include <QWidget>
 #include <QPointer>
 #include <QMessageBox>
+#include <QMenu>
 #include <QAbstractButton>
 
 void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
 {
-    if (!ctx || widget->property("redesignDialog").toBool()) return;
+    // Menus use RedesignMenuStyle; a dialog stylesheet overrides its item
+    // painting (including hover states and submenu chevrons).
+    if (!ctx || qobject_cast<QMenu*>(widget) || widget->property("redesignDialog").toBool()) return;
     widget->setProperty("redesignDialog", true);
     widget->setAttribute(Qt::WA_StyledBackground);
     const auto box = qobject_cast<QMessageBox*>(widget);

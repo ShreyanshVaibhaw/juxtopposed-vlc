@@ -495,6 +495,10 @@ void VLCMenuBar::VideoMenu( qt_intf_t *p_intf, QMenu *current )
  **/
 void VLCMenuBar::NavigMenu( qt_intf_t *p_intf, QMenu *menu )
 {
+    // SVG icons capture the palette when the actions are created.
+    if (p_intf->p_mi && !p_intf->b_isDialogProvider)
+        styleRedesignMenus(menu, p_intf->p_mi);
+
     QAction *action;
     QMenu *submenu;
 
@@ -634,6 +638,8 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
 {
     QAction *action;
     QMenu *rateMenu = new QMenu( qtr( "Sp&eed" ), menu );
+    // QMenu windows do not inherit their parent menu's palette automatically.
+    rateMenu->setPalette(menu->palette());
     rateMenu->setTearOffEnabled( true );
 
     if( b_normal )

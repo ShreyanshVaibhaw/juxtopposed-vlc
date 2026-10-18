@@ -142,7 +142,19 @@ public:
         const QColor foreground = enabled ? m_foreground : m_disabled;
         const auto visual = [&](const QRect& box) { return visualRect(item->direction, rect, box); };
         const QRect icon = visual(QRect(rect.x() + dp(14), rect.center().y() - dp(12), dp(24), dp(24)));
-        if (!item->icon.isNull()) item->icon.paint(painter, icon, Qt::AlignCenter, enabled ? QIcon::Normal : QIcon::Disabled, item->checked ? QIcon::On : QIcon::Off);
+        if (!item->icon.isNull()) {
+            const auto state = item->checked ? QIcon::On : QIcon::Off;
+            if (enabled) item->icon.paint(painter, icon, Qt::AlignCenter, QIcon::Normal, state);
+            else {
+                // Use the text's disabled colour instead of Qt's generated icon tint.
+                auto pixmap = item->icon.pixmap(icon.size(), painter->device()->devicePixelRatioF(), QIcon::Normal, state);
+                QPainter tint(&pixmap);
+                tint.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                tint.fillRect(pixmap.rect(), m_disabled);
+                tint.end();
+                drawItemPixmap(painter, icon, Qt::AlignCenter, pixmap);
+            }
+        }
         else if (item->checked) {
             painter->setPen(QPen(enabled ? m_accent : m_disabled, 1.5 * m_scale, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             painter->setBrush(Qt::NoBrush);
