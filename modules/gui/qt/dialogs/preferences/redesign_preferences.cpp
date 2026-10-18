@@ -48,6 +48,8 @@
 
 namespace {
 const QString presetOption = QStringLiteral("qt-player-presets");
+// Minimum pointer movement in pixels, from low to high sensitivity.
+constexpr int fullscreenSensitivityLevels[] = {32, 16, 8, 3, 2, 1, 0};
 
 QVariantList moduleChoices(const QStringList& capabilities)
 {
@@ -308,6 +310,18 @@ void applyWindowOpacity(MainCtx* ctx)
     if (var_Type(intf, "qt-opacity") == 0) var_Create(intf, "qt-opacity", VLC_VAR_FLOAT);
     var_SetFloat(intf, "qt-opacity", opacity);
     if (auto* window = ctx->intfMainWindow()) window->setOpacity(opacity);
+}
+
+void applyFullscreenControlPreferences(qt_intf_t* intf, bool opacity, bool sensitivity)
+{
+    if (opacity) {
+        if (var_Type(intf, "qt-fs-opacity") == 0) var_Create(intf, "qt-fs-opacity", VLC_VAR_FLOAT);
+        var_SetFloat(intf, "qt-fs-opacity", config_GetFloat("qt-fs-opacity"));
+    }
+    if (sensitivity) {
+        if (var_Type(intf, "qt-fs-sensitivity") == 0) var_Create(intf, "qt-fs-sensitivity", VLC_VAR_INTEGER);
+        var_SetInteger(intf, "qt-fs-sensitivity", config_GetInt("qt-fs-sensitivity"));
+    }
 }
 
 void applyOsdPreferences(qt_intf_t* intf)
@@ -1040,6 +1054,12 @@ bool RedesignPreferences::deletePlayerPreset(const QString& id)
 
 QVariant RedesignPreferences::value(const QString& name) const
 {
+    if (name == QLatin1String("redesign-fullscreen-sensitivity")) {
+        const auto pixels = value(QStringLiteral("qt-fs-sensitivity")).toLongLong();
+        const auto nearest = std::min_element(std::begin(fullscreenSensitivityLevels), std::end(fullscreenSensitivityLevels),
+            [pixels](int a, int b) { return std::abs(pixels - a) < std::abs(pixels - b); });
+        return int(nearest - std::begin(fullscreenSensitivityLevels));
+    }
     if (name == QLatin1String("language")) {
         QString selected = m_edits.contains(name) ? m_edits.value(name).toString() : read("language").toString();
         if (selected.isEmpty()) {
@@ -1178,8 +1198,10 @@ QVariant RedesignPreferences::value(const QString& name) const
         return m_ctx->systrayRequested();
     if (m_ctx && (name == QLatin1String("qt-notification") || name == QLatin1String("qt-notification-timeout")))
         return QVariant::fromValue<qlonglong>(var_InheritInteger(m_ctx->getIntf(), name.toUtf8().constData()));
-    if (m_ctx && name == QLatin1String("qt-opacity"))
-        return var_InheritFloat(m_ctx->getIntf(), "qt-opacity");
+    if (m_ctx && (name == QLatin1String("qt-opacity") || name == QLatin1String("qt-fs-opacity")))
+        return var_InheritFloat(m_ctx->getIntf(), name.toUtf8().constData());
+    if (m_ctx && name == QLatin1String("qt-fs-sensitivity"))
+        return QVariant::fromValue<qlonglong>(var_InheritInteger(m_ctx->getIntf(), "qt-fs-sensitivity"));
     if (m_ctx && name == QLatin1String("qt-backdrop-blur"))
         return m_ctx->backdropBlurRequested();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
@@ -1255,6 +1277,14 @@ bool RedesignPreferences::isStaged(const QString& name) const
 
 QVariantMap RedesignPreferences::describe(const QString& name) const
 {
+    if (name == QLatin1String("redesign-fullscreen-sensitivity")) {
+        if (!config_FindConfig("qt-fs-sensitivity")) return {};
+        return {{QStringLiteral("name"), name}, {QStringLiteral("kind"), QStringLiteral("integer")},
+            {QStringLiteral("title"), qtr("Fullscreen controls sensitivity")},
+            {QStringLiteral("minimum"), 0}, {QStringLiteral("maximum"), 6},
+            {QStringLiteral("defaultValue"), 3}, {QStringLiteral("value"), value(name)},
+            {QStringLiteral("help"), qtr("Move the pointer near the top or bottom edge to show the fullscreen controls. A higher sensitivity needs less movement.")}};
+    }
     if (name == QLatin1String("redesign-log-details")) {
         auto description = describe(QStringLiteral("log-level"));
         if (description.isEmpty()) return {};
@@ -1734,6 +1764,10 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         result.insert(QStringLiteral("help"), qtr("Choose how long the track popup is shown. The system can change this time."));
     if (name == QLatin1String("qt-opacity"))
         result.insert(QStringLiteral("help"), qtr("Change the opacity of the main VLC window. The change applies at once."));
+    if (name == QLatin1String("qt-fs-opacity"))
+        result.insert(QStringLiteral("help"), qtr("Change the opacity of the control backgrounds in fullscreen. The text and icons stay clear."));
+    if (name == QLatin1String("qt-fs-sensitivity"))
+        result.insert(QStringLiteral("help"), qtr("Minimum pointer movement in pixels before fullscreen controls appear near an edge. A smaller value increases sensitivity."));
     if (name == QLatin1String("qt-minimal-view"))
         result.insert(QStringLiteral("help"), qtr("Start VLC in compact mode. Restart VLC after a change. Launch options can override this setting."));
     if (name == QLatin1String("qt-verbose"))
@@ -1818,6 +1852,12 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
 
 bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 {
+    if (name == QLatin1String("redesign-fullscreen-sensitivity")) {
+        bool valid = false;
+        const double level = proposed.toDouble(&valid);
+        if (!valid || !std::isfinite(level) || level != std::floor(level) || level < 0 || level >= std::size(fullscreenSensitivityLevels)) return false;
+        return stage(QStringLiteral("qt-fs-sensitivity"), fullscreenSensitivityLevels[int(level)]);
+    }
     if (name == QLatin1String("qt-start-minimized") && proposed.toBool()
         && !value(QStringLiteral("qt-system-tray")).toBool()) {
         if (!stage(QStringLiteral("qt-system-tray"), true)) return false;
@@ -2169,8 +2209,10 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && (name == QLatin1String("qt-notification") || name == QLatin1String("qt-notification-timeout")))
         applyToPlayer = normalized.toLongLong() != value(name).toLongLong();
-    if (m_ctx && name == QLatin1String("qt-opacity"))
+    if (m_ctx && (name == QLatin1String("qt-opacity") || name == QLatin1String("qt-fs-opacity")))
         applyToPlayer = !qFuzzyCompare(normalized.toFloat(), value(name).toFloat());
+    if (m_ctx && name == QLatin1String("qt-fs-sensitivity"))
+        applyToPlayer = normalized.toLongLong() != value(name).toLongLong();
     if (m_ctx && name == QLatin1String("qt-compact-menus"))
         applyToPlayer = normalized.toBool() != m_ctx->compactMenus();
     if (m_ctx && name == QLatin1String("qt-discover-cast-devices"))
@@ -2306,6 +2348,8 @@ bool RedesignPreferences::save()
         m_ctx->refreshSystray();
     if (previous.contains(QStringLiteral("qt-opacity")))
         applyWindowOpacity(m_ctx);
+    applyFullscreenControlPreferences(m_ctx->getIntf(),
+        previous.contains(QStringLiteral("qt-fs-opacity")), previous.contains(QStringLiteral("qt-fs-sensitivity")));
     if (previous.contains(QStringLiteral("qt-verbose")))
         updateVlcQtMessageHandler(var_InheritBool(m_ctx->getIntf(), "qt-verbose"));
     if (previous.contains(QStringLiteral("qt-error-dialogs")) || previous.contains(QStringLiteral("qt-minor-warnings")))
@@ -2609,6 +2653,7 @@ bool RedesignPreferences::resetAll()
     }
     m_ctx->refreshSystray();
     applyWindowOpacity(m_ctx);
+    applyFullscreenControlPreferences(intf, true, true);
     updateVlcQtMessageHandler(var_InheritBool(intf, "qt-verbose"));
     if (auto* errors = DialogErrorModel::getInstance<false>())
         errors->refreshNotificationPreference();

@@ -244,6 +244,8 @@ FocusScope {
         autoHideMode: MainCtx.redesignPlayerPreferences.autoHide
         controlsHideTimeout: MainCtx.redesignPlayerPreferences.hideTimeout
         showFullscreenControls: MainCtx.redesignPlayerPreferences.fullscreenControls
+        fullscreenControlsOpacity: MainCtx.pinOpacity
+        fullscreenControlsSensitivity: MainCtx.redesignPlayerPreferences.fullscreenSensitivity
         showSubtitleTimeline: MainCtx.redesignPlayerPreferences.subtitleTimeline
         showSeekPreview: MainCtx.redesignPlayerPreferences.seekPreview
         subtitleTimelineCues: Player.subtitleTimelineCues

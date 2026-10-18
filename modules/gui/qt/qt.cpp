@@ -392,7 +392,7 @@ vlc_module_begin ()
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., OPACITY_TEXT,
                           OPACITY_LONGTEXT )
-    add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., OPACITY_FS_TEXT,
+    add_float_with_range( "qt-fs-opacity", 1., 0.1, 1., OPACITY_FS_TEXT,
                           OPACITY_FS_LONGTEXT )
 
     //qt-interface-scale is stored in Qt config file

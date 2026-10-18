@@ -29,6 +29,13 @@ FocusScope {
     property int autoHideMode: 1
     property int controlsHideTimeout: 1800
     property bool showFullscreenControls: true
+    property real fullscreenControlsOpacity: 1
+    property int fullscreenControlsSensitivity: 3
+    readonly property color chromeBackground: Qt.rgba(theme.background.r, theme.background.g, theme.background.b,
+        fullscreen ? Math.max(0.1, Math.min(1, fullscreenControlsOpacity)) : 1)
+    property point _lastControlMotion: Qt.point(-1, -1)
+    property bool _headerRevealed: false
+    property bool _toolbarRevealed: false
     property bool showStatistics: false
     property bool showSubtitleTimeline: false
     property bool showSeekPreview: true
@@ -177,7 +184,37 @@ FocusScope {
         keyPressed(event)
     }
     Timer { id: revealTimer; interval: root.controlsHideTimeout; running: root.fullscreen }
-    onFullscreenChanged: revealControls()
+    onFullscreenChanged: {
+        _lastControlMotion = Qt.point(-1, -1)
+        _headerRevealed = false
+        _toolbarRevealed = false
+        revealControls()
+    }
+    function observeControlMotion(position: point) {
+        const first = _lastControlMotion.x < 0
+        const distance = Math.max(Math.abs(position.x - _lastControlMotion.x), Math.abs(position.y - _lastControlMotion.y))
+        const moved = first || distance > Math.max(0, fullscreenControlsSensitivity)
+        const atTop = position.y >= 0 && position.y < headerEdge.height
+        const atBottom = position.y <= height && position.y >= height - bottomEdge.height
+        if (!atTop) _headerRevealed = false
+        else if (moved || header.visible) _headerRevealed = true
+        if (!atBottom) _toolbarRevealed = false
+        else if (moved || toolbar.visible) _toolbarRevealed = true
+        if (moved) _lastControlMotion = position
+    }
+    HoverHandler {
+        enabled: root.fullscreen
+        blocking: false
+        onPointChanged: if (hovered) root.observeControlMotion(point.position)
+        onHoveredChanged: {
+            if (hovered) root.observeControlMotion(point.position)
+            else {
+                root._lastControlMotion = Qt.point(-1, -1)
+                root._headerRevealed = false
+                root._toolbarRevealed = false
+            }
+        }
+    }
     Item {
         id: backdropScene
         anchors.fill: parent
@@ -465,8 +502,8 @@ FocusScope {
         parent: headerEdge
         objectName: "redesignHeader"
         anchors.top: parent.top; width: parent.width; height: theme.dp(40)
-        color: theme.background
-        visible: !root.minimalView && (!root.fullscreen || headerHover.hovered || header.activeFocus || revealTimer.running || root.controlsLocked)
+        color: root.chromeBackground
+        visible: !root.minimalView && (!root.fullscreen || (headerHover.hovered && root._headerRevealed) || header.activeFocus || revealTimer.running || root.controlsLocked)
         Loader { anchors.fill: parent; active: !chromeLayout.editing; sourceComponent: root.titleBarDragContent }
         RowLayout {
             id: headerLeft
@@ -594,9 +631,9 @@ FocusScope {
         parent: bottomEdge
         objectName: "redesignToolbar"
         anchors.bottom: parent.bottom; width: parent.width; height: root.controlsHeight
-        color: theme.background
+        color: root.chromeBackground
         visible: !root.minimalView && !root.libraryExpanded && (!root.fullscreen || root.showFullscreenControls || chromeLayout.editing)
-            && (!root.autoHideActive || bottomHover.hovered || toolbar.activeFocus || revealTimer.running || root.controlsLocked)
+            && (!root.autoHideActive || (bottomHover.hovered && (!root.fullscreen || root._toolbarRevealed)) || toolbar.activeFocus || revealTimer.running || root.controlsLocked)
         RowLayout {
             id: originalToolbar
             visible: !chrome.custom && !chrome.applying

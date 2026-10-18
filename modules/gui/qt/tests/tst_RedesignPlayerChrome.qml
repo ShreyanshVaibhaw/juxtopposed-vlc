@@ -33,6 +33,7 @@ TestCase {
         player.scaleFactor = 1; player.lightTheme = false
         player.libraryOpen = false; player.libraryExpanded = false
         player.fullscreen = false; player.controlsHideTimeout = 1800
+        player.fullscreenControlsOpacity = 1
         player.maximized = false
         player.showWindowButtons = true
         player.customMenuOpen = false
@@ -49,6 +50,35 @@ TestCase {
         model.move("fullscreen", "footerRight", model.layout.zones.footerRight.length)
         tryVerify(() => item("mainMenuButton").parent.objectName === "customFooterLeft")
         tryVerify(() => Math.abs(point("seekBar").x - 104) < 1 && Math.abs(point("seekBar").y - 986) < 1)
+    }
+    function test_fullscreenOpacityBlendsBackgroundWithoutFadingControls_data() {
+        return [{tag: "dark quarter", light: false, alpha: 0.25},
+                {tag: "light quarter", light: true, alpha: 0.25},
+                {tag: "dark solid", light: false, alpha: 1},
+                {tag: "light solid", light: true, alpha: 1}]
+    }
+    function test_fullscreenOpacityBlendsBackgroundWithoutFadingControls(data) {
+        player.lightTheme = data.light
+        player.fullscreenControlsOpacity = data.alpha
+        player.fullscreen = true
+        player.controlsHideTimeout = 10000
+        player.revealControls()
+        tryCompare(player, "topVisible", true); tryCompare(player, "bottomVisible", true)
+        const header = item("redesignHeader"), toolbar = item("redesignToolbar")
+        fuzzyCompare(header.color.a, data.alpha, 0.0001)
+        fuzzyCompare(toolbar.color.a, data.alpha, 0.0001)
+        compare(header.opacity, 1); compare(toolbar.opacity, 1); compare(item("playButton").opacity, 1)
+        wait(30)
+        const image = grabImage(player)
+        const video = Qt.color("#2d2b29"), chrome = player.theme.background
+        const expected = ["r", "g", "b"].map(channel => Math.round(255 * (video[channel] * (1 - data.alpha) + chrome[channel] * data.alpha)))
+        for (const y of [2, player.height - 2]) {
+            verify(Math.abs(image.red(400, y) - expected[0]) <= 2)
+            verify(Math.abs(image.green(400, y) - expected[1]) <= 2)
+            verify(Math.abs(image.blue(400, y) - expected[2]) <= 2)
+        }
+        player.fullscreen = false
+        compare(header.color.a, 1); compare(toolbar.color.a, 1)
     }
     function test_closeReachesScreenCornerWithoutMovingIcon_data() {
         return [{tag: "maximized", max: true, scale: 1},

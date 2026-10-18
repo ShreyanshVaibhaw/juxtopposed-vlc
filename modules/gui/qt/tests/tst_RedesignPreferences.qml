@@ -23,7 +23,8 @@ TestCase {
         function value(name) { return values[name] }
         function refresh() { refreshCount++; revision++ }
         function describe(name) {
-            if (name === "qt-opacity") return {kind: "float", minimum: 0.1, maximum: 1}
+            if (name === "qt-opacity" || name === "qt-fs-opacity") return {kind: "float", minimum: 0.1, maximum: 1}
+            if (name === "redesign-fullscreen-sensitivity") return {kind: "integer", minimum: 0, maximum: 6}
             if (name === "qt-controls-hide-timeout" || name === "qt-notification-timeout") return {kind: "integer", minimum: 0, maximum: 10000}
             if (name === "sout-chromecast-conversion-quality") return {kind: "integer", choices: [
                 {label: "Automatic", value: -1}, {label: "High (high quality and high bandwidth)", value: 0},
@@ -1030,7 +1031,9 @@ TestCase {
         return [
             {tag: "hide delay", option: "qt-controls-hide-timeout", advanced: false, values: [1800, 6700], labels: ["0 s", "5 s", "10 s"], minimum: 0, maximum: 10000},
             {tag: "popup duration", option: "qt-notification-timeout", advanced: false, values: [3000, 8100], labels: ["0 s", "5 s", "10 s"], minimum: 0, maximum: 10000},
-            {tag: "window opacity", option: "qt-opacity", advanced: true, values: [0.7, 0.9], labels: ["10%", "100%"], minimum: 0.1, maximum: 1}
+            {tag: "window opacity", option: "qt-opacity", advanced: true, values: [0.7, 0.9], labels: ["10%", "100%"], minimum: 0.1, maximum: 1},
+            {tag: "fullscreen opacity", option: "qt-fs-opacity", advanced: true, values: [0.4, 0.8], labels: ["10%", "100%"], minimum: 0.1, maximum: 1},
+            {tag: "fullscreen sensitivity", option: "redesign-fullscreen-sensitivity", advanced: true, values: [1, 5], labels: ["Low", "Medium", "High"], minimum: 0, maximum: 6}
         ]
     }
     function test_interfaceSliderScalesStayFixedAndKeepNativeUnits(data) {

@@ -547,9 +547,9 @@ ColumnLayout {
                         readonly property real position: (Number(modelData) - slider.from) / (slider.to - slider.from)
                         readonly property real visualPosition: slider.mirrored ? 1 - position : position
                         x: visualPosition * parent.width - (visualPosition === 0 ? 0 : visualPosition === 1 ? width : width / 2)
-                        text: (root.presentation.positiveTickSign && modelData > 0 ? "+" : "")
+                        text: root.presentation.tickLabels?.[index] ?? ((root.presentation.positiveTickSign && modelData > 0 ? "+" : "")
                             + Number(modelData).toLocaleString(Qt.locale(), 'f', Number.isInteger(Number(modelData)) ? 0 : String(modelData).split('.')[1].length)
-                            + (root.presentation.tickSuffix === undefined ? root.presentation.suffix || "" : root.presentation.tickSuffix)
+                            + (root.presentation.tickSuffix === undefined ? root.presentation.suffix || "" : root.presentation.tickSuffix))
                         color: theme.foreground; font.pixelSize: theme.dp(11)
                     }
                 }

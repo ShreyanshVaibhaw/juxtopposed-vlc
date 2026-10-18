@@ -225,6 +225,8 @@ TestCase {
         player.muted = false
         player.fullscreen = false
         player.controlsHideTimeout = 1800
+        player.fullscreenControlsOpacity = 1
+        player.fullscreenControlsSensitivity = 3
         player.minimalView = false
         player.started = true
         player.hasVideo = true
@@ -1153,6 +1155,40 @@ TestCase {
         verify(!player.bottomVisible)
         mouseMove(player, player.width / 2, player.height - 2)
         tryCompare(player, "bottomVisible", true)
+    }
+    function test_fullscreenSensitivityFiltersSmallMotion_data() {
+        return [{tag: "top", top: true, videoHover: false, scale: 1},
+                {tag: "bottom", top: false, videoHover: false, scale: 1},
+                {tag: "top over video", top: true, videoHover: true, scale: 1.5},
+                {tag: "bottom over video", top: false, videoHover: true, scale: 1.5}]
+    }
+    function test_fullscreenSensitivityFiltersSmallMotion(data) {
+        consumeVideoHover = data.videoHover
+        player.scaleFactor = data.scale
+        player.controlsHideTimeout = 50
+        player.fullscreenControlsSensitivity = 32
+        player.fullscreen = true
+        player.forceActiveFocus()
+        mouseMove(player, 600, player.height / 2)
+        wait(80)
+        const boundary = data.top ? player.theme.dp(48) : player.height - player.controlsHeight - player.theme.dp(10)
+        const outside = boundary + (data.top ? 1 : -1)
+        const inside = boundary + (data.top ? -1 : 1)
+        const target = data.top ? "topVisible" : "bottomVisible"
+        const other = data.top ? "bottomVisible" : "topVisible"
+        mouseMove(player, 400, outside); wait(20)
+        verify(!player[target]); verify(!player[other])
+        mouseMove(player, 401, inside); wait(20)
+        verify(!player[target], "Low sensitivity must ignore a small movement into an edge")
+        mouseMove(player, 450, inside)
+        tryCompare(player, target, true)
+        verify(!player[other], "Movement at one edge must not reveal the other controls")
+        mouseMove(player, 500, outside)
+        tryCompare(player, target, false)
+        player.fullscreenControlsSensitivity = 0
+        mouseMove(player, 501, inside)
+        tryCompare(player, target, true)
+        verify(!player[other])
     }
     function test_fullscreenTimelineBoundaryDoesNotFlicker_data() {
         return [{tag: "plain", videoHover: false}, {tag: "video-surface-hover", videoHover: true}]
