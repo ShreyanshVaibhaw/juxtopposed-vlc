@@ -1619,6 +1619,8 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
             ? qtr("Select the decoder to try first. Automatic lets VLC select it. Open the file again after a change.")
             : qtr("VLC uses this encoder for conversion and streaming. It must support the output format. An output profile can override this choice."));
     }
+    if (name == QLatin1String("startup-options"))
+        result.insert(QStringLiteral("help"), qtr("Enter VLC options only. Use quotes for text with spaces. The launch command takes priority. Restart VLC after a change. Use --ignore-config to start without saved options."));
     if (name == QLatin1String("clock-synchro"))
         result.insert(QStringLiteral("help"), qtr("Control input clock synchronization for live streams. Default uses the source settings. Open the stream again after a change."));
     if (name == QLatin1String("clock-jitter"))
@@ -1948,6 +1950,13 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
     }
     case CONFIG_ITEM_STRING: normalized = proposed.toString(); break;
     default: valid = false; break;
+    }
+    if (valid && name == QLatin1String("startup-options") && m_ctx
+        && (normalized.toString().contains(QChar::Null)
+            || config_ValidateStartupOptions(VLC_OBJECT(m_ctx->getIntf()), normalized.toString().toUtf8().constData()) != VLC_SUCCESS)) {
+        m_invalid.insert(name);
+        m_error = qtr("Enter VLC options only. Check the option names and quotation marks.");
+        ++m_revision; emit changed(); return false;
     }
     if (!valid) {
         m_invalid.insert(name);

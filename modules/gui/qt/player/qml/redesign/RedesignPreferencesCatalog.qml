@@ -173,9 +173,9 @@ QtObject {
         extensions: [ { title: "", rows: [ ["qt-autoload-extensions", qsTr("Load add-ons on startup")] ] } ]
     })
     readonly property var advancedSections: ({
-        general: [ {title: "", rows: [ ["logmode", qsTr("Log format")], ["stats", qsTr("Collect playback statistics")], ["redesign-config-folder", qsTr("Open configurations folder")], ["redesign-reset-all", qsTr("Reset all settings")] ] },
+        general: [ {title: "", rows: [ ["startup-options", qsTr("Additional command line options")], ["logmode", qsTr("Log format"), {choiceLabels: {text: qsTr("Plain text"), html: "HTML"}}], ["stats", qsTr("Collect playback statistics")], ["redesign-config-folder", qsTr("Open configurations folder")], ["redesign-reset-all", qsTr("Reset all settings")] ] },
             {title: qsTr("Developer Options"), rows: [ ["syslog", qsTr("Write to the system log")], ["syslog-debug", qsTr("Include debug messages in the system log")],
-                ["syslog-ident", qsTr("System log identity")], ["syslog-facility", qsTr("System log facility")] ] } ],
+                ["syslog-ident", qsTr("System log identity")], ["syslog-facility", qsTr("System log facility"), {choiceLabels: {user: qsTr("User")}}] ] } ],
         interface: [ {title: "", rows: [ ["qt-opacity", qsTr("Window opacity"), {editor: "slider", from: 10, to: 100, factor: 100, suffix: "%"}],
             ["qt-pause-minimized", qsTr("Pause video when window is minimized")], ["qt-auto-raise", qsTr("Bring VLC to the front when playback starts")],
             ["qt-bgcone", qsTr("Show cover art in the window when playing audio")], ["qt-embedded-open", qsTr("Show the file browser inside the open dialog")],

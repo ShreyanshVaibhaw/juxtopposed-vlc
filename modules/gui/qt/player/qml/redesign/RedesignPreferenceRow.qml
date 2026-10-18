@@ -629,6 +629,7 @@ ColumnLayout {
                 selectByMouse: true
                 placeholderText: root.description.placeholder || root.presentation.placeholder || ""
                 placeholderTextColor: theme.playerLabel
+                autoScroll: root.optionName !== "startup-options" || activeFocus
                 echoMode: root.description.kind === "password" ? TextInput.Password : TextInput.Normal
                 inputMethodHints: root.description.kind === "integer" || root.description.kind === "float" ? Qt.ImhFormattedNumbersOnly : Qt.ImhNone
                 Accessible.name: root.label || root.description.title
