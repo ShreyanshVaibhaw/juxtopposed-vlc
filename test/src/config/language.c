@@ -6,6 +6,9 @@
 #include <vlc_spawn.h>
 #include <vlc_variables.h>
 #include <locale.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 static void selected(int argc, const char *const *argv, const char *expected)
 {
@@ -65,6 +68,9 @@ static void scenario(const char *name)
     fclose(stream);
     if (!strncmp(name, "snapshot-", 9)) {
         const char *expected;
+#ifdef _WIN32
+        char native_language[LOCALE_NAME_MAX_LENGTH];
+#endif
         if (!strcmp(name, "snapshot-list")) {
             setenv("LANGUAGE", "fr_CA:de", 1);
             expected = "fr_CA:de";
@@ -76,13 +82,32 @@ static void scenario(const char *name)
             unsetenv("LANGUAGE"); unsetenv("LC_ALL");
             unsetenv("LC_MESSAGES"); unsetenv("LANG");
             expected = NULL;
+#ifdef _WIN32
+            wchar_t native[LOCALE_NAME_MAX_LENGTH];
+            assert(LCIDToLocaleName(MAKELCID(GetUserDefaultUILanguage(), SORT_DEFAULT),
+                                   native, ARRAY_SIZE(native), 0));
+            assert(WideCharToMultiByte(CP_UTF8, 0, native, -1, native_language,
+                                       sizeof(native_language), NULL, NULL));
+#endif
         }
         const char *override[] = {"--language=ar"};
         assert(config_ApplyInterfaceLanguage(ARRAY_SIZE(override), override) == VLC_SUCCESS);
         char *original_language = config_GetSystemInterfaceLanguage();
+#ifdef _WIN32
+        if (!expected) {
+            /* The native UI language must survive an explicit startup override
+             * even when the process originally had no locale environment. */
+            assert(original_language && strstr(original_language, native_language));
+        } else
+#endif
         assert(expected ? original_language && !strcmp(original_language, expected) : !original_language);
-        free(original_language);
         assert(!strcmp(getenv("LANGUAGE"), "ar"));
+        const char *second[] = {"--language=fr"};
+        assert(config_ApplyInterfaceLanguage(ARRAY_SIZE(second), second) == VLC_SUCCESS);
+        char *again = config_GetSystemInterfaceLanguage();
+        assert(original_language ? again && !strcmp(original_language, again) : !again);
+        free(again);
+        free(original_language);
     }
     else if (!strcmp(name, "getter")) check_getter(file);
     else {

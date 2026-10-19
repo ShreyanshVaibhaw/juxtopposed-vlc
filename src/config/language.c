@@ -18,6 +18,41 @@
 static vlc_once_t system_language_once = VLC_STATIC_ONCE;
 static char system_language[1024];
 
+#ifdef _WIN32
+static void capture_windows_language(void)
+{
+# if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+    ULONG count = 0, length = 0;
+    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &count, NULL, &length) && length)
+    {
+        wchar_t *names = vlc_alloc(length, sizeof(*names));
+        if (names && GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &count, names, &length))
+        {
+            size_t used = 0;
+            for (const wchar_t *name = names; *name; name += wcslen(name) + 1)
+            {
+                char locale[LOCALE_NAME_MAX_LENGTH];
+                int size = WideCharToMultiByte(CP_UTF8, 0, name, -1, locale,
+                                               sizeof(locale), NULL, NULL);
+                if (size <= 1) continue;
+                if (used + (used != 0) + size > sizeof(system_language)) break;
+                if (used) system_language[used++] = ':';
+                memcpy(system_language + used, locale, size);
+                used += size - 1;
+            }
+        }
+        free(names);
+    }
+# endif
+    if (*system_language) return;
+    wchar_t name[LOCALE_NAME_MAX_LENGTH];
+    if (LCIDToLocaleName(MAKELCID(GetUserDefaultUILanguage(), SORT_DEFAULT),
+                         name, ARRAY_SIZE(name), 0))
+        WideCharToMultiByte(CP_UTF8, 0, name, -1, system_language,
+                            sizeof(system_language), NULL, NULL);
+}
+#endif
+
 static void capture_system_language(void *opaque)
 {
     (void)opaque;
@@ -35,6 +70,11 @@ static void capture_system_language(void *opaque)
         language = message_locale;
     if (language != NULL && strlen(language) < sizeof(system_language))
         strcpy(system_language, language);
+#ifdef _WIN32
+    /* Qt's system locale also reads LANG. After applying a saved UI choice,
+     * asking Qt for System would therefore return that choice instead. */
+    if (!*system_language) capture_windows_language();
+#endif
 }
 
 char *config_GetSystemInterfaceLanguage(void)

@@ -110,6 +110,35 @@ private slots:
         QTest::newRow("absolute path") << QStringLiteral("/fr");
         QTest::newRow("corrupt catalog") << QStringLiteral("de");
     }
+    void switchesBackToSystemFromEitherStartup_data()
+    {
+        QTest::addColumn<QString>("system");
+        QTest::addColumn<QString>("startup");
+        for (const auto& system : {QStringLiteral("en"), QStringLiteral("fr"), QStringLiteral("ar")})
+            for (const auto& startup : {QStringLiteral("auto"), QStringLiteral("fr"), QStringLiteral("ar")})
+                QTest::newRow(qPrintable(system + QLatin1Char('/') + startup)) << system << startup;
+    }
+    void switchesBackToSystemFromEitherStartup()
+    {
+        QFETCH(QString, system); QFETCH(QString, startup);
+        InterfaceTranslator translator(m_directory.path(), {system}, startup);
+        QVERIFY(QCoreApplication::installTranslator(&translator));
+        const auto expected = [](const QString& language) {
+            return language == QLatin1String("fr") ? QStringLiteral("Ouvrir un fichier")
+                : language == QLatin1String("ar") ? QStringLiteral("افتح ملفًا") : QStringLiteral("Open file");
+        };
+        QCOMPARE(text("Open file"), expected(startup == QLatin1String("auto") ? system : startup));
+        for (const auto& selected : {QStringLiteral("auto"), QStringLiteral("fr"), QStringLiteral("auto"),
+                                     QStringLiteral("ar"), QStringLiteral("auto"), QStringLiteral("en"), QStringLiteral("auto")}) {
+            QVERIFY(translator.prepareLanguage(selected));
+            QVERIFY(translator.activatePreparedLanguage());
+            const auto effective = selected == QLatin1String("auto") ? system : selected;
+            QCOMPARE(text("Open file"), expected(effective));
+            QCOMPARE(translator.activeLanguage(), effective);
+            QCOMPARE(translator.requestedLanguage(), selected);
+            QCOMPARE(QGuiApplication::layoutDirection(), QLocale(effective).textDirection());
+        }
+    }
     void failedPreparationKeepsActiveLanguage()
     {
         QFETCH(QString, language);
