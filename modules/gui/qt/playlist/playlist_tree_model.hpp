@@ -67,6 +67,7 @@ private:
     QPersistentModelIndex m_current;
     QString m_currentKey;
     QTimer m_rebuildTimer;
+    bool m_sourceReady = false;
     bool m_treeEnabled = true;
 };
 }

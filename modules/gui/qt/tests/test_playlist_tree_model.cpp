@@ -2,6 +2,7 @@
 #include <QTest>
 #include <QSignalSpy>
 #include <QAbstractItemModelTester>
+#include <memory>
 #include "playlist/playlist_tree_model.hpp"
 
 using vlc::playlist::PlaylistTreeModel;
@@ -29,6 +30,7 @@ public:
         }
     }
     void append(const Item& item) { const int i=items.size();beginInsertRows({},i,i);items.append(item);endInsertRows(); }
+    void reset(const QList<Item>& snapshot) { beginResetModel();items=snapshot;endResetModel(); }
     void remove(int row) { beginRemoveRows({},row,row);items.removeAt(row);endRemoveRows(); }
     void move(int from,int to) { beginMoveRows({},from,from,{},to>from?to+1:to);items.move(from,to);endMoveRows(); }
     void update(int row) { emit dataChanged(index(row,0),index(row,0)); }
@@ -147,6 +149,69 @@ private slots:
         delete source;QCOMPARE(model.rowCount(),0);QVERIFY(!model.sourceModel());
         Source next;next.append({"new","Next",{group("next")}});model.setSourceModel(&next);QCOMPARE(model.rowCount(),2);
         model.setSourceModel(nullptr);QCOMPARE(model.rowCount(),0);
+    }
+    void lazyReattachmentKeepsNestedCollapsedGroups() {
+        PlaylistTreeModel model;
+        QAbstractItemModelTester tester(&model,QAbstractItemModelTester::FailureReportingMode::QtTest);
+        auto source=std::make_unique<Source>();populate(*source);source->current(4);
+        const auto snapshot=source->items;
+        model.setSourceModel(source.get());
+        model.setExpanded(model.rowForGroupKey("child"),false);
+        model.setExpanded(model.rowForGroupKey("B"),false);
+        model.setExpanded(model.rowForGroupKey("A"),false);
+        QCOMPARE(model.rowCount(),3);
+        source.reset();QVERIFY(!model.sourceModel());QCOMPARE(model.rowCount(),0);
+
+        Source reopened;model.setSourceModel(&reopened);
+        model.setTreeEnabled(false);model.setTreeEnabled(true);
+        QCOMPARE(model.rowCount(),0);
+        // A new PlaylistListModel delivers its initial snapshot asynchronously.
+        reopened.reset(snapshot);QTRY_COMPARE(model.rowCount(),3);
+        QVERIFY(!model.expandedAt(model.rowForGroupKey("A")));
+        QVERIFY(!model.expandedAt(model.rowForGroupKey("B")));
+        model.setExpanded(model.rowForGroupKey("B"),true);
+        QVERIFY(!model.expandedAt(model.rowForGroupKey("child")));
+        QCOMPARE(model.rowForSourceIndex(4),-1);
+        model.setExpanded(model.rowForGroupKey("child"),true);
+        QVERIFY(model.rowForSourceIndex(4)>=0);
+        QCOMPARE(reopened.rowCount(),snapshot.size());
+        for(int i=0;i<snapshot.size();++i) {
+            QCOMPARE(reopened.items[i].id,snapshot[i].id);
+            QCOMPARE(reopened.items[i].current,snapshot[i].current);
+        }
+    }
+    void changedCurrentIsRevealedAfterReattachment() {
+        Source source;populate(source);source.current(0);
+        PlaylistTreeModel model;model.setSourceModel(&source);
+        model.setExpanded(model.rowForGroupKey("B"),false);
+        model.setExpanded(model.rowForGroupKey("A"),false);
+        model.setSourceModel(nullptr);
+        QSignalSpy resets(&model,&QAbstractItemModel::modelReset);
+        source.current(4);source.items[0].title="Renamed while hidden";source.update(0);
+        QCoreApplication::processEvents();QCOMPARE(resets.count(),0);QCOMPARE(model.rowCount(),0);
+        Source reopened;model.setSourceModel(&reopened);reopened.reset(source.items);
+        QTRY_VERIFY(model.rowForSourceIndex(4)>=0);
+        QVERIFY(model.expandedAt(model.rowForGroupKey("B")));
+        QVERIFY(!model.expandedAt(model.rowForGroupKey("A")));
+    }
+    void initializedEmptyQueueClearsOldCollapsedGroups() {
+        Source source;populate(source);PlaylistTreeModel model;model.setSourceModel(&source);
+        model.setExpanded(model.rowForGroupKey("A"),false);
+        model.setSourceModel(nullptr);
+        Source empty;model.setSourceModel(&empty);
+        QSignalSpy resets(&model,&QAbstractItemModel::modelReset);
+        empty.reset({});QTRY_COMPARE(resets.count(),1);
+        model.setSourceModel(nullptr);
+        Source replaced;populate(replaced);model.setSourceModel(&replaced);
+        QVERIFY(model.expandedAt(model.rowForGroupKey("A")));
+
+        model.setExpanded(model.rowForGroupKey("B"),false);
+        model.setSourceModel(nullptr);
+        Source remaining;remaining.append({"other","Other",{group("A")}});
+        model.setSourceModel(&remaining);
+        remaining.append({"new","New",{group("B")}});
+        QTRY_VERIFY(model.rowForGroupKey("B")>=0);
+        QVERIFY(model.expandedAt(model.rowForGroupKey("B")));
     }
 };
 QTEST_GUILESS_MAIN(TestPlaylistTreeModel)

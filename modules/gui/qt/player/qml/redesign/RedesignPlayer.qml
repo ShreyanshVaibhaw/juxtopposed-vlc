@@ -16,6 +16,8 @@ FocusScope {
     readonly property ColorContext colorContext: ColorContext { palette: VLCStyle.palette; colorSet: ColorContext.Window }
     property bool resumeAvailable: false
     property int queueTab: 0
+    // The projection retains folder state while its lazy source is unloaded.
+    PlaylistTreeModel { id: queueTreeModel; treeEnabled: MainCtx.playlistTree }
     property int requestedLibraryCategory: -1
     function beginCustomization() {
         if (MainCtx.minimalView) MainCtx.minimalView = false
@@ -410,7 +412,8 @@ FocusScope {
                 videoBackdropContent: rootPlayer.menuBackdropContent
                 scaleFactor: view.scaleFactor; lightTheme: view.lightTheme; accentColor: view.accentColor
                 queueModel: PlaylistListModel { id: queueModel; playlist: MainPlaylistController.playlist }
-                hierarchyModel: PlaylistTreeModel { sourceModel: queueModel; treeEnabled: MainCtx.playlistTree }
+                hierarchyModel: queueTreeModel
+                Component.onCompleted: queueTreeModel.sourceModel = queueModel
                 itemCount: queueModel.count
                 currentIndex: queueModel.currentIndex
                 totalDurationText: summaryDuration(queueModel.duration)

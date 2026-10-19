@@ -22,11 +22,12 @@ void PlaylistTreeModel::setSourceModel(QAbstractItemModel* source)
     m_connections.clear();
     m_source = source;
     m_roles = source ? source->roleNames() : QHash<int, QByteArray>{};
-    m_collapsed.clear();
-    m_currentKey.clear();
+    // A lazy queue view recreates its source model when it opens. Keep only
+    // expansion state until that source has delivered its initial snapshot.
+    m_sourceReady = source && source->rowCount() > 0;
     m_current = QModelIndex{};
     if (source) {
-        const auto changed = [this] { m_rebuildTimer.start(); };
+        const auto changed = [this] { m_sourceReady = true; m_rebuildTimer.start(); };
         m_connections = {
             connect(source, &QAbstractItemModel::modelReset, this, changed),
             connect(source, &QAbstractItemModel::rowsInserted, this, changed),
@@ -37,6 +38,7 @@ void PlaylistTreeModel::setSourceModel(QAbstractItemModel* source)
             connect(source, &QObject::destroyed, this, [this] {
                 m_source = nullptr;
                 m_roles.clear();
+                m_sourceReady = false;
                 rebuild();
                 emit sourceModelChanged();
             }),
@@ -121,10 +123,12 @@ void PlaylistTreeModel::rebuild()
         }
         if (index.data(role("isCurrent")).toBool()) m_current = index;
     }
-    m_collapsed.intersect(QSet<QString>(groups.keyBegin(), groups.keyEnd()));
-    const auto currentKey = m_current.isValid() ? m_keys[m_current.row()] : QString();
-    if (currentKey != m_currentKey && m_current.isValid()) revealAncestors(m_current);
-    m_currentKey = currentKey;
+    if (m_sourceReady) {
+        m_collapsed.intersect(QSet<QString>(groups.keyBegin(), groups.keyEnd()));
+        const auto currentKey = m_current.isValid() ? m_keys[m_current.row()] : QString();
+        if (currentKey != m_currentKey && m_current.isValid()) revealAncestors(m_current);
+        m_currentKey = currentKey;
+    }
 
     QStringList path;
     QList<int> headers;
@@ -161,6 +165,9 @@ void PlaylistTreeModel::rebuild()
         if (group) { path.append(key); headers.append(header); }
     }
     close(0, size - 1);
+    if (!m_source) {
+        m_rows.squeeze(); m_keys.squeeze(); m_paths.squeeze();
+    }
     endResetModel();
     emit countChanged();
 }
