@@ -483,10 +483,16 @@ RedesignLibraryView {
     }
     ListModel {
         id: musicCategories
-        ListElement { title: QT_TR_NOOP("Songs"); iconName: "music" }
-        ListElement { title: QT_TR_NOOP("Albums"); iconName: "library-album" }
-        ListElement { title: QT_TR_NOOP("Artists"); iconName: "library-artist" }
-        ListElement { title: QT_TR_NOOP("Genres"); iconName: "library-genre" }
+        readonly property var translatedTitles: [qsTr("Songs"), qsTr("Albums"), qsTr("Artists"), qsTr("Genres")]
+        function updateTitles() {
+            for (let i = 0; i < count; ++i) setProperty(i, "title", translatedTitles[i])
+        }
+        onTranslatedTitlesChanged: updateTitles()
+        Component.onCompleted: updateTitles()
+        ListElement { title: ""; iconName: "music" }
+        ListElement { title: ""; iconName: "library-album" }
+        ListElement { title: ""; iconName: "library-artist" }
+        ListElement { title: ""; iconName: "library-genre" }
     }
     MLAudioModel { id: music; ml: MediaLib; searchPattern: root.searchText; sortCriteria: root.mediaSortField; sortOrder: root.mediaSortOrder }
     MLAlbumModel { id: albums; ml: MediaLib; searchPattern: root.searchText; sortCriteria: root.mediaSortField; sortOrder: root.mediaSortOrder }
