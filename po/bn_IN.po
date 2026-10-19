@@ -20460,9 +20460,11 @@ msgstr "&No"
 msgid "VLC media player updates"
 msgstr "VLC মিডিয়া প্লেয়ার হালনাগাদ"
 
+#. Qt placeholder correction by Codex (first pass; review welcome).
+#, qt-format
 #: modules/gui/qt/dialogs/help.cpp:294
 msgid "A new version of VLC (%1.%2.%3%4) is available."
-msgstr "একটি VLC (%1.%2. 4%3%) এর একটি নতুন সংস্করণ উপলব্ধ."
+msgstr "VLC-এর একটি নতুন সংস্করণ (%1.%2.%3%4) উপলব্ধ।"
 
 #: modules/gui/qt/dialogs/help.cpp:319
 msgid "You have the latest version of VLC media player."
@@ -34227,7 +34229,6 @@ msgstr "মিডিয়া ম্যানেজার তালিকা"
 #, fuzzy
 #~ msgid "Video Filters..."
 #~ msgstr "ভিডিও ফাইল"
-
 
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "System language"
