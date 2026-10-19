@@ -32,10 +32,13 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QScrollBar>
-#include <QMutex>
-#include <QMutexLocker>
+#include <QLabel>
+#include <QLocale>
+#include <QShowEvent>
+#include <QHideEvent>
 
 #include <cassert>
+#include <limits>
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
@@ -50,34 +53,6 @@
 #include "util/interface_translator.hpp"
 #include "util/message_log.hpp"
 
-enum {
-    MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
-};
-
-class MsgEvent : public QEvent
-{
-public:
-    MsgEvent( int, const vlc_log_t *, const char * );
-
-    int priority;
-    uintptr_t object_id;
-    QString object_type;
-    QString header;
-    QString module;
-    QString text;
-};
-
-MsgEvent::MsgEvent( int type, const vlc_log_t *msg, const char *text )
-    : QEvent( (QEvent::Type)MsgEvent_Type ),
-      priority( type ),
-      object_id( msg->i_object_id ),
-      object_type( qfu(msg->psz_object_type) ),
-      header( qfu(msg->psz_header) ),
-      module( qfu(msg->psz_module) ),
-      text( qfu(text) )
-{
-}
-
 MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
                : QVLCFrame( _p_intf )
 {
@@ -85,8 +60,17 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     setWindowRole( "vlc-messages" );
     /* Build Ui */
     ui.setupUi( this );
+    ui.messages->setUndoRedoEnabled(false);
+    ui.errors->setUndoRedoEnabled(false);
     auto* closeButton = new QPushButton(qtr("&Close"), this);
     ui.bottomButtonsBox->addButton(closeButton, QDialogButtonBox::RejectRole);
+    m_historyInfo = new QLabel(this);
+    m_historyInfo->setObjectName(QStringLiteral("logHistoryInfo"));
+    m_historyInfo->setWordWrap(true);
+    ui.msgLayout->addWidget(m_historyInfo, 3, 0, 1, 6);
+    updateHistoryInfo();
+    m_logTimer.setInterval(50);
+    connect(&m_logTimer, &QTimer::timeout, this, &MessagesDialog::drainMessages);
 
     /* Error messages */
     DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
@@ -158,6 +142,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
             ui.saveLogButton->setToolTip(qtr("Saves all the displayed logs to a file"));
             closeButton->setText(qtr("&Close"));
             ui.verbosityBox->retranslate();
+            updateHistoryInfo();
             tabChanged(ui.mainTab->currentIndex());
         });
 
@@ -181,6 +166,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
 
 MessagesDialog::~MessagesDialog()
 {
+    m_logTimer.stop();
     vlc_LogUnsubscribe(m_logSubscription);
     saveWidgetPosition( "Messages" );
 };
@@ -226,7 +212,6 @@ void MessagesDialog::errorsCountChanged(){
 
 void MessagesDialog::filterMessages()
 {
-    QMutexLocker locker( &messageLocker );
     QPlainTextEdit *messages = ui.messages;
     QTextBlock block = messages->document()->firstBlock();
 
@@ -251,24 +236,46 @@ bool MessagesDialog::matchFilter( const QString& text )
     return messageLogMatches(text, ui.filterEdit->text());
 }
 
-void MessagesDialog::sinkMessage( const MsgEvent *msg )
+void MessagesDialog::drainMessages()
 {
-    QMutexLocker locker( &messageLocker );
-
+    auto batch = m_pendingMessages.take();
     const QColor accent = p_intf->p_mi ? p_intf->p_mi->redesignAccent() : palette().color(QPalette::Link);
-    appendMessageLog(ui.messages, {{msg->priority, msg->module, msg->text}}, ui.filterEdit->text(), accent);
+    appendMessageLog(ui.messages, batch.entries, ui.filterEdit->text(), accent);
+    if (batch.skipped)
+    {
+        const auto maximum = std::numeric_limits<quint64>::max();
+        m_skippedMessages = maximum - m_skippedMessages < batch.skipped
+            ? maximum : m_skippedMessages + batch.skipped;
+        updateHistoryInfo();
+    }
 }
 
-void MessagesDialog::customEvent( QEvent *event )
+void MessagesDialog::updateHistoryInfo()
 {
-    MsgEvent *msge = static_cast<MsgEvent *>(event);
+    auto text = qtr("This window shows up to %1 log lines.").arg(QLocale().toString(MessageLogHistoryLines));
+    if (m_skippedMessages)
+        text += QLatin1Char('\n') + qtr("Log messages not shown: %1").arg(QLocale().toString(m_skippedMessages));
+    m_historyInfo->setText(text);
+    const auto help = qtr("This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change.");
+    m_historyInfo->setToolTip(QStringLiteral("<qt>%1</qt>").arg(help.toHtmlEscaped()));
+    m_historyInfo->setAccessibleDescription(help);
+}
 
-    assert( msge );
-    sinkMessage( msge );
+void MessagesDialog::showEvent(QShowEvent* event)
+{
+    QVLCFrame::showEvent(event);
+    tabChanged(ui.mainTab->currentIndex());
+}
+
+void MessagesDialog::hideEvent(QHideEvent* event)
+{
+    m_logTimer.stop();
+    QVLCFrame::hideEvent(event);
 }
 
 bool MessagesDialog::save()
 {
+    drainMessages();
     QString saveLogFileName = QFileDialog::getSaveFileName(
             this, qtr( "Save log file as..." ),
             QVLCUserDir( VLC_DOCUMENTS_DIR ),
@@ -276,6 +283,7 @@ bool MessagesDialog::save()
 
     if( !saveLogFileName.isNull() )
     {
+        drainMessages();
         QFile file( saveLogFileName );
         if ( !file.open( QFile::WriteOnly | QFile::Text ) ) {
             QMessageBox::warning( this, qtr( "Application" ),
@@ -350,7 +358,12 @@ void MessagesDialog::updateOrClear()
         buildTree( NULL, VLC_OBJECT( vlc_object_instance(p_intf) ) );
     }
     else if( ui.mainTab->currentIndex() == 0 )
+    {
+        m_pendingMessages.clear();
+        m_skippedMessages = 0;
         ui.messages->clear();
+        updateHistoryInfo();
+    }
     else if( ui.mainTab->currentIndex() == 1 )
     {
         ui.errors->clear();
@@ -364,6 +377,12 @@ void MessagesDialog::updateOrClear()
 
 void MessagesDialog::tabChanged( int i )
 {
+    if (i == 0 && isVisible())
+    {
+        drainMessages();
+        m_logTimer.start();
+    }
+    else m_logTimer.stop();
     updateButton->setIcon( i > 1 ? QIcon(":/menu/update.svg") : QIcon(":/menu/clear.svg") );
     updateButton->setToolTip( i > 1 ? qtr("Update the tree")
                                      : i == 0 ? qtr("Clear the messages")
@@ -381,17 +400,14 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
                                   const char *format, va_list ap )
 {
     MessagesDialog *dialog = (MessagesDialog *)self;
-    char *str;
     int verbosity = dialog->verbosity.load();
 
-    if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
-     || unlikely(vasprintf( &str, format, ap ) == -1) )
+    if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR) )
         return;
 
     int canc = vlc_savecancel();
-    QApplication::postEvent( dialog, new MsgEvent( type, item, str ) );
+    dialog->m_pendingMessages.append(type, item->psz_module, format, ap);
     vlc_restorecancel( canc );
-    free( str );
 }
 
 #ifndef NDEBUG
