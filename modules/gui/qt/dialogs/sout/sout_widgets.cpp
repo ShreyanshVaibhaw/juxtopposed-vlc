@@ -42,6 +42,26 @@
 #define I_FILE_SLASH_DIR \
     I_DIR_OR_FOLDER( N_("File/Directory"), N_("File/Folder") )
 
+namespace {
+template<typename Widget>
+void watchDestinationText(Widget* widget, const char* source)
+{
+    const QByteArray text(source);
+    const auto update = [widget, text] { widget->setText(qtr(text.constData())); };
+    update();
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, widget, update);
+}
+
+template<typename Widget>
+Widget* translatedDestination(const char* source, QWidget* parent)
+{
+    auto* widget = new Widget(QString(), parent);
+    watchDestinationText(widget, source);
+    return widget;
+}
+}
+
 SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( _parent )
 {
     /**
@@ -136,15 +156,15 @@ FileDestBox::FileDestBox( QWidget *_parent, qt_intf_t * _p_intf ) : VirtualDestB
 
     QPushButton *fileSelectButton;
 
-    label->setText( qtr( "This module writes the transcoded stream to a file.") );
+    watchDestinationText(label, N_("This module writes the transcoded stream to a file."));
 
-    QLabel *fileLabel = new QLabel( qtr( "Filename"), this );
+    QLabel *fileLabel = translatedDestination<QLabel>(N_("Filename"), this);
     layout->addWidget(fileLabel, 1, 0, 1, 1);
 
     fileEdit = new QLineEdit(this);
     layout->addWidget(fileEdit, 1, 4, 1, 1);
 
-    fileSelectButton = new QPushButton( qtr( "Browse..." ), this );
+    fileSelectButton = translatedDestination<QPushButton>(N_("Browse..."), this);
     QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     fileSelectButton->setSizePolicy(sizePolicy);
 
@@ -193,10 +213,10 @@ void FileDestBox::fileBrowse()
 
 HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 {
-    label->setText( qtr( "This module outputs the transcoded stream to a network via HTTP.") );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to a network via HTTP."));
 
-    QLabel *HTTPLabel = new QLabel( qtr("Path"), this );
-    QLabel *HTTPPortLabel = new QLabel( qtr("Port"), this );
+    QLabel *HTTPLabel = translatedDestination<QLabel>(N_("Path"), this);
+    QLabel *HTTPPortLabel = translatedDestination<QLabel>(N_("Port"), this);
     layout->addWidget(HTTPLabel, 2, 0, 1, 1);
     layout->addWidget(HTTPPortLabel, 1, 0, 1, 1);
 
@@ -247,11 +267,11 @@ QString HTTPDestBox::getMRL( const QString& mux )
 
 MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 {
-    label->setText( qtr( "This module outputs the transcoded stream to a network "
-             "via the mms protocol." ) );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to a network "
+             "via the mms protocol."));
 
-    QLabel *MMSHLabel = new QLabel( qtr("Address"), this );
-    QLabel *MMSHPortLabel = new QLabel( qtr("Port"), this );
+    QLabel *MMSHLabel = translatedDestination<QLabel>(N_("Address"), this);
+    QLabel *MMSHPortLabel = translatedDestination<QLabel>(N_("Port"), this);
     layout->addWidget(MMSHLabel, 1, 0, 1, 1);
     layout->addWidget(MMSHPortLabel, 2, 0, 1, 1);
 
@@ -288,11 +308,10 @@ QString MMSHDestBox::getMRL( const QString& )
 
 RTSPDestBox::RTSPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 {
-    label->setText(
-        qtr( "This module outputs the transcoded stream to a network via RTSP." ) );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to a network via RTSP."));
 
-    QLabel *RTSPLabel = new QLabel( qtr("Path"), this );
-    QLabel *RTSPPortLabel = new QLabel( qtr("Port"), this );
+    QLabel *RTSPLabel = translatedDestination<QLabel>(N_("Path"), this);
+    QLabel *RTSPPortLabel = translatedDestination<QLabel>(N_("Port"), this);
     layout->addWidget( RTSPLabel, 2, 0, 1, 1 );
     layout->addWidget( RTSPPortLabel, 1, 0, 1, 1 );
 
@@ -334,11 +353,10 @@ QString RTSPDestBox::getMRL( const QString& )
 
 UDPDestBox::UDPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 {
-    label->setText(
-        qtr( "This module outputs the transcoded stream to a network via UDP.") );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to a network via UDP."));
 
-    QLabel *UDPLabel = new QLabel( qtr("Address"), this );
-    QLabel *UDPPortLabel = new QLabel( qtr("Port"), this );
+    QLabel *UDPLabel = translatedDestination<QLabel>(N_("Address"), this);
+    QLabel *UDPPortLabel = translatedDestination<QLabel>(N_("Port"), this);
     layout->addWidget(UDPLabel, 1, 0, 1, 1);
     layout->addWidget(UDPPortLabel, 2, 0, 1, 1);
 
@@ -375,16 +393,15 @@ QString UDPDestBox::getMRL( const QString& mux )
 SRTDestBox::SRTDestBox(QWidget *_parent, const char *_mux) :
         VirtualDestBox( _parent ), mux( qfu( _mux ) )
 {
-    label->setText(
-            qtr( "This module outputs the transcoded stream to a network"
-                    " via SRT." ) );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to a network"
+                    " via SRT."));
 
-    QLabel *SRTLabel = new QLabel( qtr( "Address" ), this );
+    QLabel *SRTLabel = translatedDestination<QLabel>(N_("Address"), this);
     SRTEdit = new QLineEdit( this );
     layout->addWidget( SRTLabel, 1, 0, 1, 1 );
     layout->addWidget( SRTEdit, 1, 1, 1, 1 );
 
-    QLabel *SRTPortLabel = new QLabel( qtr( "Base port" ), this );
+    QLabel *SRTPortLabel = translatedDestination<QLabel>(N_("Base port"), this);
     SRTPort = new QSpinBox( this );
     SRTPort->setMaximumSize( QSize( 90, 16777215 ) );
     SRTPort->setAlignment(
@@ -395,7 +412,7 @@ SRTDestBox::SRTDestBox(QWidget *_parent, const char *_mux) :
     layout->addWidget( SRTPortLabel, 2, 0, 1, 1 );
     layout->addWidget( SRTPort, 2, 1, 1, 1 );
 
-    QLabel *SAPNameLabel = new QLabel( qtr( "Stream name" ), this );
+    QLabel *SAPNameLabel = translatedDestination<QLabel>(N_("Stream name"), this);
     SAPName = new QLineEdit( this );
     layout->addWidget( SAPNameLabel, 3, 0, 1, 1 );
     layout->addWidget( SAPName, 3, 1, 1, 1 );
@@ -431,14 +448,14 @@ QString SRTDestBox::getMRL(const QString&)
 RISTDestBox::RISTDestBox( QWidget *_parent, const char * )
     : VirtualDestBox( _parent )
 {
-    label->setText( qtr( "This module outputs the stream using the RIST protocol (TR06).") );
+    watchDestinationText(label, N_("This module outputs the stream using the RIST protocol (TR06)."));
 
-    QLabel *RISTAddressLabel = new QLabel( qtr("Destination Address"), this );
+    QLabel *RISTAddressLabel = translatedDestination<QLabel>(N_("Destination Address"), this);
     RISTAddress = new QLineEdit(this);
     layout->addWidget(RISTAddressLabel, 1, 0, 1, 1);
     layout->addWidget(RISTAddress, 1, 1, 1, 1);
 
-    QLabel *RISTPortLabel = new QLabel( qtr("Destination Port"), this );
+    QLabel *RISTPortLabel = translatedDestination<QLabel>(N_("Destination Port"), this);
     RISTPort = new QSpinBox(this);
     RISTPort->setMaximumSize(QSize(90, 16777215));
     RISTPort->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -448,7 +465,7 @@ RISTDestBox::RISTDestBox( QWidget *_parent, const char * )
     layout->addWidget(RISTPortLabel, 2, 0, 1, 1);
     layout->addWidget(RISTPort, 2, 1, 1, 1);
 
-    QLabel *RISTNameLabel = new QLabel( qtr("Stream Name"), this );
+    QLabel *RISTNameLabel = translatedDestination<QLabel>(N_("Stream Name"), this);
     RISTName = new QLineEdit(this);
     layout->addWidget(RISTNameLabel, 3, 0, 1, 1);
     layout->addWidget(RISTName, 3, 1, 1, 1);
@@ -486,14 +503,14 @@ QString RISTDestBox::getMRL( const QString& )
 RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
     : VirtualDestBox( _parent ), mux( qfu(_mux) )
 {
-    label->setText( qtr( "This module outputs the transcoded stream to a network via RTP.") );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to a network via RTP."));
 
-    QLabel *RTPLabel = new QLabel( qtr("Address"), this );
+    QLabel *RTPLabel = translatedDestination<QLabel>(N_("Address"), this);
     RTPEdit = new QLineEdit(this);
     layout->addWidget(RTPLabel, 1, 0, 1, 1);
     layout->addWidget(RTPEdit, 1, 1, 1, 1);
 
-    QLabel *RTPPortLabel = new QLabel( qtr("Base port"), this );
+    QLabel *RTPPortLabel = translatedDestination<QLabel>(N_("Base port"), this);
     RTPPort = new QSpinBox(this);
     RTPPort->setMaximumSize(QSize(90, 16777215));
     RTPPort->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -503,7 +520,7 @@ RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
     layout->addWidget(RTPPortLabel, 2, 0, 1, 1);
     layout->addWidget(RTPPort, 2, 1, 1, 1);
 
-    QLabel *SAPNameLabel = new QLabel( qtr("Stream name"), this );
+    QLabel *SAPNameLabel = translatedDestination<QLabel>(N_("Stream name"), this);
     SAPName = new QLineEdit(this);
     layout->addWidget(SAPNameLabel, 3, 0, 1, 1);
     layout->addWidget(SAPName, 3, 1, 1, 1);
@@ -540,11 +557,10 @@ QString RTPDestBox::getMRL( const QString& )
 
 ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 {
-    label->setText(
-        qtr( "This module outputs the transcoded stream to an Icecast server.") );
+    watchDestinationText(label, N_("This module outputs the transcoded stream to an Icecast server."));
 
-    QLabel *ICELabel = new QLabel( qtr("Address"), this );
-    QLabel *ICEPortLabel = new QLabel( qtr("Port"), this );
+    QLabel *ICELabel = translatedDestination<QLabel>(N_("Address"), this);
+    QLabel *ICEPortLabel = translatedDestination<QLabel>(N_("Port"), this);
     layout->addWidget(ICELabel, 1, 0, 1, 1);
     layout->addWidget(ICEPortLabel, 2, 0, 1, 1);
 
@@ -560,8 +576,8 @@ ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     layout->addWidget(ICEEdit, 1, 1, 1, 1);
     layout->addWidget(ICEPort, 2, 1, 1, 1);
 
-    QLabel *IcecastMountpointLabel = new QLabel( qtr( "Mount Point" ), this );
-    QLabel *IcecastNameLabel = new QLabel( qtr( "Login:pass" ), this );
+    QLabel *IcecastMountpointLabel = translatedDestination<QLabel>(N_("Mount Point"), this);
+    QLabel *IcecastNameLabel = translatedDestination<QLabel>(N_("Login:pass"), this);
     ICEMountEdit = new QLineEdit( this );
     ICEPassEdit = new QLineEdit( this );
     layout->addWidget(IcecastMountpointLabel, 3, 0, 1, 1 );

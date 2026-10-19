@@ -53,6 +53,7 @@ protected:
     virtual void done( int );
 private:
     Ui::Sout ui;
+    void retranslate();
 
     QString chain;
     QPushButton *okButton;

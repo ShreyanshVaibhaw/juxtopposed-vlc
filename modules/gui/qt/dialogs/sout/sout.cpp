@@ -28,6 +28,7 @@
 
 #include "dialogs/sout/sout.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/interface_translator.hpp"
 #include "dialogs/sout/sout_widgets.hpp"
 #include "widgets/native/qvlcframe.hpp"
 #include "util/colorizedsvgicon.hpp"
@@ -37,6 +38,7 @@
 #include <cassert>
 #include <QWindow>
 #include <QStyle>
+#include <QSignalBlocker>
 
 SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inputChain )
 {
@@ -55,18 +57,6 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
     ui.setupUi( this );
     ui.profileSelect->setThemeContext(p_intf->p_mi);
     ui.inputBox->setMRL( inputChain );
-    ui.helpEdit->setPlainText( qtr("This wizard will allow you to stream or "
-            "convert your media for use locally, on your private network, "
-            "or on the Internet.\n"
-            "You should start by checking that source matches what you want "
-            "your input to be and then press the \"Next\" "
-            "button to continue.\n") );
-
-    ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n"
-                "This is automatically generated "
-                 "when you change the above settings,\n"
-                 "but you can change it manually." ) ) ;
-
     ui.destTab->setTabsClosable( true );
     QTabBar* tb = ui.destTab->findChild<QTabBar*>();
     if( tb != NULL ) tb->tabButton(0, QTabBar::RightSide)->hide();
@@ -94,10 +84,6 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
     connect( ui.transcodeBox, &QCheckBox::toggled, this, &SoutDialog::updateChain );
     connect( ui.profileSelect, &VLCProfileSelector::optionsChanged, this, &SoutDialog::updateChain );
 
-    setButtonText( QWizard::BackButton, qtr("Back") );
-    setButtonText( QWizard::CancelButton, qtr("Cancel") );
-    setButtonText( QWizard::NextButton, qtr("Next") );
-    setButtonText( QWizard::FinishButton, qtr("Stream") );
     for (const auto role : {QWizard::NextButton, QWizard::FinishButton})
     {
         auto *primary = button(role);
@@ -108,6 +94,35 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
 
     ui.localOutput->setChecked( var_InheritBool( p_intf, "sout-display" ) );
     updateChain();
+    retranslate();
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, &SoutDialog::retranslate);
+}
+
+void SoutDialog::retranslate()
+{
+    const QSignalBlocker blocker(ui.destBox);
+    ui.retranslateUi(this);
+    ui.helpEdit->setPlainText( qtr("This wizard will allow you to stream or "
+            "convert your media for use locally, on your private network, "
+            "or on the Internet.\n"
+            "You should start by checking that source matches what you want "
+            "your input to be and then press the \"Next\" "
+            "button to continue.\n") );
+
+    ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n"
+                "This is automatically generated "
+                 "when you change the above settings,\n"
+                 "but you can change it manually." ) ) ;
+
+    setButtonText( QWizard::BackButton, qtr("Back") );
+    setButtonText( QWizard::CancelButton, qtr("Cancel") );
+    setButtonText( QWizard::NextButton, qtr("Next") );
+    setButtonText( QWizard::FinishButton, qtr("Stream") );
+    ui.destBox->setItemText(0, qtr("File"));
+    for (int tab = 1; tab < ui.destTab->count(); ++tab)
+        if (qobject_cast<FileDestBox*>(ui.destTab->widget(tab)))
+            ui.destTab->setTabText(tab, qtr("File"));
 }
 
 void SoutDialog::closeTab( int i )
