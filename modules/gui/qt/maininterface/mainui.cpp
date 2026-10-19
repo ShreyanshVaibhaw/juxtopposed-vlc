@@ -1,4 +1,5 @@
 #include "mainui.hpp"
+#include "util/interface_translator.hpp"
 
 #include <cassert>
 
@@ -161,6 +162,7 @@ MainUI::~MainUI()
 bool MainUI::setup(QQmlEngine* engine)
 {
     m_engineBound = engine;
+    if (auto* translator = InterfaceTranslator::instance()) translator->watchEngine(engine);
 
     if (m_mainCtx->hasMediaLibrary())
     {

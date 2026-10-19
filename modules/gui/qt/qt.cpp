@@ -59,7 +59,7 @@ extern "C" char **environ;
 #include <QLoggingCategory>
 #include <QQmlError>
 #include <QList>
-#include <QTranslator>
+#include "util/interface_translator.hpp"
 
 #if __has_include(<rhi/qrhi.h>) // Qt 6.6
 #define RHI_HEADER_AVAILABLE
@@ -582,28 +582,6 @@ static inline void triggerQuit()
         }, Qt::QueuedConnection);
 }
 
-class Translator : public QTranslator
-{
-public:
-    explicit Translator(QObject* parent) : QTranslator(parent) { }
-
-    bool isEmpty() const override { return false; };
-
-    QString translate(const char *context,
-                      const char *sourceText,
-                      const char *disambiguation = nullptr,
-                      int n = -1) const override
-    {
-        Q_UNUSED(context);
-
-        const char* text = (n >= 0 && disambiguation != nullptr) ? vlc_ngettext(sourceText, disambiguation, n)
-                                                                 : vlc_gettext(sourceText);
-
-        assert(text);
-        return QString::fromUtf8(text);
-    }
-};
-
 /*****************************************************************************
  * Module callbacks
  *****************************************************************************/
@@ -982,7 +960,19 @@ static void *Thread( void *obj )
 
     {
         // Install custom translator:
-        const auto translator = new Translator(&app);
+        char* directory = config_GetSysPath(VLC_LOCALE_DIR, nullptr);
+        char* systemLanguage = config_GetSystemInterfaceLanguage();
+        QStringList systemLanguages;
+        if (systemLanguage) systemLanguages = qfu(systemLanguage).split(QLatin1Char(':'), Qt::SkipEmptyParts);
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
+        else systemLanguages = {QStringLiteral("en")};
+#else
+        else systemLanguages = QLocale::system().uiLanguages();
+#endif
+        const auto translator = new InterfaceTranslator(qfu(directory ? directory : ""), systemLanguages,
+            qfu(vlc_gettext("C")), &app);
+        free(systemLanguage);
+        free(directory);
         const auto ret = QCoreApplication::installTranslator(translator);
         assert(ret);
     }

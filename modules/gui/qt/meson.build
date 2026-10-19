@@ -179,6 +179,7 @@ moc_headers = files(
     'widgets/native/csdthemeimage.hpp',
     'widgets/native/customwidgets.hpp',
     'widgets/native/embedded_file_browser.hpp',
+    'util/interface_translator.hpp',
     'widgets/native/interface_widgets.hpp',
     'widgets/native/navigation_attached.hpp',
     'widgets/native/mlfolderseditor.hpp',
@@ -490,6 +491,8 @@ qt_plugin_sources = files(
     'util/local_file_url.hpp',
     'util/gettext_translator.cpp',
     'util/gettext_translator.hpp',
+    'util/interface_translator.cpp',
+    'util/interface_translator.hpp',
     'util/ui_notifier.cpp',
     'util/ui_notifier.hpp',
     'util/color_svg_image_provider.cpp',
@@ -1802,6 +1805,17 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_interface_translator',
+            'sources': files('tests/test_interface_translator.cpp', 'util/interface_translator.cpp', 'util/gettext_translator.cpp'),
+            'moc_sources': files('tests/test_interface_translator.cpp'),
+            'moc_headers': files('util/interface_translator.hpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
         }
 
         vlc_tests += {

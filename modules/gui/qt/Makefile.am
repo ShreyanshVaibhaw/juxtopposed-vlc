@@ -343,6 +343,7 @@ libqt_plugin_la_SOURCES = \
 	util/track_matching.hpp \
 	util/local_file_url.hpp \
 	util/gettext_translator.cpp util/gettext_translator.hpp \
+	util/interface_translator.cpp util/interface_translator.hpp \
 	util/ui_notifier.cpp util/ui_notifier.hpp \
 	util/color_svg_image_provider.cpp util/color_svg_image_provider.hpp \
 	util/vlcaccess_image_provider.cpp util/vlcaccess_image_provider.hpp \
@@ -581,6 +582,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	widgets/native/csdthemeimage.moc.cpp \
 	widgets/native/customwidgets.moc.cpp \
 	widgets/native/embedded_file_browser.moc.cpp \
+	util/interface_translator.moc.cpp \
 	widgets/native/interface_widgets.moc.cpp \
 	widgets/native/navigation_attached.moc.cpp \
 	widgets/native/mlfolderseditor.moc.cpp \
@@ -2160,6 +2162,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_interface_translator
+
+test_interface_translator_SOURCES = tests/test_interface_translator.cpp util/interface_translator.hpp util/interface_translator.cpp util/gettext_translator.hpp util/gettext_translator.cpp
+nodist_test_interface_translator_SOURCES = tests/test_interface_translator.moc util/interface_translator.moc.cpp
+BUILT_SOURCES += tests/test_interface_translator.moc
+CLEANFILES += tests/test_interface_translator.moc
+test_interface_translator_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_interface_translator_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_interface_translator_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_interface_translator_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_interface_translator
+TESTS += test_interface_translator
 
 # test_gettext_translator
 

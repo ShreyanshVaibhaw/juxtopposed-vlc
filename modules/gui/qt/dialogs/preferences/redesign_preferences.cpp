@@ -39,6 +39,7 @@
 #include <QUuid>
 #include "util/vlchotkeyconverter.hpp"
 #include "util/postprocessing_preferences.hpp"
+#include "util/interface_translator.hpp"
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -502,7 +503,7 @@ QString languageCodes(const QString& input)
 
 QVariantList languageChoices(const QString& current)
 {
-    static const QVariantList languages = [] {
+    const QVariantList languages = [] {
         QVariantList result;size_t count;
         const auto* records = vlc_iso639_languages(&count);
         for (size_t i = 0; i < count; ++i) {
@@ -565,6 +566,19 @@ QString categoryFor(const QString& name, int subcat)
 
 RedesignPreferences::RedesignPreferences(QObject* parent) : QObject(parent)
 {
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+            for (auto& entry : m_catalog) {
+                const auto name = entry.name.toUtf8();
+                const auto* config = config_FindConfig(name.constData());
+                if (config && config->psz_text) entry.title = qtr(config->psz_text);
+            }
+            std::sort(m_catalog.begin(), m_catalog.end(), [](const Entry& a, const Entry& b) {
+                return QString::localeAwareCompare(a.title, b.title) < 0;
+            });
+            ++m_revision;
+            emit changed();
+        }, Qt::QueuedConnection);
     m_saveTimer.setSingleShot(true);
     m_saveTimer.setInterval(300);
     connect(&m_saveTimer, &QTimer::timeout, this, [this]() { if (m_autoSave && dirty()) save(); });
@@ -1840,7 +1854,7 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
             choices.append(QVariantMap{{QStringLiteral("label"), qtr("Saved language (%1)").arg(current)}, {QStringLiteral("value"), current}});
         result.insert(QStringLiteral("editor"), QStringLiteral("choice"));
         result.insert(QStringLiteral("defaultValue"), QStringLiteral("auto"));
-        result.insert(QStringLiteral("help"), qtr("Choose a language for the interface. Restart VLC after a change. Text without a translation is shown in English. Launch options can override this setting."));
+        result.insert(QStringLiteral("help"), qtr("Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."));
     }
     if (name == QLatin1String("codec") || name == QLatin1String("sout-transcode-venc")
         || name == QLatin1String("sout-transcode-aenc") || name == QLatin1String("sout-transcode-senc")) {
@@ -2261,6 +2275,9 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
 
     bool applyToPlayer = m_ctx && name == QLatin1String("qt-backdrop-blur")
         && normalized.toBool() != m_ctx->backdropBlurRequested();
+    if (m_ctx && name == QLatin1String("language"))
+        if (auto* translator = InterfaceTranslator::instance())
+            applyToPlayer = normalized.toString() != translator->requestedLanguage();
     if (m_ctx && (name == QLatin1String("qt-error-dialogs") || name == QLatin1String("qt-minor-warnings") || name == QLatin1String("qt-verbose") || name == QLatin1String("playlist-tree") || name == QLatin1String("qt-video-autoresize") || name == QLatin1String("qt-embedded-open")))
         applyToPlayer = normalized.toBool() != value(name).toBool();
     if (m_ctx && name == QLatin1String("qt-system-tray"))
@@ -2306,7 +2323,11 @@ bool RedesignPreferences::stage(const QString& name, const QVariant& proposed)
         m_error.clear();
     ++m_revision;
     emit changed();
-    if (m_autoSave) m_saveTimer.start();
+    if (m_autoSave) {
+        if (name == QLatin1String("language"))
+            QTimer::singleShot(0, this, [this] { if (m_autoSave && dirty()) save(); });
+        else m_saveTimer.start();
+    }
     if (name == QLatin1String("pitch-shift"))
         return stage(QStringLiteral("filter:audio-filter:scaletempo_pitch"), normalized.toFloat() != 0.f);
     return true;
@@ -2375,6 +2396,12 @@ bool RedesignPreferences::save()
             }
             m_edits.insert(presetOption, QString::fromUtf8(QJsonDocument::fromVariant(state).toJson(QJsonDocument::Compact)));
         }
+    }
+    auto* translator = InterfaceTranslator::instance();
+    const bool changeLanguage = translator && m_edits.contains(QStringLiteral("language"));
+    if (changeLanguage && !translator->prepareLanguage(value(QStringLiteral("language")).toString())) {
+        m_error = qtr("VLC cannot load this language.");
+        ++m_revision; emit changed(); return false;
     }
     QVariantMap previous;
     for (auto it = m_edits.cbegin(); it != m_edits.cend(); ++it) {
@@ -2620,12 +2647,18 @@ bool RedesignPreferences::save()
     m_ctx->reloadPrefs();
     m_ctx->getIntf()->preferencesResetPending = false;
     discard();
+    if (changeLanguage) translator->activatePreparedLanguage();
     return true;
 }
 
 bool RedesignPreferences::resetAll()
 {
     if (!m_ctx) return false;
+    auto* translator = InterfaceTranslator::instance();
+    if (translator && !translator->prepareLanguage(QStringLiteral("auto"))) {
+        m_error = qtr("VLC cannot load this language.");
+        ++m_revision; emit changed(); return false;
+    }
     m_saveTimer.stop();
     auto* intf = m_ctx->getIntf();
     QSettings uiSettings(intf->mainSettings->fileName(), intf->mainSettings->format());
@@ -2729,6 +2762,7 @@ bool RedesignPreferences::resetAll()
     m_ctx->reloadPrefs();
     m_ctx->reloadFromSettings();
     discard();
+    if (translator) translator->activatePreparedLanguage();
     return true;
 }
 
