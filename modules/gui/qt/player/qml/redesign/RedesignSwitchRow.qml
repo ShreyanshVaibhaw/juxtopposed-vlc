@@ -26,13 +26,20 @@ RowLayout {
     T.Button {
         id: toggle
         objectName: "settingSwitch"
-        Layout.preferredWidth: theme.dp(68); Layout.preferredHeight: theme.dp(32)
+        // Measure both labels so the width stays stable when the state changes.
+        implicitWidth: Math.max(theme.dp(68),
+            Math.ceil(onMetrics.advanceWidth) + theme.dp(40),
+            Math.ceil(offMetrics.advanceWidth) + theme.dp(39))
+        Layout.minimumWidth: implicitWidth
+        Layout.preferredWidth: implicitWidth; Layout.preferredHeight: theme.dp(32)
         checkable: true; checked: root.checked
         hoverEnabled: true; focusPolicy: Qt.StrongFocus
         Accessible.name: root.accessibleName
         Accessible.role: Accessible.CheckBox
         Accessible.checkable: true; Accessible.checked: checked
         onClicked: root.toggled(checked)
+        TextMetrics { id: onMetrics; font: stateText.font; text: qsTr("ON") }
+        TextMetrics { id: offMetrics; font: stateText.font; text: qsTr("OFF") }
         background: Rectangle {
             radius: root.theme.dp(4); color: toggle.checked ? root.theme.progress : root.theme.field
             border.color: toggle.visualFocus ? root.theme.accent : root.theme.background
@@ -50,6 +57,7 @@ RowLayout {
                 radius: root.theme.dp(3); color: toggle.checked ? root.theme.accent : "#404040"
             }
             Text {
+                id: stateText
                 x: toggle.checked ? root.theme.dp(8) : root.theme.dp(36)
                 anchors.verticalCenter: parent.verticalCenter
                 text: toggle.checked ? qsTr("ON") : qsTr("OFF")

@@ -109,6 +109,7 @@ ColumnLayout {
             visible: !root.fullWidth
             active: visible
             enabled: root.editorEnabled
+            Layout.minimumWidth: root.editorComponent === toggleEditor && item ? item.implicitWidth : 0
             Layout.preferredWidth: root.compact ? root.editor === "language"
                 ? Math.min(theme.dp(184),Math.max(theme.dp(138),languageMetrics.advanceWidth+theme.dp(56))) : Math.min(theme.dp(root.compactEditorWidth), root.width * .61)
                 : Math.min(theme.dp(320), Math.max(theme.dp(150), root.width * 0.43))
@@ -119,6 +120,7 @@ ColumnLayout {
     }
     Loader {
         Layout.fillWidth: true
+        Layout.minimumWidth: root.editorComponent === toggleEditor && item ? item.implicitWidth : 0
         Layout.preferredHeight: item ? item.implicitHeight : 0
         active: root.fullWidth; visible: active
         enabled: root.editorEnabled
@@ -284,14 +286,23 @@ ColumnLayout {
     Component {
         id: toggleEditor
         Item {
+            implicitWidth: preferenceToggle.implicitWidth
             implicitHeight: theme.dp(34)
             RedesignButton {
+                id: preferenceToggle
                 anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
-                width: theme.dp(64); height: theme.dp(30)
+                scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
+                // Measure both labels so the width stays stable when the state changes.
+                implicitWidth: Math.max(theme.dp(64),
+                    Math.ceil(onMetrics.advanceWidth) + theme.dp(40),
+                    Math.ceil(offMetrics.advanceWidth) + theme.dp(37))
+                width: implicitWidth; height: theme.dp(30)
                 objectName: "preferenceToggleEditor"
                 checkable: true; checked: !!root.displayedValue && (root.editorEnabled || !root.presentation.hideDisabledValue)
                 text: root.label || root.description.title
                 onClicked: root.commit(checked)
+                TextMetrics { id: onMetrics; font: stateText.font; text: qsTr("ON") }
+                TextMetrics { id: offMetrics; font: stateText.font; text: qsTr("OFF") }
                 background: Rectangle {
                     radius: theme.dp(4); color: parent.checked ? theme.progress : theme.background
                     border.width: parent.visualFocus ? 1 : 0; border.color: theme.accent
@@ -303,6 +314,7 @@ ColumnLayout {
                         radius: theme.dp(3); color: parent.parent.checked ? theme.accent : "#444444"
                     }
                     Text {
+                        id: stateText
                         x: parent.parent.checked ? theme.dp(8) : theme.dp(34)
                         anchors.verticalCenter: parent.verticalCenter
                         text: parent.parent.checked ? qsTr("ON") : qsTr("OFF")
