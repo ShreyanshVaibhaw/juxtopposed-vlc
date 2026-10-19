@@ -31,6 +31,7 @@
 #include "maininterface/mainctx.hpp"
 #include "util/color_scheme_model.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/interface_translator.hpp"
 
 
 #include <vlc_intf_strings.h>
@@ -48,6 +49,7 @@
 #include <QRegularExpression>
 #include <QApplication>
 #include <QStyleHints>
+#include <QScrollBar>
 
 #include <cassert>
 
@@ -71,14 +73,22 @@ HelpDialog::HelpDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
     helpBrowser->setHtml( qfut(I_LONGHELP) );
 
     QDialogButtonBox *closeButtonBox = new QDialogButtonBox( this );
-    closeButtonBox->addButton(
-        new QPushButton( qtr("&Close") ), QDialogButtonBox::RejectRole );
+    auto* closeButton = new QPushButton(qtr("&Close"));
+    closeButtonBox->addButton(closeButton, QDialogButtonBox::RejectRole);
     closeButtonBox->setFocus();
 
     layout->addWidget( helpBrowser );
     layout->addWidget( closeButtonBox );
 
     connect( closeButtonBox, &QDialogButtonBox::rejected, this, &HelpDialog::close );
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this, helpBrowser, closeButton] {
+            const auto scroll = helpBrowser->verticalScrollBar()->value();
+            setWindowTitle(qtr("Help"));
+            helpBrowser->setHtml(qfut(I_LONGHELP));
+            helpBrowser->verticalScrollBar()->setValue(scroll);
+            closeButton->setText(qtr("&Close"));
+        });
     restoreWidgetPosition( "Help", QSize( 500, 450 ) );
 }
 
@@ -97,11 +107,20 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
     setWindowModality( Qt::WindowModal );
 
     ui.version->setText(qfu( " " VERSION_MESSAGE ) );
-    ui.title->setText("<html><head/><body><p><span style=\" font-size:26pt;\"> " + qtr( "VLC media player" ) + " </span></p></body></html>");
+    const auto updateText = [this] {
+        setWindowTitle(qtr("About"));
+        ui.title->setText("<html><head/><body><p><span style=\" font-size:26pt;\"> " + qtr( "VLC media player" ) + " </span></p></body></html>");
 
-    ui.MainBlabla->setText("<html><head/><body>" +
-    qtr( "<p>VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the <a href=\"https://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join us!</span></a>" ).remove(QStringLiteral("color:#0057ae;")) +
-    "</p>" + AboutModel::getDesignAttribution() + "</body> </html>");
+        ui.MainBlabla->setText("<html><head/><body>" +
+        qtr( "<p>VLC media player is a free and open source media player, encoder, and streamer made by the volunteers of the <a href=\"https://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> community.</p><p>VLC uses its internal codecs, works on essentially every popular platform, and can read almost all files, CDs, DVDs, network streams, capture cards and other media formats!</p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join us!</span></a>" ).remove(QStringLiteral("color:#0057ae;")) +
+        "</p>" + AboutModel::getDesignAttribution() + "</body> </html>");
+        ui.licenseButton->setText(qtr("License"));
+        ui.authorsButton->setText(qtr("Authors"));
+        ui.creditsButton->setText(qtr("Credits"));
+        ui.UpdateLabel->setText(qtr("Update"));
+        ui.checkUpdates->setText(qtr("Update"));
+    };
+    updateText();
 
     const QDate today = QDate::currentDate();
     if( today.month() == 4 && today.day() == 1
@@ -119,13 +138,10 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
     /* People who wrote the software */
     ui.authorsPage->setText( qfu( psz_authors ) );
 
-    ui.licenseButton->setText(qtr("License"));
     connect(ui.licenseButton, &QPushButton::clicked, this, &AboutDialog::showLicense);
 
-    ui.authorsButton->setText(qtr("Authors"));
     connect(ui.authorsButton, &QPushButton::clicked, this, &AboutDialog::showAuthors);
 
-    ui.creditsButton->setText(qtr("Credits"));
     connect(ui.creditsButton, &QPushButton::clicked, this, &AboutDialog::showCredit);
 
     const auto updateLinkColor = [this] {
@@ -136,6 +152,11 @@ AboutDialog::AboutDialog( qt_intf_t *_p_intf)
         ui.MainBlabla->setText(html);
     };
     updateLinkColor();
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [updateText, updateLinkColor] {
+            updateText();
+            updateLinkColor();
+        });
     if (p_intf->p_mi)
     {
         connect(p_intf->p_mi, &MainCtx::redesignAccentChanged, this, updateLinkColor);
