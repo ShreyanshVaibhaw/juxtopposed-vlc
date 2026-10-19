@@ -33574,7 +33574,6 @@ msgstr "Properties"
 #~ msgid "Telnet Interface host"
 #~ msgstr "Control interfaces"
 
-
 #. Redesign British English translation by Codex (first pass; review welcome).
 msgid "Warning: %1"
 msgstr "Warning: %1"
@@ -38956,3 +38955,92 @@ msgstr "See All"
 #. Redesign British English translation by Codex (first pass; review welcome).
 msgid "More options"
 msgstr "More options"
+
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "<p>Interface design adapted from <a href=\"https://www.figma.com/community/file/1691465999134370980/vlc-redesign\">VLC Redesign</a> by <a href=\"https://www.juxtopposed.com/\">Juxtopposed</a>, licensed under <a href=\"https://creativecommons.org/licenses/by/4.0/\">CC BY 4.0</a>. Modified for VLC's native interface, responsive layouts, controls, and settings.</p><p>Interface font: <a href=\"https://rsms.me/inter/\">Inter</a> by Rasmus Andersson and contributors. Licensed under the <a href=\"https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt\">SIL Open Font License 1.1</a>. The full font license is in the License tab.</p>"
+msgstr "<p>Interface design adapted from <a href=\"https://www.figma.com/community/file/1691465999134370980/vlc-redesign\">VLC Redesign</a> by <a href=\"https://www.juxtopposed.com/\">Juxtopposed</a>, licensed under <a href=\"https://creativecommons.org/licenses/by/4.0/\">CC BY 4.0</a>. Modified for VLC's native interface, responsive layouts, controls, and settings.</p><p>Interface font: <a href=\"https://rsms.me/inter/\">Inter</a> by Rasmus Andersson and contributors. Licensed under the <a href=\"https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt\">SIL Open Font License 1.1</a>. The full font licence is in the Licence tab.</p>"
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles refused this request. Check your key and its download settings."
+msgstr "OpenSubtitles refused this request. Check your key and its download settings."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles refused this request. Try again later, or add your own key in setup."
+msgstr "OpenSubtitles refused this request. Try again later, or add your own key in setup."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "The subtitle server refused this link. Check the link and try again."
+msgstr "The subtitle server refused this link. Check the link and try again."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles cannot download more files now. Try again later."
+msgstr "OpenSubtitles cannot download more files now. Try again later."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "The subtitle server cannot download more files now. Try again later."
+msgstr "The subtitle server cannot download more files now. Try again later."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "The subtitle server could not complete this request. Try again."
+msgstr "The subtitle server could not complete this request. Try again."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "VLC could not connect to the subtitle server. Try again."
+msgstr "VLC could not connect to the subtitle server. Try again."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "The subtitle server returned an invalid response. Try again."
+msgstr "The subtitle server returned an invalid response. Try again."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "This subtitle response is too large."
+msgstr "This subtitle response is too large."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "The subtitle request took too long. Try again."
+msgstr "The subtitle request took too long. Try again."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles returned an invalid response. Try again."
+msgstr "OpenSubtitles returned an invalid response. Try again."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "Enter a title and select a subtitle language."
+msgstr "Enter a title and select a subtitle language."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "Search for these subtitles again before Save."
+msgstr "Search for these subtitles again before Save."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "The subtitle server returned an invalid download link."
+msgstr "The subtitle server returned an invalid download link."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "This download does not contain valid subtitles."
+msgstr "This download does not contain valid subtitles."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "VLC could not save these subtitles."
+msgstr "VLC could not save these subtitles."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "Use direct subtitle file links that start with http:// or https://."
+msgstr "Use direct subtitle file links that start with http:// or https://."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "VLC could not create the subtitle folder."
+msgstr "VLC could not create the subtitle folder."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "This link contains an archive. Extract its subtitle files, then add them from Computer."
+msgstr "This link contains an archive. Extract its subtitle files, then add them from Computer."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "This link does not contain a subtitle file. Use a direct subtitle file link."
+msgstr "This link does not contain a subtitle file. Use a direct subtitle file link."
+
+#. Redesign British English translation by Codex (first pass; review welcome).
+msgid "Songs"
+msgstr "Songs"

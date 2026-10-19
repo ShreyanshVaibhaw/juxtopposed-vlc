@@ -37464,7 +37464,6 @@ msgstr "Choisissez une langue pour l’interface. Les modifications s’applique
 msgid "VLC cannot load this language."
 msgstr "VLC ne peut pas charger cette langue."
 
-
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Control VLC from a web browser. Restart VLC after changing the web remote, port or password."
 msgstr "Contrôlez VLC depuis un navigateur web. Redémarrez VLC après avoir modifié la télécommande web, le port ou le mot de passe."
@@ -38076,3 +38075,96 @@ msgstr "Barre de progression"
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Playback Settings"
 msgstr "Paramètres de lecture"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Profile %1"
+msgstr "Profil %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles refused this request. Check your key and its download settings."
+msgstr "OpenSubtitles a refusé cette demande. Vérifiez votre clé et ses paramètres de téléchargement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles refused this request. Try again later, or add your own key in setup."
+msgstr "OpenSubtitles a refusé cette demande. Réessayez plus tard ou ajoutez votre propre clé dans la configuration."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The subtitle server refused this link. Check the link and try again."
+msgstr "Le serveur de sous-titres a refusé ce lien. Vérifiez le lien et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles cannot download more files now. Try again later."
+msgstr "OpenSubtitles ne peut pas télécharger davantage de fichiers pour le moment. Réessayez plus tard."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The subtitle server cannot download more files now. Try again later."
+msgstr "Le serveur de sous-titres ne peut pas télécharger davantage de fichiers pour le moment. Réessayez plus tard."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The subtitle server could not complete this request. Try again."
+msgstr "Le serveur de sous-titres n’a pas pu terminer cette demande. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not connect to the subtitle server. Try again."
+msgstr "VLC n’a pas pu se connecter au serveur de sous-titres. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The subtitle server returned an invalid response. Try again."
+msgstr "Le serveur de sous-titres a renvoyé une réponse non valide. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This subtitle response is too large."
+msgstr "Cette réponse du serveur de sous-titres est trop volumineuse."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The subtitle request took too long. Try again."
+msgstr "La demande de sous-titres a pris trop de temps. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles returned an invalid response. Try again."
+msgstr "OpenSubtitles a renvoyé une réponse non valide. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles is not set up. Add an API key to use this source."
+msgstr "OpenSubtitles n’est pas configuré. Ajoutez une clé API pour utiliser cette source."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter a title and select a subtitle language."
+msgstr "Saisissez un titre et choisissez une langue de sous-titres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search for these subtitles again before Save."
+msgstr "Recherchez à nouveau ces sous-titres avant de sélectionner Enregistrer."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The subtitle server returned an invalid download link."
+msgstr "Le serveur de sous-titres a renvoyé un lien de téléchargement non valide."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This download does not contain valid subtitles."
+msgstr "Ce téléchargement ne contient pas de sous-titres valides."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not save these subtitles."
+msgstr "VLC n’a pas pu enregistrer ces sous-titres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use direct subtitle file links that start with http:// or https://."
+msgstr "Utilisez des liens directs vers des fichiers de sous-titres qui commencent par http:// ou https://."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not create the subtitle folder."
+msgstr "VLC n’a pas pu créer le dossier de sous-titres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This link contains an archive. Extract its subtitle files, then add them from Computer."
+msgstr "Ce lien contient une archive. Extrayez ses fichiers de sous-titres, puis ajoutez-les depuis Ordinateur."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This link does not contain a subtitle file. Use a direct subtitle file link."
+msgstr "Ce lien ne contient pas de fichier de sous-titres. Utilisez un lien direct vers un fichier de sous-titres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "<p>Interface design adapted from <a href=\"https://www.figma.com/community/file/1691465999134370980/vlc-redesign\">VLC Redesign</a> by <a href=\"https://www.juxtopposed.com/\">Juxtopposed</a>, licensed under <a href=\"https://creativecommons.org/licenses/by/4.0/\">CC BY 4.0</a>. Modified for VLC's native interface, responsive layouts, controls, and settings.</p><p>Interface font: <a href=\"https://rsms.me/inter/\">Inter</a> by Rasmus Andersson and contributors. Licensed under the <a href=\"https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt\">SIL Open Font License 1.1</a>. The full font license is in the License tab.</p>"
+msgstr "<p>Conception de l’interface adaptée de <a href=\"https://www.figma.com/community/file/1691465999134370980/vlc-redesign\">VLC Redesign</a> par <a href=\"https://www.juxtopposed.com/\">Juxtopposed</a>, sous licence <a href=\"https://creativecommons.org/licenses/by/4.0/\">CC BY 4.0</a>. Modifiée pour l’interface native de VLC, les mises en page adaptatives, les commandes et les paramètres.</p><p>Police de l’interface : <a href=\"https://rsms.me/inter/\">Inter</a> par Rasmus Andersson et ses contributeurs. Sous licence <a href=\"https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt\">SIL Open Font License 1.1</a>. La licence complète de la police se trouve dans l’onglet Licence.</p>"
