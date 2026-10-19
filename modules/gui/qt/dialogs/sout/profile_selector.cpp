@@ -25,6 +25,7 @@
 #include "dialogs/sout/sout.hpp"
 #include "util/soutchain.hpp"
 #include "util/redesign_widget_theme.hpp"
+#include "util/interface_translator.hpp"
 #include "maininterface/mainctx.hpp"
 
 #include <QHBoxLayout>
@@ -80,6 +81,15 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     connect( profileBox, QOverload<int>::of(&QComboBox::activated),
              this, &VLCProfileSelector::updateOptions );
     updateOptions( qMax(profileBox->currentIndex(), 0) );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this,
+                [prLabel, editButton, deleteButton, newButton] {
+            prLabel->setText(qtr("Profile"));
+            editButton->setToolTip(qtr("Edit selected profile"));
+            deleteButton->setToolTip(qtr("Delete selected profile"));
+            newButton->setToolTip(qtr("Create a new profile"));
+        });
 }
 
 VLCProfileSelector::~VLCProfileSelector()

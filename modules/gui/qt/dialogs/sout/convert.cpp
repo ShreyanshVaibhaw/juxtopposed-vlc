@@ -30,12 +30,14 @@
 #include "maininterface/mainctx.hpp"
 
 #include "util/qt_dirs.hpp"
+#include "util/interface_translator.hpp"
 
 #include <QLabel>
 #include <QGroupBox>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QSignalBlocker>
 
 #define urlToDisplayString(filestr) toNativeSeparators(QUrl(filestr).toDisplayString(\
     QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ))
@@ -77,9 +79,10 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
     fileLine->setReadOnly(true);
     destLabel->setBuddy( fileLine );
     // You can set a specific name for only one file.
+    QPushButton *fileSelectButton = nullptr;
     if(singleFileSelected)
     {
-        QPushButton *fileSelectButton = new QPushButton( qtr( "Browse" ) );
+        fileSelectButton = new QPushButton( qtr( "Browse" ) );
         destLayout->addWidget( fileSelectButton, 0, 2);
         BUTTONACT( fileSelectButton, &ConvertDialog::fileBrowse );
     }
@@ -152,6 +155,35 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
     connect( profile, &VLCProfileSelector::optionsChanged, this, &ConvertDialog::setDestinationFileExtension );
     connect( fileLine, &QLineEdit::editingFinished, this, &ConvertDialog::setDestinationFileExtension );
     connect( fileLine, &QLineEdit::textChanged, this, &ConvertDialog::validate );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this,
+                [this, inputBox, destBox, destLabel, settingBox, convertRadio,
+                 fileSelectButton, cancelButton] {
+            setWindowTitle(qtr("Convert"));
+            destBox->setTitle(qtr("Destination"));
+            destLabel->setText(qtr("Destination file:"));
+            settingBox->setTitle(qtr("Settings"));
+            convertRadio->setText(qtr("Convert"));
+            dumpRadio->setText(qtr("Dump raw input"));
+            displayBox->setText(qtr("Display the output"));
+            displayBox->setToolTip(qtr("This displays the resulting media, but can "
+                                      "slow things down."));
+            deinterBox->setText(qtr("Deinterlace"));
+            okButton->setText(qtr("&Start"));
+            cancelButton->setText(qtr("&Cancel"));
+            if (singleFileSelected)
+                fileSelectButton->setText(qtr("Browse"));
+            else
+            {
+                const QSignalBlocker blocker(fileLine);
+                inputBox->setMRL(qtr("Multiple files selected."));
+                fileLine->setText(qtr("Multiple Files Selected."));
+                fileLine->setToolTip(qtr("Files will be placed in the same directory "
+                                       "with the same name."));
+                appendBox->setText(qtr("Append '-converted' to filename"));
+            }
+        });
 
     validate();
 }

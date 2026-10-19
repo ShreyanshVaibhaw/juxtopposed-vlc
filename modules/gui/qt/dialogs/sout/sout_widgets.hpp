@@ -41,6 +41,7 @@ class SoutInputBox : public QGroupBox
     private:
         QLineEdit *sourceLine;
         QLabel *sourceValueLabel;
+        bool localFileType = false;
 
 };
 

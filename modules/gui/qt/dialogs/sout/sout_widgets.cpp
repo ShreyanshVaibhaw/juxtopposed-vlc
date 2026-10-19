@@ -28,6 +28,7 @@
 #include "maininterface/mainctx.hpp"
 #include "util/soutchain.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/interface_translator.hpp"
 #include <vlc_intf_strings.h>
 
 #include <QGroupBox>
@@ -67,12 +68,23 @@ SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( 
     QFrame *line = new QFrame;
     line->setFrameStyle( QFrame::HLine |QFrame::Sunken );
     sourceLayout->addWidget( line, 2, 0, 1, -1 );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this,
+                [this, sourceLabel, sourceTypeLabel] {
+            setTitle(qtr("Source"));
+            sourceLabel->setText(qtr("Source:"));
+            sourceTypeLabel->setText(qtr("Type:"));
+            if (localFileType)
+                sourceValueLabel->setText(qfut(I_FILE_SLASH_DIR));
+        });
 }
 
 void SoutInputBox::setMRL( const QString& mrl )
 {
     QUrl uri( mrl );
     QString type = uri.scheme();
+    localFileType = false;
 
     if( !uri.isValid() &&
         !mrl.startsWith("http") &&
@@ -97,7 +109,8 @@ void SoutInputBox::setMRL( const QString& mrl )
             toNativeSeparators(uri.toDisplayString(
                 QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments
             )));
-        if ( type.isEmpty() ) type = qfut( I_FILE_SLASH_DIR );
+        localFileType = type.isEmpty();
+        if (localFileType) type = qfut(I_FILE_SLASH_DIR);
         sourceValueLabel->setText( type );
     }
 }
