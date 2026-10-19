@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QAbstractButton>
+#include <QToolTip>
+#include <QFont>
 
 void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
 {
@@ -55,7 +57,13 @@ void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
         colors.setColor(QPalette::Mid, QColor(border));
         colors.setColor(QPalette::Dark, QColor(border));
         colors.setColor(QPalette::Shadow, QColor(border));
+        colors.setColor(QPalette::ToolTipBase, QColor(field));
+        colors.setColor(QPalette::ToolTipText, QColor(bright));
         widget->setPalette(colors);
+        QFont tooltipFont(QStringLiteral("Inter"));
+        tooltipFont.setPixelSize(dp(14));
+        QToolTip::setFont(tooltipFont);
+        QToolTip::setPalette(colors);
         if (auto message = qobject_cast<QMessageBox*>(widget)) {
             for (auto button : message->buttons()) button->setIcon({});
             if (messageIcon == QMessageBox::Question || messageIcon == QMessageBox::Information) {
@@ -67,6 +75,7 @@ void applyRedesignWidgetTheme(QWidget* widget, MainCtx* ctx)
         }
         widget->setStyleSheet(QStringLiteral(
             "QWidget { font-family: Inter; font-size: %1px; color: %2; }"
+            "QToolTip { background: %4; color: %5; border: 1px solid %6; border-radius: 4px; padding: 6px; }"
             "QWidget[redesignDialog=\"true\"], QDialog, QTabWidget::pane { background: %3; border: none; }"
             "QWidget#aboutWidget QFrame#footer { background: %4; }"
             "QWidget#aboutWidget QLabel#title { color: %5; }"
