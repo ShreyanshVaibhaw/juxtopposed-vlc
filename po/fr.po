@@ -37454,3 +37454,11 @@ msgstr "Volume au démarrage"
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Web remote control"
 msgstr "Commande à distance par navigateur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Choisissez une langue pour l’interface. Les modifications s’appliquent immédiatement. Le texte sans traduction est affiché en anglais."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ne peut pas charger cette langue."
