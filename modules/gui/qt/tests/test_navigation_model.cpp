@@ -30,6 +30,8 @@
 #include <QTest>
 #include <QAbstractItemModelTester>
 #include <QSignalSpy>
+#include <QTranslator>
+#include <QEvent>
 
 class TestVLCNavigationModel : public QObject
 {
@@ -497,6 +499,40 @@ private slots:
         COMPARE_ROW(i++, "Music", Closed);
         COMPARE_ROW(i++, "Browse", Leaf);
         COMPARE_ROW(i++, "Discover", Closed);
+    }
+
+    void liveLanguageKeepsExpandedNavigation()
+    {
+        initWithMedialib(true);
+        QVERIFY(m_model->setData(m_model->index(1), true, NavigationModel::EXPANDED));
+        QSignalSpy changed(m_model.get(), &NavigationModel::dataChanged);
+        QSignalSpy reset(m_model.get(), &NavigationModel::modelReset);
+        class Translator : public QTranslator {
+        public:
+            bool isEmpty() const override { return false; }
+            QString translate(const char*, const char* source, const char*, int) const override {
+                if (qstrcmp(source, "Home") == 0) return QStringLiteral("Accueil");
+                if (qstrcmp(source, "All") == 0) return QStringLiteral("Tous");
+                return {};
+            }
+        } translator;
+        QVERIFY(QCoreApplication::installTranslator(&translator));
+        QEvent language(QEvent::LanguageChange);
+        QCoreApplication::sendEvent(qApp, &language);
+        QVERIFY(!changed.isEmpty());
+        QCOMPARE(m_model->data(m_model->index(0), NavigationModel::TITLE).toString(), QStringLiteral("Accueil"));
+        QCOMPARE(m_model->data(m_model->index(2), NavigationModel::TITLE).toString(), QStringLiteral("Tous"));
+        const auto children = m_model->data(m_model->index(1), NavigationModel::CHILDREN).value<QList<NavigationModelItem>>();
+        QCOMPARE(children.size(), 2);
+        QCOMPARE(children[0].name(), QStringLiteral("Tous"));
+        QCOMPARE(m_model->rowCount(), 7);
+        QVERIFY(m_model->data(m_model->index(1), NavigationModel::EXPANDED).toBool());
+        QVERIFY(reset.isEmpty());
+        QVERIFY(QCoreApplication::removeTranslator(&translator));
+        QCoreApplication::sendEvent(qApp, &language);
+        QCOMPARE(m_model->data(m_model->index(0), NavigationModel::TITLE).toString(), QStringLiteral("Home"));
+        QCOMPARE(m_model->rowCount(), 7);
+        QVERIFY(reset.isEmpty());
     }
 
     void testExpandVideoExpandHome() {

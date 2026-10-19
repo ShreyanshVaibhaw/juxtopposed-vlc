@@ -104,6 +104,7 @@ signals:
     void hasMedialibChanged(bool);
 
 protected:
+    bool eventFilter(QObject* object, QEvent* event) override;
     QScopedPointer<NavigationModelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(NavigationModel)
 };
