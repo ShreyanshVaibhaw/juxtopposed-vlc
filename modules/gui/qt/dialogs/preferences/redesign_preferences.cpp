@@ -132,6 +132,22 @@ QVariantList moduleChoices(const QStringList& capabilities)
     return choices;
 }
 
+QString configChoiceText(const module_config_t* cfg, ssize_t index,
+                         const char* value, const char* text)
+{
+    // The core choice APIs translate labels with the startup locale. Use the
+    // canonical source for UI-owned labels so live changes do not keep it.
+    if (cfg->i_type == CONFIG_ITEM_MODULE && value) {
+        if (qstrcmp(value, "any") == 0) return qtr("Automatic");
+        if (qstrcmp(value, "none") == 0) return qtr("Disable");
+        if (auto* module = module_find(value)) return qtr(module_GetLongName(module));
+    } else if (index >= 0 && index < cfg->list_count && cfg->list_text) {
+        return cfg->list_text[index] ? qtr(cfg->list_text[index]) : QString();
+    }
+    // Dynamic choices can contain device names and other user data.
+    return qfu(text ? text : "");
+}
+
 const QVariantList& installedInterfaceLanguages()
 {
     // Catalogs are installed outside the running app. Refresh on the next
@@ -1712,7 +1728,7 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         int64_t* values = nullptr; char** labels = nullptr;
         const ssize_t count = config_GetIntChoices(bytes.constData(), &values, &labels);
         for (ssize_t i = 0; i < count; ++i) {
-            choices.append(QVariantMap{{QStringLiteral("label"), qfu(labels[i])}, {QStringLiteral("value"), QVariant::fromValue<qlonglong>(values[i])}});
+            choices.append(QVariantMap{{QStringLiteral("label"), configChoiceText(cfg, i, nullptr, labels[i])}, {QStringLiteral("value"), QVariant::fromValue<qlonglong>(values[i])}});
             free(labels[i]);
         }
         free(values); free(labels);
@@ -1727,7 +1743,7 @@ QVariantMap RedesignPreferences::describe(const QString& name) const
         char** values = nullptr; char** labels = nullptr;
         const ssize_t count = config_GetPszChoices(bytes.constData(), &values, &labels);
         for (ssize_t i = 0; i < count; ++i) {
-            choices.append(QVariantMap{{QStringLiteral("label"), qfu(labels[i])}, {QStringLiteral("value"), qfu(values[i])}});
+            choices.append(QVariantMap{{QStringLiteral("label"), configChoiceText(cfg, i, values[i], labels[i])}, {QStringLiteral("value"), qfu(values[i])}});
             free(values[i]); free(labels[i]);
         }
         free(values); free(labels);
