@@ -12,6 +12,8 @@ DIST_SUBDIRS = m4 $(SUBDIRS)
 EXTRA_DIST = \
 	buildsystem/cargo-test.py \
 	buildsystem/check_qml_module.py \
+	buildsystem/extract-qt-ui.py \
+	buildsystem/test_extract_qt_ui.py \
 	extras/include/x86/x86inc.asm \
 	extras/include/x86/x86util.asm \
 	extras/package/macosx/package.mak \

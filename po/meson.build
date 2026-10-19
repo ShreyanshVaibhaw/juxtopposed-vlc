@@ -2,8 +2,21 @@ i18n = import('i18n')
 
 add_project_arguments(f'-DGETTEXT_PACKAGE="@vlc_package_name@"',
 	language: ['c', 'cpp', 'objc'])
+qt_ui_python = find_program('python3', native: true)
+qt_ui_extractor = files('../buildsystem/extract-qt-ui.py')
+qt_ui_sources = run_command(qt_ui_python, qt_ui_extractor,
+    '--root', meson.project_source_root(), '--list', check: true).stdout().strip().split('\n')
+configure_file(
+    input: files(qt_ui_sources),
+    output: 'qt-ui-strings.h',
+    command: [qt_ui_python, qt_ui_extractor, '--root', meson.project_source_root(), '--output', '@OUTPUT@'])
+if not get_option('tests').disabled()
+    test('qt-ui-gettext', qt_ui_python, args: files('../buildsystem/test_extract_qt_ui.py'))
+endif
+
 i18n.gettext(vlc_package_name,
 	args: [
+        '--directory=' + meson.project_build_root(),
 		'--keyword=_',
 		'--keyword=N_',
 		'--keyword=_NS',

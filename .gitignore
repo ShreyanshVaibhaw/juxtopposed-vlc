@@ -66,3 +66,6 @@ static-lib/
 
 # Local redesign source media and working artifacts
 /.design-reference/
+
+# Generated gettext bridge for Qt Designer forms
+/po/qt-ui-strings.h

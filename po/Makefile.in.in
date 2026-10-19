@@ -171,7 +171,13 @@ $(srcdir)/stamp-po: $(srcdir)/$(DOMAIN).pot $(POFILES)
 # The determination of whether the package xyz is a GNU one is based on the
 # heuristic whether some file in the top level directory mentions "GNU xyz".
 # If GNU 'find' is available, we avoid grepping through monster files.
-$(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
+PYTHON3 ?= python3
+QT_UI_SOURCES = $(shell find $(top_srcdir)/modules/gui/qt -name '*.ui')
+
+qt-ui-strings.h: $(QT_UI_SOURCES) $(top_srcdir)/buildsystem/extract-qt-ui.py
+	$(PYTHON3) $(top_srcdir)/buildsystem/extract-qt-ui.py --root $(top_srcdir) --output $@
+
+$(DOMAIN).pot-update: qt-ui-strings.h $(filter-out %po/qt-ui-strings.h,$(POTFILES)) $(srcdir)/POTFILES.in remove-potcdate.sed
 	package_gnu="$(PACKAGE_GNU)"; \
 	test -n "$$package_gnu" || { \
 	  if { if (LC_ALL=C find --version) 2>/dev/null | grep GNU >/dev/null; then \
@@ -389,13 +395,14 @@ uninstall-data-yes:
 	done
 
 check: all
+	$(PYTHON3) $(top_srcdir)/buildsystem/test_extract_qt_ui.py
 
 info dvi ps pdf html tags TAGS ctags CTAGS ID:
 
 install-dvi install-ps install-pdf install-html:
 
 mostlyclean:
-	rm -f remove-potcdate.sed
+	rm -f remove-potcdate.sed qt-ui-strings.h
 	rm -f $(srcdir)/stamp-poT
 	rm -f core core.* $(DOMAIN).po $(DOMAIN).1po $(DOMAIN).2po *.new.po
 	rm -fr *.o
