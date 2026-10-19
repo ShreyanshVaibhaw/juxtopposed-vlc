@@ -57,9 +57,8 @@ T.Button {
         id: contentRow
         spacing: theme.dp(root.captionSpacing)
         anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: root.leftAligned ? undefined : parent.horizontalCenter
-        anchors.left: root.leftAligned ? parent.left : undefined
-        anchors.leftMargin: theme.dp(12)
+        // Keep the row's natural width when switching between labeled and icon-only buttons.
+        x: root.leftAligned ? theme.dp(12) : (parent.width - width) / 2
         RedesignIcon {
             objectName: "redesignButtonIcon"
             width: root.iconName ? root.iconSize : 0

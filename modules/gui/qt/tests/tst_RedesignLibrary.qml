@@ -812,6 +812,34 @@ TestCase {
         return [{tag: "dark-orange", light: false, accent: "#d37918"},
                 {tag: "light-green", light: true, accent: "#0cb37a"}]
     }
+    function test_navigationIconsStayCenteredAfterCollapse_data() {
+        return [0.8, 1, 1.25, 1.5].map(scale => ({tag: String(scale), scale: scale}))
+    }
+    function test_navigationIconsStayCenteredAfterCollapse(data) {
+        library.scaleFactor = data.scale
+        library.pins = [{id: "folder:shows", kind: "folder", name: "Shows", icon: "folder"}]
+        const navigation = findChild(library, "libraryNavigation")
+        const pin = findChild(library, "libraryPinPicture0")
+        for (const expanded of [false, true, false, true, false]) {
+            library.expanded = expanded
+            wait(20)
+            for (let i = 0; i < 7; ++i) {
+                const button = findChild(library, "libraryCategory" + i)
+                const icon = findChild(button, "redesignButtonIcon")
+                const center = icon.mapToItem(button, icon.width / 2, icon.height / 2)
+                fuzzyCompare(center.y, button.height / 2, 1)
+                if (expanded) {
+                    fuzzyCompare(center.x, library.theme.dp(24), 0.01)
+                } else {
+                    fuzzyCompare(center.x, button.width / 2, 0.01)
+                    const railCenter = icon.mapToItem(navigation, icon.width / 2, 0).x
+                    fuzzyCompare(railCenter, navigation.width / 2, 1)
+                }
+                fuzzyCompare(icon.mapToItem(navigation, icon.width / 2, 0).x,
+                    pin.mapToItem(navigation, pin.width / 2, 0).x, 0.01)
+            }
+        }
+    }
     function verifyNavigationFolderFill(index, color) {
         if (index !== 1 && index !== 2) return
         const icon = findChild(findChild(library, "libraryCategory" + index), "redesignButtonIcon")
