@@ -168,7 +168,7 @@ RedesignSettingsDialog {
                             {key: "library", title: qsTr("Library"), icon: "nav-folder"},
                             {group: qsTr("System"), key: "network", title: qsTr("Network"), icon: "nav-streaming"},
                             {key: "performance", title: qsTr("Performance"), icon: "nav-preferences"},
-                            {key: "recording", title: qsTr("Recording"), icon: "nav-record"},
+                            {key: "recording", title: qsTranslate("Settings", "Recording"), icon: "nav-record"},
                             {key: "extensions", title: qsTr("Extensions"), icon: "nav-plugins"} ]
                         delegate: Column {
                             required property var modelData

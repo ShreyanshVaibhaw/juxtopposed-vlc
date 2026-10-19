@@ -156,7 +156,7 @@ QtObject {
             { title: qsTr("Smooth Playback"), rows: [ ["drop-late-frames", qsTr("Drop frames when the system can't keep up")], ["high-priority", qsTr("Give VLC higher priority")],
                 ["redesign-rescan-plugins", qsTr("Rescan plugins"), {fullWidthAction: true}] ] } ],
         recording: [
-            { title: qsTr("Recording"), rows: [ ["input-record-path", qsTr("Save recordings to")], ["input-record-native", qsTr("Record without re-encoding when possible")] ] },
+            { title: qsTranslate("Settings", "Recording"), rows: [ ["input-record-path", qsTr("Save recordings to")], ["input-record-native", qsTr("Record without re-encoding when possible")] ] },
             { title: qsTr("Casting"), rows: [ ["qt-discover-cast-devices", qsTr("Discover cast devices")],
                 ["sout-chromecast-conversion-quality", qsTr("Cast quality"), {choiceLabels: {
                     "-1": qsTr("Automatic"), 0: qsTr("High"), 1: qsTr("Medium"), 2: qsTr("Low"), 3: qsTr("Low CPU use")},

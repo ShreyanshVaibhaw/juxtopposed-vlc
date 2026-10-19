@@ -181,11 +181,28 @@ QString GettextTranslator::catalogLanguage() const
     return m_language;
 }
 
-QString GettextTranslator::translate(const char*, const char* source, const char*, int n) const
+QString GettextTranslator::translate(const char* context, const char* source, const char*, int n) const
 {
+    const auto contextual = translateInContext(context, source, n);
+    if (!contextual.isNull()) return contextual;
     if (!source || !*source) return {};
+    // Existing GNU catalogs share uncontextualized messages between Qt classes.
+    return translateMessage(QByteArray(source), n);
+}
+
+QString GettextTranslator::translateInContext(const char* context, const char* source, int n) const
+{
+    if (!context || !*context || !source || !*source) return {};
+    QByteArray key(context);
+    key.append('\x04');
+    key.append(source);
+    return translateMessage(key, n);
+}
+
+QString GettextTranslator::translateMessage(const QByteArray& key, int n) const
+{
     QReadLocker lock(&m_lock);
-    const auto found = m_messages.constFind(QByteArray(source));
+    const auto found = m_messages.constFind(key);
     if (found == m_messages.cend()) return {};
     quint64 form = 0;
     if (n >= 0 && (!PluralExpression(m_plural, unsigned(n)).evaluate(form) || form >= m_formCount)) return {};

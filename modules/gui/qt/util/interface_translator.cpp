@@ -136,8 +136,15 @@ QString InterfaceTranslator::translate(const char* context, const char* source, 
     QReadLocker lock(&m_lock);
     if (qstrcmp(source, "QT_LAYOUT_DIRECTION") == 0)
         return QLocale(m_active->effective).textDirection() == Qt::RightToLeft ? QStringLiteral("RTL") : QStringLiteral("LTR");
+    // A parent catalog's explicit context wins over a regional shared message.
+    if (context && *context) {
+        for (const auto& catalog : m_active->catalogs) {
+            auto translated = catalog->translateInContext(context, source, n);
+            if (!translated.isNull()) return translated;
+        }
+    }
     for (const auto& catalog : m_active->catalogs) {
-        auto translated = catalog->translate(context, source, disambiguation, n);
+        auto translated = catalog->translate(nullptr, source, disambiguation, n);
         if (!translated.isNull()) return translated;
     }
     return QString::fromUtf8(n >= 0 && n != 1 && disambiguation && *disambiguation ? disambiguation : source);

@@ -17,9 +17,12 @@ public:
     bool isEmpty() const override;
     QString translate(const char* context, const char* source,
                       const char* disambiguation = nullptr, int n = -1) const override;
+    // Query only this context; callers control shared-message fallback.
+    QString translateInContext(const char* context, const char* source, int n = -1) const;
     QString catalogLanguage() const;
 
 private:
+    QString translateMessage(const QByteArray& key, int n) const;
     mutable QReadWriteLock m_lock;
     QHash<QByteArray, QStringList> m_messages;
     QByteArray m_plural = "n != 1";

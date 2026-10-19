@@ -15,6 +15,9 @@ class TestGettextTranslator : public QObject
         messages.insert({}, "Language: fr\nContent-Type: text/plain; charset=UTF-8\nPlural-Forms: nplurals=" + QByteArray::number(forms) + "; plural=" + rule + ";\n");
         messages.insert("Open file", QStringLiteral("Ouvrir un fichier").toUtf8());
         messages.insert("Unicode", QStringLiteral("Français العربية 日本語").toUtf8());
+        messages.insert("Recording", QStringLiteral("Enregistrement en cours").toUtf8());
+        messages.insert("Settings\004Recording", QStringLiteral("Enregistrement").toUtf8());
+        messages.insert("Settings\004Only here", QStringLiteral("Uniquement ici").toUtf8());
         QByteArray translated;
         for (unsigned i = 0; i < forms; ++i) {
             if (i) translated.append('\0');
@@ -22,6 +25,7 @@ class TestGettextTranslator : public QObject
         }
         QByteArray plural("%n item"); plural.append('\0'); plural.append("%n items");
         messages.insert(plural, translated);
+        messages.insert(QByteArray("Settings\004") + plural, QByteArray(translated).replace("form", "settings"));
         const unsigned count = unsigned(messages.size());
         QByteArray result(int(28 + count * 16), '\0');
         const auto word = [&](unsigned offset, quint32 value) {
@@ -79,6 +83,32 @@ private slots:
         QTest::newRow("short circuit") << QByteArray("n == 0 || 10 / n > 1 ? 0 : 1") << 2u << QList<int>{0,1,10,100} << QList<int>{0,0,1,1};
         QTest::newRow("precedence") << QByteArray("n != 1 && (n + 2 * 3 - 6) >= 2 ? 1 : 0") << 2u << QList<int>{0,1,2,100} << QList<int>{0,0,1,1};
         QTest::newRow("whitespace") << QByteArray("n\t!=\t1") << 2u << QList<int>{0,1,2} << QList<int>{1,0,1};
+    }
+    void contexts_data()
+    {
+        QTest::addColumn<bool>("bigEndian");
+        QTest::newRow("little endian") << false;
+        QTest::newRow("big endian") << true;
+    }
+    void contexts()
+    {
+        QFETCH(bool, bigEndian);
+        GettextTranslator translator;
+        QVERIFY(load(translator, catalog("n != 1", 2, bigEndian)));
+        QCOMPARE(translator.translate("Settings", "Recording"), QStringLiteral("Enregistrement"));
+        QCOMPARE(translator.translate("Player", "Recording"), QStringLiteral("Enregistrement en cours"));
+        QCOMPARE(translator.translate(nullptr, "Recording"), QStringLiteral("Enregistrement en cours"));
+        QVERIFY(translator.translateInContext("Player", "Recording").isNull());
+        QVERIFY(translator.translateInContext(nullptr, "Recording").isNull());
+        QCOMPARE(translator.translate("Settings", "Only here"), QStringLiteral("Uniquement ici"));
+        QVERIFY(translator.translate("Player", "Only here").isNull());
+        QCOMPARE(translator.translate("Settings", "%n item", "%n items", 1), QStringLiteral("settings0 %n"));
+        QCOMPARE(translator.translate("Settings", "%n item", "%n items", 2), QStringLiteral("settings1 %n"));
+        QCOMPARE(translator.translate("Player", "%n item", "%n items", 2), QStringLiteral("form1 %n"));
+        QVERIFY(QCoreApplication::installTranslator(&translator));
+        QCOMPARE(QCoreApplication::translate("Settings", "Recording"), QStringLiteral("Enregistrement"));
+        QCOMPARE(QCoreApplication::translate("Settings", "%n item", "%n items", 2), QStringLiteral("settings1 2"));
+        QCoreApplication::removeTranslator(&translator);
     }
     void plurals()
     {

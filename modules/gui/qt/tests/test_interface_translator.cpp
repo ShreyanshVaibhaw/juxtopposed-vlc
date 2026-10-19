@@ -44,8 +44,10 @@ private slots:
     void initTestCase()
     {
         QVERIFY(m_directory.isValid());
-        QVERIFY(writeCatalog(QStringLiteral("fr"), {{"Open file", "Ouvrir un fichier"}, {"French only", "En français"}}));
-        QVERIFY(writeCatalog(QStringLiteral("fr_CA"), {{"Open file", "Ouvrir un fichier au Québec"}}));
+        QVERIFY(writeCatalog(QStringLiteral("fr"), {{"Open file", "Ouvrir un fichier"}, {"French only", "En français"},
+            {"Recording", "Enregistrement en cours"}, {"Settings\004Recording", "Enregistrement"}}));
+        QVERIFY(writeCatalog(QStringLiteral("fr_CA"), {{"Open file", "Ouvrir un fichier au Québec"},
+            {"Recording", "Enregistrement en cours au Québec"}}));
         QVERIFY(writeCatalog(QStringLiteral("ar"), {{"Open file", QStringLiteral("افتح ملفًا").toUtf8()}}));
         QVERIFY(writeCatalog(QStringLiteral("sr@latin"), {{"Open file", "Otvori datoteku"}}));
     }
@@ -181,6 +183,32 @@ private slots:
             QCOMPARE(text("Open file"), QStringLiteral("Ouvrir un fichier"));
         }
         QCOMPARE(text("Open file"), QStringLiteral("Open file"));
+    }
+    void contextualQmlRetranslatesWithoutChangingState()
+    {
+        InterfaceTranslator translator(m_directory.path(), {}, QStringLiteral("en"));
+        QVERIFY(QCoreApplication::installTranslator(&translator));
+        QQmlEngine engine;
+        translator.watchEngine(&engine);
+        QQmlComponent component(&engine);
+        component.setData("import QtQml\nQtObject { property string status: qsTr(\"Recording\"); property string section: qsTranslate(\"Settings\", \"Recording\"); property int position: 22 }", QUrl());
+        std::unique_ptr<QObject> object(component.create());
+        QVERIFY2(object, qPrintable(component.errorString()));
+        QCOMPARE(object->property("status").toString(), QStringLiteral("Recording"));
+        QCOMPARE(object->property("section").toString(), QStringLiteral("Recording"));
+        QVERIFY(translator.prepareLanguage(QStringLiteral("fr_CA")));
+        QVERIFY(translator.activatePreparedLanguage());
+        QCOMPARE(object->property("status").toString(), QStringLiteral("Enregistrement en cours au Québec"));
+        QCOMPARE(object->property("section").toString(), QStringLiteral("Enregistrement"));
+        QVERIFY(translator.prepareLanguage(QStringLiteral("fr")));
+        QVERIFY(translator.activatePreparedLanguage());
+        QCOMPARE(object->property("status").toString(), QStringLiteral("Enregistrement en cours"));
+        QCOMPARE(object->property("section").toString(), QStringLiteral("Enregistrement"));
+        QVERIFY(translator.prepareLanguage(QStringLiteral("en")));
+        QVERIFY(translator.activatePreparedLanguage());
+        QCOMPARE(object->property("status").toString(), QStringLiteral("Recording"));
+        QCOMPARE(object->property("section").toString(), QStringLiteral("Recording"));
+        QCOMPARE(object->property("position").toInt(), 22);
     }
 };
 QTEST_MAIN(TestInterfaceTranslator)
