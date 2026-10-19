@@ -37127,3 +37127,330 @@ msgstr "Liste du gestionnaire de médias"
 
 #~ msgid "Streaming Output"
 #~ msgstr "Diffusion de la sortie"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Warning: %1"
+msgstr "Avertissement : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "%1\n%2 warnings. This entry shows the first warning."
+msgstr "%1\n%2 avertissements. Cette entrée affiche le premier avertissement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Change the level of each frequency band."
+msgstr "Modifiez le niveau de chaque bande de fréquences."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reduce the volume when the average audio level is above the target level."
+msgstr "Réduisez le volume lorsque le niveau sonore moyen dépasse le niveau cible."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reduce the difference between loud and quiet sounds."
+msgstr "Réduisez l’écart entre les sons forts et les sons faibles."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Increase the separation between the left and right audio channels."
+msgstr "Augmentez la séparation entre les canaux audio gauche et droit."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Mix the audio with delayed copies to change its sound."
+msgstr "Mélangez le son avec des copies retardées pour modifier sa sonorité."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reduce sounds in the center of stereo audio."
+msgstr "Atténuez les sons au centre du signal stéréo."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add the sound of a room to stereo audio."
+msgstr "Ajoutez une ambiance de pièce au signal stéréo."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Send information about played tracks to Last.fm."
+msgstr "Envoyez à Last.fm des informations sur les pistes écoutées."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Default Preset"
+msgstr "Préréglage par défaut"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Langue du système"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Custom…"
+msgstr "Personnalisé…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot start the plugin scan. Check that the cache generator is installed."
+msgstr "VLC ne peut pas lancer l’analyse des modules. Vérifiez que le générateur de cache est installé."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The plugin scan timed out. Try again."
+msgstr "Le délai d’analyse des modules est dépassé. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot update the plugin cache. Check folder access and try again."
+msgstr "VLC ne peut pas mettre à jour le cache des modules. Vérifiez l’accès au dossier et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC updated the plugin cache. Restart VLC to use plugin changes."
+msgstr "VLC a mis à jour le cache des modules. Redémarrez VLC pour appliquer les modifications des modules."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enable audio to run this test."
+msgstr "Activez l’audio pour lancer ce test."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot start the audio test."
+msgstr "VLC ne peut pas lancer le test audio."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Unmute audio to run this test."
+msgstr "Rétablissez le son pour lancer ce test."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Increase the volume to run this test."
+msgstr "Augmentez le volume pour lancer ce test."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Starting test"
+msgstr "Démarrage du test"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Left channel"
+msgstr "Canal gauche"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Right channel"
+msgstr "Canal droit"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read the saved presets."
+msgstr "VLC ne peut pas lire les préréglages enregistrés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter a unique preset name with 1 to 80 characters."
+msgstr "Saisissez un nom de préréglage unique de 1 à 80 caractères."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Delete a preset before you add another preset."
+msgstr "Supprimez un préréglage avant d’en ajouter un autre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This preset is no longer available."
+msgstr "Ce préréglage n’est plus disponible."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot apply this preset. Check its saved settings."
+msgstr "VLC ne peut pas appliquer ce préréglage. Vérifiez ses paramètres enregistrés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fullscreen controls sensitivity"
+msgstr "Sensibilité des commandes en plein écran"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Move the pointer near the top or bottom edge to show the fullscreen controls. A higher sensitivity needs less movement."
+msgstr "Approchez le pointeur du bord supérieur ou inférieur pour afficher les commandes en plein écran. Une sensibilité plus élevée demande moins de mouvement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Errors and information"
+msgstr "Erreurs et informations"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Saved value (%1)"
+msgstr "Valeur enregistrée (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Log details"
+msgstr "Détails du journal"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose the messages to save in the log file. Restart VLC after a change."
+msgstr "Choisissez les messages à enregistrer dans le journal. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Scanning…"
+msgstr "Analyse en cours…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Rescan"
+msgstr "Relancer l’analyse"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Check plugin files and update the plugin cache. Restart VLC after the scan to use plugin changes."
+msgstr "Vérifiez les fichiers des modules et mettez à jour leur cache. Redémarrez VLC après l’analyse pour appliquer les modifications des modules."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "1 (Lowest)"
+msgstr "1 (Minimum)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "%1 (Highest)"
+msgstr "%1 (Maximum)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Video post-processing"
+msgstr "Post-traitement vidéo"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Off turns off this filter. A higher level can use more processor time."
+msgstr "L’option Désactivé désactive ce filtre. Un niveau plus élevé peut solliciter davantage le processeur."
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Saved device (%1)"
+msgstr "Périphérique enregistré (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Automatic lets VLC select a decoder device. Off uses software decoding and keeps your saved device choice. Reopen the video after a change."
+msgstr "L’option Automatique laisse VLC choisir un périphérique de décodage. L’option Désactivé utilise le décodage logiciel et conserve votre choix de périphérique. Rouvrez la vidéo après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Automatic (fallback: %1)"
+msgstr "Automatique (repli : %1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Custom (%1)"
+msgstr "Personnalisé (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Text encoding"
+msgstr "Encodage du texte"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Automatic detects UTF-8 text first. If detection fails, VLC uses the default text encoding. Select a specific encoding to turn off this detection. Reopen the subtitle file after a change."
+msgstr "L’option Automatique détecte d’abord le texte UTF-8. En cas d’échec, VLC utilise l’encodage par défaut. Choisissez un encodage précis pour désactiver cette détection. Rouvrez le fichier de sous-titres après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "The current automatic fallback is %1."
+msgstr "L’encodage de repli automatique actuel est %1."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Very small"
+msgstr "Très petite"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Very large"
+msgstr "Très grande"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Buffering"
+msgstr "Mise en mémoire tampon"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "A larger buffer can reduce pauses, but playback can take longer to start. Normal uses the default buffer values. Select Custom to set each value in milliseconds. New media uses these settings."
+msgstr "Une mémoire tampon plus grande peut réduire les interruptions, mais retarder le démarrage de la lecture. L’option Normal utilise les valeurs par défaut. Choisissez Personnalisé pour définir chaque valeur en millisecondes. Ces paramètres s’appliquent aux nouveaux médias."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Box"
+msgstr "Encadré"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select None to hide the background. The color and opacity values stay saved."
+msgstr "Choisissez Aucun pour masquer l’arrière-plan. Les valeurs de couleur et d’opacité restent enregistrées."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit"
+msgstr "Adapter"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fill window"
+msgstr "Remplir la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit window width"
+msgstr "Adapter à la largeur de la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit window height"
+msgstr "Adapter à la hauteur de la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Custom (%1×)"
+msgstr "Personnalisé (%1×)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit scales the video to the window. Zoom ratios use the video's actual pixel size."
+msgstr "L’option Adapter ajuste la vidéo à la fenêtre. Les rapports de zoom utilisent la taille réelle de la vidéo en pixels."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Same as video"
+msgstr "Identique à la vidéo"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "%1 px wide"
+msgstr "Largeur de %1 px"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the snapshot width. The height changes to keep the video's aspect ratio. Custom uses your saved width and height."
+msgstr "Définissez la largeur de la capture. La hauteur s’ajuste pour conserver les proportions de la vidéo. L’option Personnalisé utilise la largeur et la hauteur enregistrées."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set hue, brightness, contrast, saturation and gamma to their default values."
+msgstr "Rétablissez les valeurs par défaut de la teinte, de la luminosité, du contraste, de la saturation et du gamma."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Pass compressed audio to the receiver"
+msgstr "Transmettre l’audio compressé au récepteur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Send compressed audio to the receiver. The receiver must support the audio format. This setting uses the active audio output."
+msgstr "Envoyez l’audio compressé au récepteur. Celui-ci doit prendre en charge le format audio. Ce paramètre utilise la sortie audio active."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Balanced"
+msgstr "Équilibrée"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the quality for audio sample rate conversion. Higher quality uses more processing power. Some resamplers do not have a quality control."
+msgstr "Définissez la qualité du rééchantillonnage audio. Une qualité plus élevée sollicite davantage le processeur. Certains rééchantillonneurs ne permettent pas de régler la qualité."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Change how long subtitles stay on screen. Set 0 to use the file duration."
+msgstr "Modifiez la durée d’affichage des sous-titres. Saisissez 0 pour utiliser la durée du fichier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Positive values show subtitles later. Negative values show subtitles earlier."
+msgstr "Une valeur positive retarde les sous-titres. Une valeur négative les avance."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a track for the next video. Track numbers start at 1. Automatic uses the language setting."
+msgstr "Choisissez une piste pour la prochaine vidéo. La numérotation commence à 1. L’option Automatique utilise le paramètre de langue."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language. System language uses your system's language. Choose Custom to enter a language order. Separate names or codes with commas. This sets the track to Automatic for the next file."
+msgstr "Choisissez une langue. L’option Langue du système utilise la langue de votre système. Choisissez Personnalisé pour définir un ordre de préférence. Séparez les noms ou les codes par des virgules. La piste sera réglée sur Automatique pour le prochain fichier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Replace all VLC settings with the default settings."
+msgstr "Remplacez tous les paramètres de VLC par les valeurs par défaut."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open the folder that contains the VLC settings."
+msgstr "Ouvrez le dossier contenant les paramètres de VLC."
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, qt-format
+msgid "Unavailable device (%1)"
+msgstr "Périphérique indisponible (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose the device to use for audio. A disconnected device falls back to the audio driver's default."
+msgstr "Choisissez le périphérique audio à utiliser. Si ce périphérique est déconnecté, VLC utilise le périphérique par défaut du pilote audio."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Startup volume"
+msgstr "Volume au démarrage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Web remote control"
+msgstr "Commande à distance par navigateur"
