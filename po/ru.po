@@ -46878,3 +46878,21 @@ msgstr "Увеличивает или уменьшает громкость зв
 #, qt-format
 msgid "No change"
 msgstr "Без изменений"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:255
+#, qt-format
+msgid "This window shows up to %1 log lines."
+msgstr "В этом окне отображается не более %1 строк журнала."
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:257
+#, qt-format
+msgid "Log messages not shown: %1"
+msgstr "Сообщения журнала, которые не показаны: %1"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:259
+#, qt-format
+msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
+msgstr "В этом окне может отображаться только часть длинного сообщения журнала. Чтобы сохранить полный журнал, включите параметр «Сохранить журнал» в настройках. После этого перезапустите VLC."
