@@ -43876,3 +43876,21 @@ msgstr "Augmentez ou réduisez le volume audio du fichier de sortie.\n0 = Aucun 
 #, qt-format
 msgid "No change"
 msgstr "Aucun changement"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:255
+#, qt-format
+msgid "This window shows up to %1 log lines."
+msgstr "Cette fenêtre affiche jusqu’à %1 lignes du journal."
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:257
+#, qt-format
+msgid "Log messages not shown: %1"
+msgstr "Messages du journal non affichés : %1"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:259
+#, qt-format
+msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
+msgstr "Cette fenêtre peut n’afficher qu’une partie d’un long message du journal. Pour conserver un journal complet, activez Enregistrer un journal dans les paramètres. Redémarrez VLC après ce changement."
