@@ -1721,10 +1721,10 @@ msgstr ""
 "Cette option désactive complètement la sortie audio. Le décodage des pistes "
 "audio ne sera alors pas réalisé, et cela économisera du temps processeur."
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Musical"
+msgstr "Musique"
 
 #: src/libvlc-module.c:142
 #, fuzzy
@@ -1754,9 +1754,10 @@ msgstr "Produit"
 msgid "Accessibility"
 msgstr ""
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Tester"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -22637,8 +22638,8 @@ msgstr "&Non"
 msgid "Any"
 msgstr ""
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: modules/keystore/keychain.m:46
-#, fuzzy
 msgid "System default"
 msgstr "Valeur par défaut du système"
 
@@ -35681,9 +35682,9 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Output File"
 #~ msgstr "Fichier de sortie"
 
-#, fuzzy
-#~ msgid "File Name"
-#~ msgstr "Nom de fichier"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "File Name"
+msgstr "Nom du fichier"
 
 #, fuzzy
 #~ msgid "Rows:"
@@ -35906,9 +35907,9 @@ msgstr "Liste du gestionnaire de médias"
 #~ msgid "Viewer"
 #~ msgstr "Vue"
 
-#, fuzzy
-#~ msgid "Library"
-#~ msgstr "Médiathèque"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Library"
+msgstr "Médiathèque"
 
 #, fuzzy
 #~ msgid "Graphical Equalizer"
@@ -37462,3 +37463,616 @@ msgstr "Choisissez une langue pour l’interface. Les modifications s’applique
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "VLC cannot load this language."
 msgstr "VLC ne peut pas charger cette langue."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Control VLC from a web browser. Restart VLC after changing the web remote, port or password."
+msgstr "Contrôlez VLC depuis un navigateur web. Redémarrez VLC après avoir modifié la télécommande web, le port ou le mot de passe."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Web remote control is unavailable in this VLC build."
+msgstr "La télécommande web n’est pas disponible dans cette version de VLC."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Current item"
+msgstr "Élément actuel"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "All items"
+msgstr "Tous les éléments"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Pause on the last frame"
+msgstr "Mettre en pause sur la dernière image"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "When playback finishes"
+msgstr "À la fin de la lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Request a higher process priority from the system. Restart VLC after a change."
+msgstr "Demandez au système une priorité plus élevée pour le processus. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System monospace"
+msgstr "Police à chasse fixe du système"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System, sans-serif"
+msgstr "Police sans empattement du système"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Font file"
+msgstr "Fichier de police"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter a monospace font family name. Leave the field empty to use the default monospace font."
+msgstr "Saisissez le nom d’une famille de polices à chasse fixe. Laissez le champ vide pour utiliser la police à chasse fixe par défaut."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter a font family name. Leave the field empty to use the default sans-serif font. A subtitle file can specify its own font."
+msgstr "Saisissez le nom d’une famille de polices. Laissez le champ vide pour utiliser la police sans empattement par défaut. Un fichier de sous-titres peut définir sa propre police."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Automatic detects the paragraph direction from the text. Select a direction if the text is not in the correct order."
+msgstr "L’option Automatique détecte le sens du paragraphe à partir du texte. Choisissez un sens si le texte n’est pas dans le bon ordre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Leave the field empty to use your Videos folder for video recordings and your Music folder for audio recordings. Direct stream recordings use your Downloads folder."
+msgstr "Laissez le champ vide pour enregistrer les vidéos dans le dossier Vidéos et l’audio dans le dossier Musique. Les enregistrements directs de flux utilisent le dossier Téléchargements."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System proxy"
+msgstr "Serveur mandataire du système"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select an audio output driver. Restart VLC to use a new driver."
+msgstr "Choisissez un pilote de sortie audio. Redémarrez VLC pour utiliser un nouveau pilote."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the pitch in semitones. Use 0 to turn off this effect. Playback speed does not change."
+msgstr "Réglez la hauteur du son en demi-tons. Utilisez 0 pour désactiver cet effet. La vitesse de lecture ne change pas."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot use spatial audio in this version."
+msgstr "VLC ne peut pas utiliser l’audio spatial dans cette version."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Current screen"
+msgstr "Écran actuel"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Custom (%1 MiB)"
+msgstr "Personnalisé (%1 Mio)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the maximum size of each temporary file used for time-shift playback. Small uses 10 MiB, Medium uses 50 MiB and Large uses 100 MiB."
+msgstr "Définissez la taille maximale de chaque fichier temporaire utilisé pour la lecture en différé. Petite utilise 10 Mio, Moyenne utilise 50 Mio et Grande utilise 100 Mio."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Any subtitle file"
+msgstr "Tout fichier de sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "File name contains title"
+msgstr "Le nom du fichier contient le titre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Title with extra characters"
+msgstr "Titre avec des caractères supplémentaires"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Exact title match"
+msgstr "Correspondance exacte du titre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose how closely subtitle file names must match the video title."
+msgstr "Choisissez le degré de correspondance entre les noms des fichiers de sous-titres et le titre de la vidéo."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the distance between the text and its shadow."
+msgstr "Définissez la distance entre le texte et son ombre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select settings for the type of video. None uses the default settings."
+msgstr "Choisissez des paramètres adaptés au type de vidéo. L’option Aucun utilise les paramètres par défaut."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select the encoding speed. Slow presets use more processor time and can produce smaller files."
+msgstr "Choisissez la vitesse d’encodage. Les préréglages lents utilisent davantage le processeur et peuvent produire des fichiers plus petits."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Save messages to a file. Restart VLC after a change."
+msgstr "Enregistrez les messages dans un fichier. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose the log file. VLC adds new messages to the end of this file. Restart VLC after a change."
+msgstr "Choisissez le fichier journal. VLC ajoute les nouveaux messages à la fin de ce fichier. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose plain text or HTML for the log file. Restart VLC after a change."
+msgstr "Choisissez le texte brut ou le format HTML pour le journal. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose the VLC log level. File logs can use this level or a separate file log level. Restart VLC after a change."
+msgstr "Choisissez le niveau du journal de VLC. Les journaux sur fichier peuvent utiliser ce niveau ou un niveau distinct. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show the VLC icon in the system tray."
+msgstr "Affichez l’icône de VLC dans la zone de notification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Start VLC in the system tray. This turns on the tray icon. Restart VLC after a change."
+msgstr "Démarrez VLC dans la zone de notification. Cette option active l’icône de notification. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show a track message always, only when VLC is hidden or minimized, or never."
+msgstr "Affichez les informations sur la piste toujours, uniquement lorsque VLC est masqué ou réduit, ou jamais."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose how long the track popup is shown. The system can change this time."
+msgstr "Choisissez la durée d’affichage de la fenêtre d’informations sur la piste. Le système peut modifier cette durée."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Change the opacity of the main VLC window. The change applies at once."
+msgstr "Modifiez l’opacité de la fenêtre principale de VLC. La modification s’applique immédiatement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Change the opacity of the control backgrounds in fullscreen. The text and icons stay clear."
+msgstr "Modifiez l’opacité de l’arrière-plan des commandes en plein écran. Le texte et les icônes restent nets."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Minimum pointer movement in pixels before fullscreen controls appear near an edge. A smaller value increases sensitivity."
+msgstr "Déplacement minimal du pointeur en pixels avant l’affichage des commandes près d’un bord en plein écran. Une valeur plus petite augmente la sensibilité."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show a file browser in Open Media. When off, use Add to select files. Changes apply when you open the dialog again."
+msgstr "Affichez un navigateur de fichiers dans Ouvrir un média. Si cette option est désactivée, utilisez Ajouter pour choisir des fichiers. Les modifications s’appliquent à la prochaine ouverture de la fenêtre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select Never to keep the window size. Select Always to resize the window when a video opens. Fullscreen and maximized windows keep their size. Audio visualizers do not change the window size."
+msgstr "Choisissez Jamais pour conserver la taille de la fenêtre. Choisissez Toujours pour redimensionner la fenêtre à l’ouverture d’une vidéo. Les fenêtres en plein écran et agrandies conservent leur taille. Les visualisations audio ne modifient pas la taille de la fenêtre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Start VLC in compact mode. Restart VLC after a change. Launch options can override this setting."
+msgstr "Démarrez VLC en mode compact. Redémarrez VLC après une modification. Les options de lancement peuvent remplacer ce paramètre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add internal interface information, warnings and errors to the VLC log. Use Log details to choose which messages to save."
+msgstr "Ajoutez les informations internes de l’interface, les avertissements et les erreurs au journal de VLC. Utilisez Détails du journal pour choisir les messages à enregistrer."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show error messages and confirmation questions. When this is off, VLC cancels normal and warning questions. Errors stay in the error history. Login, progress and critical questions stay on."
+msgstr "Affichez les messages d’erreur et les demandes de confirmation. Lorsque cette option est désactivée, VLC annule les questions normales et les avertissements. Les erreurs restent dans l’historique. Les fenêtres de connexion, de progression et les questions critiques restent actives."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Saved language (%1)"
+msgstr "Langue enregistrée (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Saved list (%1)"
+msgstr "Liste enregistrée (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Saved encoder (%1)"
+msgstr "Encodeur enregistré (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select the decoder to try first. Automatic lets VLC select it. Open the file again after a change."
+msgstr "Choisissez le décodeur à essayer en premier. L’option Automatique laisse VLC le choisir. Rouvrez le fichier après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC uses this encoder for conversion and streaming. It must support the output format. An output profile can override this choice."
+msgstr "VLC utilise cet encodeur pour la conversion et la diffusion. Il doit prendre en charge le format de sortie. Un profil de sortie peut remplacer ce choix."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter VLC options only. Use quotes for text with spaces. The launch command takes priority. Restart VLC after a change. Use --ignore-config to start without saved options."
+msgstr "Saisissez uniquement des options de VLC. Placez le texte contenant des espaces entre guillemets. La commande de lancement est prioritaire. Redémarrez VLC après une modification. Utilisez --ignore-config pour démarrer sans les options enregistrées."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Control input clock synchronization for live streams. Default uses the source settings. Open the stream again after a change."
+msgstr "Réglez la synchronisation de l’horloge d’entrée pour les flux en direct. L’option Par défaut utilise les paramètres de la source. Rouvrez le flux après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the maximum variation in input delay that VLC can correct, in milliseconds. Open the file or stream again after a change."
+msgstr "Définissez en millisecondes la variation maximale du délai d’entrée que VLC peut corriger. Rouvrez le fichier ou le flux après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the number of clock samples used to smooth timing changes. Higher values give a slower response. The input buffer also affects this value. Open the file or stream again after a change."
+msgstr "Définissez le nombre d’échantillons d’horloge utilisés pour lisser les variations temporelles. Une valeur plus élevée ralentit la réponse. La mémoire tampon d’entrée influe également sur cette valeur. Rouvrez le fichier ou le flux après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The media library is not available in this build."
+msgstr "La médiathèque n’est pas disponible dans cette version."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Include subfolders adds files from the folder and keeps its subfolders in the queue. Open folders on playback reads a folder when you play it. Expand all subfolders reads all files at once. Changes apply to the next folder you add."
+msgstr "Inclure les sous-dossiers ajoute les fichiers du dossier et conserve ses sous-dossiers dans la file d’attente. Ouvrir les dossiers à la lecture lit un dossier lorsque vous le lancez. Développer tous les sous-dossiers lit tous les fichiers en une fois. Les modifications s’appliquent au prochain dossier ajouté."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Restart VLC to use this option. A command-line option can stop VLC from reading file information."
+msgstr "Redémarrez VLC pour utiliser cette option. Une option de ligne de commande peut empêcher VLC de lire les informations des fichiers."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Turn on \"Read file metadata automatically\" in Advanced Options, then restart VLC to use this option."
+msgstr "Activez « Lire automatiquement les métadonnées des fichiers » dans les options avancées, puis redémarrez VLC pour utiliser cette option."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Read file information for items added to the queue. Restart VLC after a change."
+msgstr "Lisez les informations des fichiers ajoutés à la file d’attente. Redémarrez VLC après une modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use one VLC window for app launches. The file manager option also includes files opened from the file manager. Close all VLC windows and start VLC again after you turn this on. Command-line options can override these settings."
+msgstr "Utilisez une seule fenêtre VLC pour les lancements de l’application. L’option du gestionnaire de fichiers inclut aussi les fichiers ouverts depuis celui-ci. Fermez toutes les fenêtres VLC et relancez VLC après activation. Les options de ligne de commande peuvent remplacer ces paramètres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use the same VLC window for files opened from the file manager."
+msgstr "Utilisez la même fenêtre VLC pour les fichiers ouverts depuis le gestionnaire de fichiers."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Keep the current item playing and add new files to the queue. Otherwise, start the new files."
+msgstr "Poursuivez la lecture de l’élément actuel et ajoutez les nouveaux fichiers à la file d’attente. Sinon, lancez les nouveaux fichiers."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter a language name or a two or three letter language code."
+msgstr "Saisissez un nom de langue ou un code de langue de deux ou trois lettres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter VLC options only. Check the option names and quotation marks."
+msgstr "Saisissez uniquement des options de VLC. Vérifiez le nom des options et les guillemets."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language from the list."
+msgstr "Choisissez une langue dans la liste."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter a value within the allowed range."
+msgstr "Saisissez une valeur dans l’intervalle autorisé."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The preferences file could not be saved. Your edits are still open."
+msgstr "Le fichier de préférences n’a pas pu être enregistré. Vos modifications restent ouvertes."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save the default settings. Your settings did not change."
+msgstr "VLC ne peut pas enregistrer les paramètres par défaut. Vos paramètres n’ont pas changé."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot restore the settings file. Restart VLC and check your settings."
+msgstr "VLC ne peut pas restaurer le fichier de paramètres. Redémarrez VLC et vérifiez vos paramètres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select folder"
+msgstr "Choisir un dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select file"
+msgstr "Choisir un fichier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose color"
+msgstr "Choisir une couleur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Toggle fullscreen"
+msgstr "Basculer en plein écran"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Exit fullscreen / close dialog"
+msgstr "Quitter le plein écran / fermer la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show playback position and time"
+msgstr "Afficher la position et le temps de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show interface controls in fullscreen"
+msgstr "Afficher les commandes de l’interface en plein écran"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Play / pause"
+msgstr "Lecture / pause"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Next track"
+msgstr "Piste suivante"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Previous track"
+msgstr "Piste précédente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlists"
+msgstr "Listes de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Artists"
+msgstr "Artistes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Albums"
+msgstr "Albums"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Genres"
+msgstr "Genres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Discover"
+msgstr "Découvrir"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot rescan this folder. Check the folder and try again."
+msgstr "VLC ne peut pas réanalyser ce dossier. Vérifiez le dossier et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this playlist. Select it again."
+msgstr "VLC ne peut pas lire cette liste de lecture. Sélectionnez-la à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read these files. Select them again."
+msgstr "VLC ne peut pas lire ces fichiers. Sélectionnez-les à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not read the saved folder matches. Save again to replace them."
+msgstr "VLC n’a pas pu lire les associations de dossiers enregistrées. Enregistrez à nouveau pour les remplacer."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this folder. Select it again."
+msgstr "VLC ne peut pas lire ce dossier. Sélectionnez-le à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select subtitle files or folders."
+msgstr "Choisissez des fichiers ou des dossiers de sous-titres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select audio files or folders."
+msgstr "Choisissez des fichiers ou des dossiers audio."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Some files cannot be used. Select track files or folders."
+msgstr "Certains fichiers ne peuvent pas être utilisés. Choisissez des fichiers de pistes ou des dossiers."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save these folder matches. Select the folder again."
+msgstr "VLC ne peut pas enregistrer ces associations de dossiers. Sélectionnez le dossier à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save this selection. Select the files again."
+msgstr "VLC ne peut pas enregistrer cette sélection. Sélectionnez les fichiers à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The saved tracks changed. Close this window and select the files again."
+msgstr "Les pistes enregistrées ont changé. Fermez cette fenêtre et sélectionnez les fichiers à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this media: %1"
+msgstr "VLC ne peut pas lire ce média : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot use this track: %1"
+msgstr "VLC ne peut pas utiliser cette piste : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC already uses this file for another track: %1"
+msgstr "VLC utilise déjà ce fichier pour une autre piste : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this track: %1"
+msgstr "VLC ne peut pas lire cette piste : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This VLC build cannot replace saved tracks."
+msgstr "Cette version de VLC ne peut pas remplacer les pistes enregistrées."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not save the tracks for %1. Try again."
+msgstr "VLC n’a pas pu enregistrer les pistes pour %1. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not save the folder matches. Try Save again."
+msgstr "VLC n’a pas pu enregistrer les associations de dossiers. Essayez à nouveau d’enregistrer."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save this change. Try again."
+msgstr "VLC ne peut pas enregistrer cette modification. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save this playlist. Try again."
+msgstr "VLC ne peut pas enregistrer cette liste de lecture. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "You cannot change this playlist."
+msgstr "Vous ne pouvez pas modifier cette liste de lecture."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read or save this image. Select another image."
+msgstr "VLC ne peut pas lire ou enregistrer cette image. Choisissez une autre image."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC saved the name but cannot save the thumbnail. Open the properties again to see the saved values."
+msgstr "VLC a enregistré le nom, mais ne peut pas enregistrer la miniature. Rouvrez les propriétés pour voir les valeurs enregistrées."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot export this playlist. Select it again."
+msgstr "VLC ne peut pas exporter cette liste de lecture. Sélectionnez-la à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save this file. Select another location."
+msgstr "VLC ne peut pas enregistrer ce fichier. Choisissez un autre emplacement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this media. Select the file again."
+msgstr "VLC ne peut pas lire ce média. Sélectionnez le fichier à nouveau."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not save this track: %1"
+msgstr "VLC n’a pas pu enregistrer cette piste : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this file: %1"
+msgstr "VLC ne peut pas lire ce fichier : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not add this folder: %1"
+msgstr "VLC n’a pas pu ajouter ce dossier : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save this selection. Try again."
+msgstr "VLC ne peut pas enregistrer cette sélection. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a Playlist"
+msgstr "Choisir une liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add the selected media to a saved playlist, or create a new playlist."
+msgstr "Ajoutez les médias sélectionnés à une liste de lecture enregistrée, ou créez une liste de lecture."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search playlists"
+msgstr "Rechercher des listes de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Read only"
+msgstr "Lecture seule"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No playlists match your search."
+msgstr "Aucune liste de lecture ne correspond à votre recherche."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC has no saved playlists."
+msgstr "VLC n’a aucune liste de lecture enregistrée."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Or create a new playlist"
+msgstr "Ou créer une liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlist name"
+msgstr "Nom de la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Saving…"
+msgstr "Enregistrement…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Stereo Mode"
+msgstr "Mode stéréo"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Test the left and right audio channels"
+msgstr "Tester les canaux audio gauche et droit"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Audio Track Delay"
+msgstr "Décalage de la piste audio"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Rename"
+msgstr "Renommer"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove bookmark"
+msgstr "Supprimer le signet"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Bookmark current time"
+msgstr "Ajouter un signet à la position actuelle"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select + to save the current time."
+msgstr "Sélectionnez + pour enregistrer la position actuelle."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Parent locations"
+msgstr "Emplacements parents"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This media has no chapters."
+msgstr "Ce média ne contient aucun chapitre."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Divider"
+msgstr "Séparateur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Forward 10s"
+msgstr "Avancer de 10 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Backward 10s"
+msgstr "Reculer de 10 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Forward 15s"
+msgstr "Avancer de 15 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Backward 15s"
+msgstr "Reculer de 15 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Picture in Picture"
+msgstr "Image dans l’image"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Right Sidebar"
+msgstr "Panneau latéral droit"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC Settings"
+msgstr "Paramètres de VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Go Home"
+msgstr "Aller à l’accueil"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Thumbnail"
+msgstr "Miniature"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Artist Name"
+msgstr "Nom de l’artiste"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Folder Name"
+msgstr "Nom du dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlist Name"
+msgstr "Nom de la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Properties"
+msgstr "Propriétés"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Replay"
+msgstr "Relire"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Favorite"
+msgstr "Favori"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Media Folder"
+msgstr "Dossier du média"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Media Title"
+msgstr "Titre du média"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Maximize"
+msgstr "Agrandir"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Timeline"
+msgstr "Barre de progression"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playback Settings"
+msgstr "Paramètres de lecture"
