@@ -40,6 +40,8 @@
 #include <vlc_input_item.h>
 #include <vlc_list.hpp>
 
+#include "util/interface_translator.hpp"
+
 #include <QTreeWidget>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -52,6 +54,18 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QMessageBox>
+#include <QEvent>
+
+namespace {
+QLabel* translatedLabel(const char* source, QWidget* parent)
+{
+    auto* label = new QLabel(qtr(source), parent);
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, label,
+                         [label, source] { label->setText(qtr(source)); });
+    return label;
+}
+}
 
 /************************************************************************
  * Single panels
@@ -76,8 +90,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     p_input = NULL;
     QLabel *label;
 
-#define ADD_META( string, widget, col, colspan ) {                        \
-    label = new QLabel( qfu( string ) ); label->setFont( smallFont );     \
+#define ADD_META( type, widget, col, colspan ) {                           \
+    label = translatedLabel( vlc_meta_TypeToString( type ), this );        \
+    label->setFont( smallFont );                                          \
     label->setContentsMargins( 3, 2, 0, 0 );                              \
     metaLayout->addWidget( label, line++, col, 1, colspan );              \
     widget = new QLineEdit;                                               \
@@ -86,12 +101,12 @@ MetaPanel::MetaPanel( QWidget *parent,
 }
 
     /* Title, artist and album*/
-    ADD_META( VLC_META_TITLE, title_text, 0, 10 ); line++;
-    ADD_META( VLC_META_ARTIST, artist_text, 0, 10 ); line++;
-    ADD_META( VLC_META_ALBUM, collection_text, 0, 7 );
+    ADD_META( vlc_meta_Title, title_text, 0, 10 ); line++;
+    ADD_META( vlc_meta_Artist, artist_text, 0, 10 ); line++;
+    ADD_META( vlc_meta_Album, collection_text, 0, 7 );
 
     /* Date */
-    label = new QLabel( qfu( VLC_META_DATE ) );
+    label = translatedLabel( vlc_meta_TypeToString( vlc_meta_Date ), this );
     label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line - 1, 7, 1, 2 );
 
@@ -105,10 +120,10 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     /* Genre Name */
     /* TODO List id3genres.h is not includable yet ? */
-    ADD_META( VLC_META_GENRE, genre_text, 0, 7 );
+    ADD_META( vlc_meta_Genre, genre_text, 0, 7 );
 
     /* Number - on the same line */
-    label = new QLabel( qfu( VLC_META_TRACK_NUMBER ) );
+    label = translatedLabel( vlc_meta_TypeToString( vlc_meta_TrackNumber ), this );
     label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line - 1, 7, 1, 3  );
 
@@ -127,12 +142,12 @@ MetaPanel::MetaPanel( QWidget *parent,
     line++;
 
     /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
-    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text, 0, 7 );
+    ADD_META( vlc_meta_NowPlaying, nowplaying_text, 0, 7 );
     nowplaying_text->setReadOnly( true ); line--;
 
     /* Language on the same line */
-    ADD_META( VLC_META_LANGUAGE, language_text, 7, -1 ); line++;
-    ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 );
+    ADD_META( vlc_meta_Language, language_text, 7, -1 ); line++;
+    ADD_META( vlc_meta_Publisher, publisher_text, 0, 7 );
 
     /* Fingerprint button on the same line */
     fingerprintButton = new QPushButton( qtr("&Fingerprint") );
@@ -149,14 +164,14 @@ MetaPanel::MetaPanel( QWidget *parent,
         currentURL = url;
     } );
 
-    ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
+    ADD_META( vlc_meta_Copyright, copyright_text, 0,  7 ); line++;
 
     fingerprintButton->setMinimumWidth( std::max( fingerprintButton->minimumSizeHint().width(),
                                                   art_cover->minimumSizeHint().width() ) );
 
-    ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
+    ADD_META( vlc_meta_EncodedBy, encodedby_text, 0, 7 ); line++;
 
-    label = new QLabel( qtr( "Comments" ) ); label->setFont( smallFont );
+    label = translatedLabel( N_("Comments"), this ); label->setFont( smallFont );
     label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line++, 0, 1, 7 );
     description_text = new QTextEdit;
@@ -177,6 +192,13 @@ MetaPanel::MetaPanel( QWidget *parent,
     connect( seqtot_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
 
     connect( date_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+            fingerprintButton->setText(qtr("&Fingerprint"));
+            fingerprintButton->setToolTip(qtr("Find meta data using audio fingerprinting"));
+            fingerprintButton->setMinimumWidth(std::max(fingerprintButton->minimumSizeHint().width(),
+                                                       art_cover->minimumSizeHint().width()));
+        });
     /* We are not yet in Edit Mode */
     b_inEditMode = false;
 }
@@ -385,8 +407,8 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
 {
      QGridLayout *layout = new QGridLayout(this);
 
-     QLabel *topLabel = new QLabel( qtr( "Extra metadata and other information"
-                 " are shown in this panel.\n" ) );
+     QLabel *topLabel = translatedLabel( N_("Extra metadata and other information"
+                 " are shown in this panel.\n"), this );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
@@ -409,6 +431,10 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
      extraMeta->setSelectionMode( QAbstractItemView::SingleSelection );
 
      layout->addWidget( extraMeta, 1, 0 );
+     if (auto* translator = InterfaceTranslator::instance())
+         connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+             extraMeta->setHorizontalHeaderLabels({qtr("Property"), qtr("Value")});
+         });
 }
 
 void ExtraMetaPanel::showEvent( QShowEvent * event )
@@ -498,9 +524,9 @@ InfoPanel::InfoPanel( QWidget *parent ) : QWidget( parent )
 {
      QGridLayout *layout = new QGridLayout(this);
 
-     QLabel *topLabel = new QLabel( qtr( "Information about what your media or"
+     QLabel *topLabel = translatedLabel( N_("Information about what your media or"
               " stream is made of.\nMuxer, Audio and Video Codecs, Subtitles "
-              "are shown." ) );
+              "are shown."), this );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
@@ -572,8 +598,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
 {
      QVBoxLayout *layout = new QVBoxLayout(this);
 
-     QLabel *topLabel = new QLabel( qtr( "Current"
-                 " media / stream " "statistics") );
+     QLabel *topLabel = translatedLabel( N_("Current media / stream statistics"), this );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0 );
 
@@ -646,12 +671,44 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
     statsView->setFrameStyle( QFrame::NoFrame );
     statsView->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
     input_bitrate_graph->setSizeHint( 1, QSize(0, 100) );
-    QString graphlabel =
-            QString( "<font style=\"color:#ff8c00\">%1</font><br/>%2" )
-            .arg( qtr("Last 60 seconds") )
-            .arg( qtr("Overall") );
-    StatsTree->setItemWidget( input_bitrate_graph, 0, new QLabel( graphlabel ) );
+    graphLegend = new QLabel;
+    StatsTree->setItemWidget( input_bitrate_graph, 0, graphLegend );
     StatsTree->setItemWidget( input_bitrate_graph, 1, statsView );
+    updateGraphLegend();
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, &InputStatsPanel::retranslate);
+}
+
+void InputStatsPanel::retranslate()
+{
+    const struct { QTreeWidgetItem* item; const char* source; } labels[] = {
+        {audio, N_("Audio")}, {video, N_("Video")}, {input, N_("Input/Read")},
+        {read_media_stat, N_("Media data size")}, {input_bitrate_stat, N_("Input bitrate")},
+        {demuxed_stat, N_("Demuxed data size")}, {stream_bitrate_stat, N_("Content bitrate")},
+        {corrupted_stat, N_("Discarded (corrupted)")}, {discontinuity_stat, N_("Dropped (discontinued)")},
+        {vdecoded_stat, N_("Decoded")}, {vdisplayed_stat, N_("Displayed")},
+        {vlate_stat, N_("Late")}, {vlost_frames_stat, N_("Lost")},
+        {adecoded_stat, N_("Decoded")}, {aplayed_stat, N_("Played")}, {alost_stat, N_("Lost")}
+    };
+    for (const auto& label : labels) label.item->setText(0, qtr(label.source));
+    for (auto* item : {vdecoded_stat, adecoded_stat}) item->setText(2, qtr("blocks"));
+    for (auto* item : {vdisplayed_stat, vlate_stat, vlost_frames_stat}) item->setText(2, qtr("frames"));
+    for (auto* item : {aplayed_stat, alost_stat}) item->setText(2, qtr("buffers"));
+    updateGraphLegend();
+}
+
+void InputStatsPanel::updateGraphLegend()
+{
+    if (!graphLegend) return;
+    graphLegend->setText(QStringLiteral("<font style=\"color:%1\">%2</font><br/>%3")
+        .arg(palette().color(QPalette::Highlight).name(),
+             qtr("Last 60 seconds").toHtmlEscaped(), qtr("Overall").toHtmlEscaped()));
+}
+
+void InputStatsPanel::changeEvent(QEvent* event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange) updateGraphLegend();
 }
 
 void InputStatsPanel::hideEvent( QHideEvent * event )

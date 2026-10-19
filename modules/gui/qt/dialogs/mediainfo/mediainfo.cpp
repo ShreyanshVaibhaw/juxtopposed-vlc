@@ -28,6 +28,7 @@
 #include "mediainfo.hpp"
 #include "player/player_controller.hpp"
 #include "util/redesign_widget_theme.hpp"
+#include "util/interface_translator.hpp"
 
 #include <vlc_url.h>
 
@@ -139,6 +140,19 @@ MediaInfoDialog::MediaInfoDialog(qt_intf_t *_p_intf,
     /* Call update at start, so info is filled up at beginning */
     if( p_item )
         updateAllTabs( p_item );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this, closeButton, uriLabel] {
+            setWindowTitle(isMainInputInfo ? qtr("Current Media Information") : qtr("Media Information"));
+            infoTabW->setTabText(META_PANEL, qtr("&General"));
+            infoTabW->setTabText(EXTRAMETA_PANEL, qtr("&Metadata"));
+            infoTabW->setTabText(INFO_PANEL, qtr("Co&dec"));
+            if (ISP) infoTabW->setTabText(INPUTSTATS_PANEL, qtr("S&tatistics"));
+            saveMetaButton->setText(qtr("&Save Metadata"));
+            closeButton->setText(qtr("&Close"));
+            closeButton->setMaximumWidth(closeButton->minimumSizeHint().width());
+            uriLabel->setText(qtr("Location:"));
+        });
 
     applyRedesignWidgetTheme(this, p_intf->p_mi);
     restoreWidgetPosition( "Mediainfo", QSize( 720 , 720 ) );
