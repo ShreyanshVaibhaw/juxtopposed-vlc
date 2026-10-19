@@ -5,6 +5,7 @@
 #include <vlc_common.h>
 #include <vlc_configuration.h>
 #include <vlc_charset.h>
+#include <vlc_threads.h>
 #include <ctype.h>
 #include <locale.h>
 #include "configuration.h"
@@ -13,6 +14,34 @@
 #elif defined(__APPLE__)
 # include <CoreFoundation/CoreFoundation.h>
 #endif
+
+static vlc_once_t system_language_once = VLC_STATIC_ONCE;
+static char system_language[1024];
+
+static void capture_system_language(void *opaque)
+{
+    (void)opaque;
+    const char *message_locale = NULL;
+    const char *variables[] = { "LC_ALL", "LC_MESSAGES", "LANG" };
+    for (size_t i = 0; i < ARRAY_SIZE(variables); ++i)
+    {
+        const char *value = getenv(variables[i]);
+        if (value && *value) { message_locale = value; break; }
+    }
+    const char *language = getenv("LANGUAGE");
+    if (message_locale && (!strcmp(message_locale, "C") || !strcmp(message_locale, "POSIX")))
+        language = "C";
+    else if (language == NULL || *language == '\0')
+        language = message_locale;
+    if (language != NULL && strlen(language) < sizeof(system_language))
+        strcpy(system_language, language);
+}
+
+char *config_GetSystemInterfaceLanguage(void)
+{
+    vlc_once(&system_language_once, capture_system_language, NULL);
+    return *system_language ? strdup(system_language) : NULL;
+}
 
 static char *legacy_language(void)
 {
@@ -63,6 +92,8 @@ char *config_GetInterfaceLanguage(int argc, const char *const argv[])
 
 int config_ApplyInterfaceLanguage(int argc, const char *const argv[])
 {
+    /* Preserve System before a standalone UI choice changes LANG/LANGUAGE. */
+    vlc_once(&system_language_once, capture_system_language, NULL);
     char *language = config_GetInterfaceLanguage(argc, argv);
     if (language == NULL) return VLC_ENOMEM;
     if (!strcmp(language, "auto")) { free(language); return VLC_SUCCESS; }

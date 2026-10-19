@@ -39,6 +39,9 @@ static void check_getter(const char *file)
     const char *bcp47[] = {"--language=pt-BR"};
     assert(config_ApplyInterfaceLanguage(ARRAY_SIZE(bcp47), bcp47) == VLC_SUCCESS);
     assert(!strcmp(getenv("LANGUAGE"), "pt_BR"));
+    char *original_language = config_GetSystemInterfaceLanguage();
+    assert(original_language != NULL && !strcmp(original_language, "en"));
+    free(original_language);
 }
 
 static void scenario(const char *name)
@@ -60,7 +63,28 @@ static void scenario(const char *name)
         fputs("startup-options=--language=ar --removed-plugin-setting\n", stream);
     if (!strcmp(name, "system")) fputs("language=auto\n", stream);
     fclose(stream);
-    if (!strcmp(name, "getter")) check_getter(file);
+    if (!strncmp(name, "snapshot-", 9)) {
+        const char *expected;
+        if (!strcmp(name, "snapshot-list")) {
+            setenv("LANGUAGE", "fr_CA:de", 1);
+            expected = "fr_CA:de";
+        } else if (!strcmp(name, "snapshot-c")) {
+            setenv("LC_ALL", "C", 1);
+            setenv("LANGUAGE", "fr", 1);
+            expected = "C";
+        } else {
+            unsetenv("LANGUAGE"); unsetenv("LC_ALL");
+            unsetenv("LC_MESSAGES"); unsetenv("LANG");
+            expected = NULL;
+        }
+        const char *override[] = {"--language=ar"};
+        assert(config_ApplyInterfaceLanguage(ARRAY_SIZE(override), override) == VLC_SUCCESS);
+        char *original_language = config_GetSystemInterfaceLanguage();
+        assert(expected ? original_language && !strcmp(original_language, expected) : !original_language);
+        free(original_language);
+        assert(!strcmp(getenv("LANGUAGE"), "ar"));
+    }
+    else if (!strcmp(name, "getter")) check_getter(file);
     else {
         const char *args[] = {"--config", file, "--no-ignore-config", "--no-media-library",
             "--no-metadata-network-access", "--no-plugins-cache", "--load-startup-options",
@@ -72,6 +96,9 @@ static void scenario(const char *name)
         const char *expected = embedded || !strcmp(name, "override") || !strcmp(name, "system") || !strcmp(name, "ignore") || !strcmp(name, "reset")
             ? "en" : !strcmp(name, "saved-extra") ? "ar" : "fr";
         assert(!strcmp(getenv("LANGUAGE"), expected));
+        char *original_language = config_GetSystemInterfaceLanguage();
+        assert(original_language != NULL && !strcmp(original_language, "en"));
+        free(original_language);
         assert(!strcmp(setlocale(LC_NUMERIC, NULL), "C"));
 #ifndef _WIN32
         if (embedded) assert(!strcmp(setlocale(LC_MESSAGES, NULL), "C"));
@@ -95,7 +122,8 @@ int main(int argc, char **argv)
 {
     test_init();
     if (argc == 2) { scenario(argv[1]); return 0; }
-    const char *cases[] = {"getter", "profile", "system", "ignore", "reset", "embedded", "saved-extra", "override", "recovery"};
+    const char *cases[] = {"getter", "profile", "system", "ignore", "reset", "embedded", "saved-extra", "override", "recovery",
+        "snapshot-list", "snapshot-c", "snapshot-platform"};
     for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
         const char *args[] = {argv[0], cases[i], NULL};
         const int fds[] = {-1, 1, 2, -1};

@@ -66,6 +66,11 @@ VLC_API int config_ValidateStartupOptions(vlc_object_t *parent, const char *text
  * This getter does not modify the process locale or environment.
  */
 VLC_API char *config_GetInterfaceLanguage(int argc, const char *const argv[]);
+/** Get the original message-language environment, before the standalone UI
+ * language override. The caller frees the result. NULL means use the platform
+ * language or that the result could not be allocated. No locale is changed.
+ */
+VLC_API char *config_GetSystemInterfaceLanguage(void);
 /** Apply the standalone language before any threads or LibVLC instances start.
  * Embedded clients must not call this while their process is multithreaded.
  */
