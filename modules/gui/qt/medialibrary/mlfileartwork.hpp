@@ -33,6 +33,7 @@ public:
 signals:
     void ctxChanged();
     void artworkChanged(const QUrl& url, const QString& artwork);
+    void mediaProgressChanged(const QUrl& url, qreal progress);
 private:
     void mediaUpdated(const QString& mrl, const MLMedia& media);
     struct ExportedFile {

@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QThreadPool>
 #include <algorithm>
+#include <cmath>
 
 namespace {
 QUrl normalizeFolderUrl(const QUrl& folder)
@@ -48,6 +49,7 @@ void RedesignFolderModel::setFolder(const QUrl& folder)
     m_folder = normalized;
     ++m_folderSerial;
     m_artwork.clear();
+    m_progress.clear();
     m_artworkRequested.clear();
     const auto watched = m_watcher.directories();
     if (!watched.isEmpty())
@@ -63,6 +65,7 @@ void RedesignFolderModel::refresh()
 {
     ++m_folderSerial;
     m_artwork.clear();
+    m_progress.clear();
     m_artworkRequested.clear();
     scheduleRefresh();
 }
@@ -154,7 +157,8 @@ int RedesignFolderModel::rowCount(const QModelIndex& parent) const
 
 QHash<int, QByteArray> RedesignFolderModel::roleNames() const
 {
-    return {{FileName, "fileName"}, {FileUrl, "fileUrl"}, {FileIsDir, "fileIsDir"}, {Thumbnail, "thumbnail"}};
+    return {{FileName, "fileName"}, {FileUrl, "fileUrl"}, {FileIsDir, "fileIsDir"},
+            {Thumbnail, "thumbnail"}, {Progress, "progress"}};
 }
 
 QVariant RedesignFolderModel::data(const QModelIndex& index, int role) const
@@ -167,8 +171,9 @@ QVariant RedesignFolderModel::data(const QModelIndex& index, int role) const
     case FileName: return file.fileName();
     case FileUrl: return QUrl::fromLocalFile(file.absoluteFilePath());
     case FileIsDir: return file.isDir();
-    case Thumbnail: {
-        if (file.isDir()) return QString {};
+    case Thumbnail:
+    case Progress: {
+        if (file.isDir()) return role == Thumbnail ? QVariant(QString {}) : QVariant(0.0);
         const auto url = QUrl::fromLocalFile(file.absoluteFilePath());
         if (!m_artworkRequested.contains(url)) {
             m_artworkRequested.insert(url);
@@ -178,7 +183,7 @@ QVariant RedesignFolderModel::data(const QModelIndex& index, int role) const
                     emit self->artworkRequested(url);
             });
         }
-        return m_artwork.value(url);
+        return role == Thumbnail ? QVariant(m_artwork.value(url)) : QVariant(m_progress.value(url, 0.0));
     }
     default: return {};
     }
@@ -193,6 +198,19 @@ void RedesignFolderModel::setArtwork(const QUrl& url, const QString& artwork)
     const auto row = m_rowsByUrl.value(url, -1);
     if (row >= 0)
         emit dataChanged(index(row), index(row), {Thumbnail});
+}
+
+void RedesignFolderModel::setProgress(const QUrl& url, qreal progress)
+{
+    if (!m_artworkRequested.contains(url))
+        return;
+    const qreal bounded = std::isfinite(progress) ? std::clamp(progress, qreal(0), qreal(1)) : 0;
+    if (m_progress.value(url, 0.0) == bounded)
+        return;
+    m_progress.insert(url, bounded);
+    const auto row = m_rowsByUrl.value(url, -1);
+    if (row >= 0)
+        emit dataChanged(index(row), index(row), {Progress});
 }
 
 QVariant RedesignFolderModel::get(int row, const QString& role) const

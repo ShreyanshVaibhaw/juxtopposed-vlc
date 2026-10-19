@@ -68,6 +68,7 @@ void MLFileArtwork::request(const QUrl& url, bool generateVideo)
 void MLFileArtwork::mediaUpdated(const QString& mrl, const MLMedia& media)
 {
     if (!m_requested.contains(mrl)) return;
+    emit mediaProgressChanged(QUrl::fromEncoded(mrl.toUtf8()), media.valid() ? media.progress() : 0.0);
     const QString artwork = media.valid() ? media.smallCover() : QString {};
     if (!artwork.isEmpty())
         emit artworkChanged(QUrl::fromEncoded(mrl.toUtf8()), artwork);

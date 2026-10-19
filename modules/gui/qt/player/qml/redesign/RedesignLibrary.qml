@@ -461,6 +461,9 @@ RedesignLibraryView {
     MLFileArtwork {
         id: folderArtwork
         ctx: MainCtx
+        onMediaProgressChanged: (url, progress) => {
+            if (folderLoader.item) folderLoader.item.setProgress(url, progress)
+        }
         onArtworkChanged: (url, artwork) => {
             if (folderLoader.item) folderLoader.item.setArtwork(url, artwork)
             if (!artwork) return

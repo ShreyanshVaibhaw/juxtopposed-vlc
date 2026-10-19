@@ -34,7 +34,7 @@ class RedesignFolderModel : public QAbstractListModel
     Q_PROPERTY(int directoryCount READ directoryCount NOTIFY countChanged FINAL)
     Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern NOTIFY searchPatternChanged FINAL)
 public:
-    enum Role { FileName = Qt::UserRole + 1, FileUrl, FileIsDir, Thumbnail };
+    enum Role { FileName = Qt::UserRole + 1, FileUrl, FileIsDir, Thumbnail, Progress };
     explicit RedesignFolderModel(QObject* parent = nullptr);
     QUrl folder() const { return m_folder; }
     void setFolder(const QUrl& folder);
@@ -53,6 +53,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     Q_INVOKABLE QVariant get(int row, const QString& role) const;
     Q_INVOKABLE void setArtwork(const QUrl& url, const QString& artwork);
+    Q_INVOKABLE void setProgress(const QUrl& url, qreal progress);
     Q_INVOKABLE void refresh();
     Q_INVOKABLE quint64 requestInfo(const QUrl& folder);
 signals:
@@ -77,6 +78,7 @@ private:
     QFileInfoList m_entries;
     QHash<QUrl, int> m_rowsByUrl;
     QHash<QUrl, QString> m_artwork;
+    QHash<QUrl, qreal> m_progress;
     mutable QSet<QUrl> m_artworkRequested;
     quint64 m_folderSerial = 0;
     quint64 m_serial = 0;

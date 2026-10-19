@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 #include <QDateTime>
+#include <limits>
 #include "util/redesign_folder_model.hpp"
 
 class TestRedesignFolderModel : public QObject
@@ -14,6 +15,56 @@ class TestRedesignFolderModel : public QObject
         QVERIFY(file.open(QIODevice::WriteOnly));
     }
 private slots:
+    void progressSharesTheLazyArtworkRequestAndUpdatesOnlyItsRole() {
+        QTemporaryDir directory;
+        QDir dir(directory.path());
+        QVERIFY(dir.mkdir("folder"));
+        touch(dir.filePath("movie.mp4"));
+        RedesignFolderModel model;
+        QSignalSpy requested(&model, &RedesignFolderModel::artworkRequested);
+        QSignalSpy changed(&model, &RedesignFolderModel::dataChanged);
+        QSignalSpy reset(&model, &RedesignFolderModel::modelReset);
+        model.setFolder(QUrl::fromLocalFile(directory.path()));
+        QTRY_COMPARE(model.count(), 2);
+        reset.clear();
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
+        QCOMPARE(requested.count(), 0);
+        QCOMPARE(model.get(1, "progress").toDouble(), 0.0);
+        model.get(1, "thumbnail");
+        QTRY_COMPARE(requested.count(), 1);
+        const auto url = model.get(1, "fileUrl").toUrl();
+        model.setProgress(url, .45);
+        QCOMPARE(model.get(1, "progress").toDouble(), .45);
+        QCOMPARE(changed.count(), 1);
+        QCOMPARE(changed[0][2].value<QList<int>>(), QList<int>{RedesignFolderModel::Progress});
+        model.setProgress(url, .45);
+        QCOMPARE(changed.count(), 1);
+        QCOMPARE(reset.count(), 0);
+        QCOMPARE(requested.count(), 1);
+    }
+    void progressIsBoundedAndRefreshClearsIt() {
+        QTemporaryDir directory;
+        touch(QDir(directory.path()).filePath("movie.mp4"));
+        RedesignFolderModel model;
+        model.setFolder(QUrl::fromLocalFile(directory.path()));
+        QTRY_COMPARE(model.count(), 1);
+        const auto url = model.get(0, "fileUrl").toUrl();
+        model.setProgress(url, .8);
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
+        model.setProgress(url, 2);
+        QCOMPARE(model.get(0, "progress").toDouble(), 1.0);
+        model.setProgress(url, -1);
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
+        model.setProgress(url, .6);
+        model.setProgress(url, std::numeric_limits<qreal>::quiet_NaN());
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
+        model.setProgress(url, .6);
+        model.setProgress(url, std::numeric_limits<qreal>::infinity());
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
+        model.setProgress(url, .6);
+        model.refresh();
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
+    }
     void artworkIsLazyAndDirectoriesDoNotRequestIt() {
         QTemporaryDir directory;
         QDir dir(directory.path());
@@ -46,16 +97,21 @@ private slots:
         const auto a = model.get(0, "fileUrl").toUrl();
         const auto b = model.get(1, "fileUrl").toUrl();
         model.get(0, "thumbnail"); model.get(1, "thumbnail");
+        model.setProgress(a, .3); model.setProgress(b, .8);
         model.setSearchPattern("b");
         QTRY_COMPARE(model.count(), 1);
         model.setArtwork(a, QStringLiteral("a.jpg"));
         model.setArtwork(b, QStringLiteral("b.jpg"));
+        model.setProgress(a, .4);
+        QCOMPARE(model.get(0, "progress").toDouble(), .8);
         QCOMPARE(model.get(0, "thumbnail").toString(), QStringLiteral("b.jpg"));
         model.setSearchPattern(""); model.setSortReversed(true);
         QTRY_COMPARE(model.count(), 2);
         QCOMPARE(model.get(0, "fileName").toString(), QStringLiteral("b.mp4"));
         QCOMPARE(model.get(0, "thumbnail").toString(), QStringLiteral("b.jpg"));
         QCOMPARE(model.get(1, "thumbnail").toString(), QStringLiteral("a.jpg"));
+        QCOMPARE(model.get(0, "progress").toDouble(), .8);
+        QCOMPARE(model.get(1, "progress").toDouble(), .4);
     }
     void oldFolderArtworkCannotReplaceCurrentFiles() {
         QTemporaryDir first, second;
@@ -70,7 +126,9 @@ private slots:
         QTRY_COMPARE(model.count(), 1);
         model.get(0, "thumbnail");
         model.setArtwork(old, QStringLiteral("old.jpg"));
+        model.setProgress(old, .7);
         QVERIFY(model.get(0, "thumbnail").toString().isEmpty());
+        QCOMPARE(model.get(0, "progress").toDouble(), 0.0);
         model.setArtwork(model.get(0, "fileUrl").toUrl(), QStringLiteral("current.jpg"));
         QCOMPARE(model.get(0, "thumbnail").toString(), QStringLiteral("current.jpg"));
     }
