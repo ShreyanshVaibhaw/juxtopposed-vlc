@@ -1129,10 +1129,10 @@ msgstr "Débit d'images "
 msgid "Decoded format"
 msgstr "Format décodé"
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: src/input/es_out.c:3164
-#, fuzzy
 msgid "Top left"
-msgstr "Zone 3 : gauche"
+msgstr "En haut à gauche"
 
 #: src/input/es_out.c:3164
 #, fuzzy
@@ -1144,20 +1144,20 @@ msgstr "Avant Gauche"
 msgid "Right bottom"
 msgstr "haut bas"
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: src/input/es_out.c:3165
-#, fuzzy
 msgid "Top right"
-msgstr "Copyright"
+msgstr "En haut à droite"
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom left"
-msgstr "Bas-Gauche"
+msgstr "En bas à gauche"
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: src/input/es_out.c:3166
-#, fuzzy
 msgid "Bottom right"
-msgstr "Bas-Droite"
+msgstr "En bas à droite"
 
 #: src/input/es_out.c:3167
 #, fuzzy
@@ -17154,10 +17154,10 @@ msgstr "Avancer"
 msgid "Seek forward"
 msgstr "Avancer d'un pas"
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Contrôle de lecture"
+msgstr "Position de lecture"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
 #, fuzzy
@@ -22759,10 +22759,10 @@ msgstr "Console"
 msgid "HTML"
 msgstr ""
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Détails"
+msgstr "Informations"
 
 #. Redesign translation by Codex (first pass; review welcome).
 #: modules/logger/file.c:203
@@ -31540,8 +31540,9 @@ msgstr "Inclure les sous-titres"
 #~ msgid "Select the directory to save to"
 #~ msgstr "Dossier de destination"
 
-#~ msgid "No folder selected"
-#~ msgstr "Aucun dossier sélectionné"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No folder selected"
+msgstr "Aucun dossier sélectionné"
 
 #~ msgid "A directory where to save the files has to be selected."
 #~ msgstr "Vous devez sélectionner un dossier où enregistrer les fichiers."
@@ -31563,8 +31564,9 @@ msgstr "Inclure les sous-titres"
 #~ "Entrez un chemin valide ou utilisez le bouton « Choisir… » pour choisir "
 #~ "un emplacement."
 
-#~ msgid "Finish"
-#~ msgstr "Terminer"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Finish"
+msgstr "Terminer"
 
 #~ msgid "%i items"
 #~ msgstr "%i éléments"
@@ -35244,9 +35246,9 @@ msgstr "Inclure les sous-titres"
 #~ msgid "HTTP Proxy"
 #~ msgstr "Serveur mandataire HTTP"
 
-#, fuzzy
-#~ msgid "Font Size"
-#~ msgstr "Taille"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Font Size"
+msgstr "Taille de la police"
 
 #, fuzzy
 #~ msgid "Preferred Subtitle Language"
@@ -35256,9 +35258,9 @@ msgstr "Inclure les sous-titres"
 #~ msgid "Force Bold"
 #~ msgstr "Forcer en gras"
 
-#, fuzzy
-#~ msgid "Outline Color"
-#~ msgstr "Couleur du contour"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Outline Color"
+msgstr "Couleur du contour"
 
 #, fuzzy
 #~ msgid "Enable Video"
@@ -35352,9 +35354,9 @@ msgstr "Inclure les sous-titres"
 #~ msgid "Icon View"
 #~ msgstr "Vue"
 
-#, fuzzy
-#~ msgid "List View"
-#~ msgstr "Média voir"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "List View"
+msgstr "Vue en liste"
 
 #, fuzzy
 #~ msgid "Hotkey for "
@@ -35528,9 +35530,9 @@ msgstr "Inclure les sous-titres"
 #~ msgid "MPEG2 video switcher stream output"
 #~ msgstr "Activer le flux de sortie vidéo"
 
-#, fuzzy
-#~ msgid "Audio Language"
-#~ msgstr "Langue audio"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Audio Language"
+msgstr "Langue audio"
 
 #, fuzzy
 #~ msgid "Edge Weightning"
@@ -35928,9 +35930,9 @@ msgstr "Médiathèque"
 #~ msgid "Seek Time"
 #~ msgstr "Média temps"
 
-#, fuzzy
-#~ msgid "Close"
-#~ msgstr "&Fermer"
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close"
+msgstr "Fermer"
 
 #, fuzzy
 #~ msgid "Error!"
@@ -39009,7 +39011,6 @@ msgstr "Se reconnecter automatiquement"
 msgid "Connection timeout (ms)"
 msgstr "Délai de connexion (ms)"
 
-
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Light"
 msgstr "Clair"
@@ -39169,3 +39170,1689 @@ msgstr "Utiliser le niveau du journal de VLC"
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Silent"
 msgstr "Silencieux"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC Media Player"
+msgstr "Lecteur multimédia VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Videos"
+msgstr "Vidéos"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open media folder"
+msgstr "Ouvrir le dossier du média"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Play queue"
+msgstr "Lire la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "15 minutes"
+msgstr "15 minutes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "30 minutes"
+msgstr "30 minutes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "60 minutes"
+msgstr "60 minutes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "90 minutes"
+msgstr "90 minutes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show Subtitle Timeline on Seekbar"
+msgstr "Afficher la chronologie des sous-titres sur la barre de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reading subtitle times…"
+msgstr "Lecture des repères temporels des sous-titres…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select a subtitle track to show its times."
+msgstr "Sélectionnez une piste de sous-titres pour afficher ses repères temporels."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This subtitle track has no cue times."
+msgstr "Cette piste de sous-titres ne contient aucun repère temporel."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read the times for this subtitle track."
+msgstr "VLC ne peut pas lire les repères temporels de cette piste de sous-titres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show Statistics"
+msgstr "Afficher les statistiques"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sleep Timer"
+msgstr "Minuteur de veille"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Audio Visualizer"
+msgstr "Visualisation audio"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Speed"
+msgstr "Vitesse"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Custom speed…"
+msgstr "Vitesse personnalisée…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit Inside Window"
+msgstr "Ajuster à la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fill Window"
+msgstr "Remplir la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit Window Width"
+msgstr "Ajuster à la largeur de la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Fit Window Height"
+msgstr "Ajuster à la hauteur de la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Repeat this item"
+msgstr "Répéter cet élément"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Repeat off"
+msgstr "Désactiver la répétition"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The media library is not available. Open files or a folder to add them to the queue."
+msgstr "La médiathèque n’est pas disponible. Ouvrez des fichiers ou un dossier pour les ajouter à la file d’attente."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "New Preset"
+msgstr "Nouveau préréglage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Preset actions for %1"
+msgstr "Actions du préréglage %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Duplicate"
+msgstr "Dupliquer"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Rename Preset"
+msgstr "Renommer le préréglage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Duplicate Preset"
+msgstr "Dupliquer le préréglage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Preset name"
+msgstr "Nom du préréglage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Delete Preset"
+msgstr "Supprimer le préréglage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Delete “%1”?"
+msgstr "Supprimer « %1 » ?"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Drop a file to start playing"
+msgstr "Déposez un fichier pour lancer la lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open file"
+msgstr "Ouvrir un fichier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Buffering %1%"
+msgstr "Mise en mémoire tampon : %1 %"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Continue where you left off?"
+msgstr "Reprendre la lecture là où vous l’avez arrêtée ?"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Start from the beginning"
+msgstr "Reprendre depuis le début"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Hide library"
+msgstr "Masquer la médiathèque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show library"
+msgstr "Afficher la médiathèque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Browse library"
+msgstr "Parcourir la médiathèque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Restore window"
+msgstr "Restaurer la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Unmute"
+msgstr "Rétablir le son"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Audio tracks and output"
+msgstr "Pistes et sortie audio"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle tracks"
+msgstr "Pistes de sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playback settings"
+msgstr "Paramètres de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show subtitles 0.1 seconds earlier"
+msgstr "Avancer les sous-titres de 0,1 seconde"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Zoom out on subtitle times"
+msgstr "Réduire le zoom sur les repères temporels des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Zoom in on subtitle times"
+msgstr "Agrandir les repères temporels des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show subtitles 0.1 seconds later"
+msgstr "Retarder les sous-titres de 0,1 seconde"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle delay: %1 s"
+msgstr "Décalage des sous-titres : %1 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open Advanced Settings"
+msgstr "Ouvrir les paramètres avancés"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle Track Delay"
+msgstr "Décalage de la piste de sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle Speed"
+msgstr "Vitesse des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle Duration Factor"
+msgstr "Facteur de durée des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Embedded Sub Format"
+msgstr "Style intégré des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle files can set their own style. Turn off Embedded Sub Format to use these settings for all text subtitles."
+msgstr "Les fichiers de sous-titres peuvent définir leur propre style. Désactivez « Style intégré des sous-titres » pour appliquer ces paramètres à tous les sous-titres au format texte."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle Font"
+msgstr "Police des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subtitle Offset"
+msgstr "Décalage vertical des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Size Values"
+msgstr "Unité de taille"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Relative"
+msgstr "Relative"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Pixels"
+msgstr "Pixels"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Flip"
+msgstr "Retournement"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Flip: %1"
+msgstr "Retournement : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Zoom ratios use the video's actual pixel size."
+msgstr "Les facteurs de zoom utilisent la taille réelle de la vidéo en pixels."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "HDR"
+msgstr "HDR"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use Direct3D11 output for this setting. The mode applies when a video output starts. Unavailable formats are dimmed."
+msgstr "Utilisez la sortie Direct3D11 pour ce paramètre. Le mode s’applique au démarrage d’une sortie vidéo. Les formats indisponibles sont grisés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This VLC build does not include Direct3D11 HDR output."
+msgstr "Cette version de VLC ne comprend pas de sortie HDR Direct3D11."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "SDR to HDR"
+msgstr "SDR vers HDR"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Best Available"
+msgstr "Meilleure disponible"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set the maximum resolution for the next video."
+msgstr "Définissez la résolution maximale pour la prochaine vidéo."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Render"
+msgstr "Rendu"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Local"
+msgstr "Local"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sharpen Sigma"
+msgstr "Sigma de netteté"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Banding Removal Radius"
+msgstr "Rayon de suppression des bandes de couleur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Film Grain Variance"
+msgstr "Variance du grain de film"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Crop %1"
+msgstr "Rogner : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Link top and bottom"
+msgstr "Lier le haut et le bas"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Link left and right"
+msgstr "Lier la gauche et la droite"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Color Extraction"
+msgstr "Extraction de couleur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Color Threshold"
+msgstr "Seuil de couleur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose %1 color"
+msgstr "Choisir la couleur pour %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Negate Colors"
+msgstr "Inverser les couleurs"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Gradient mode"
+msgstr "Mode du dégradé"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sepia Intensity"
+msgstr "Intensité du sépia"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Game Mode"
+msgstr "Mode de jeu"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Piece Rotation"
+msgstr "Rotation des pièces"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Preview Size"
+msgstr "Taille de l’aperçu"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Piece Size"
+msgstr "Taille des pièces"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Auto Shuffle"
+msgstr "Mélange automatique"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Auto Solve"
+msgstr "Résolution automatique"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Text Overlay"
+msgstr "Incrustation de texte"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "X Offset"
+msgstr "Décalage horizontal"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Y Offset"
+msgstr "Décalage vertical"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Text File"
+msgstr "Fichier texte"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Keep the file path empty to use the text above."
+msgstr "Laissez le chemin du fichier vide pour utiliser le texte ci-dessus."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Refresh Interval"
+msgstr "Intervalle d’actualisation"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Image Overlay"
+msgstr "Incrustation d’image"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Image File"
+msgstr "Fichier image"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Image Delay"
+msgstr "Durée d’affichage de l’image"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Logo Erase"
+msgstr "Effacement du logo"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Mask File"
+msgstr "Fichier de masque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Generate HDR from SDR"
+msgstr "Générer une image HDR à partir d’une image SDR"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Motion Blur"
+msgstr "Flou de mouvement"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Blur Factor"
+msgstr "Facteur de flou"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Antiflicker"
+msgstr "Réduction du scintillement"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Window Size"
+msgstr "Taille de la fenêtre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Softening Size"
+msgstr "Taille du lissage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Denoise"
+msgstr "Réduction du bruit"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Luma Spatial"
+msgstr "Luminance spatiale"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Chroma Spatial"
+msgstr "Chrominance spatiale"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Luma Temporal"
+msgstr "Luminance temporelle"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Chroma Temporal"
+msgstr "Chrominance temporelle"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Color Scheme"
+msgstr "Palette de couleurs"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1%"
+msgstr "%1 %"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Queue"
+msgstr "File d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1s"
+msgstr "%1 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1m"
+msgstr "%1 min"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1h %2m"
+msgstr "%1 h %2 min"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1h"
+msgstr "%1 h"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sort queue"
+msgstr "Trier la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove from queue"
+msgstr "Retirer de la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add files to queue"
+msgstr "Ajouter des fichiers à la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Move queue item"
+msgstr "Déplacer l’élément dans la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Drop files here, or add media from your library."
+msgstr "Déposez des fichiers ici ou ajoutez des médias depuis votre médiathèque."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reverse order"
+msgstr "Inverser l’ordre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Move earlier"
+msgstr "Déplacer vers le début"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Move later"
+msgstr "Déplacer vers la fin"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Save queue to file"
+msgstr "Enregistrer la file d’attente dans un fichier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Clear queue"
+msgstr "Vider la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close queue"
+msgstr "Fermer la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add Subtitle Tracks"
+msgstr "Ajouter des pistes de sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add Audio Tracks"
+msgstr "Ajouter des pistes audio"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1 — %2"
+msgstr "%1 — %2"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This playlist has no files that VLC can use."
+msgstr "Cette liste de lecture ne contient aucun fichier que VLC peut utiliser."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "The files in this playlist are not available."
+msgstr "Les fichiers de cette liste de lecture ne sont pas disponibles."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Loading playlist…"
+msgstr "Chargement de la liste de lecture…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select a file, then select the tracks for that file."
+msgstr "Sélectionnez un fichier, puis les pistes à utiliser pour ce fichier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "File for these tracks"
+msgstr "Fichier pour ces pistes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select tracks"
+msgstr "Sélectionner les pistes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Properties & Metadata"
+msgstr "Propriétés et métadonnées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this playlist. Try again."
+msgstr "VLC ne peut pas lire cette liste de lecture. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlist Details"
+msgstr "Détails de la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "You cannot change this playlist here."
+msgstr "Vous ne pouvez pas modifier cette liste de lecture ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Change thumbnail"
+msgstr "Changer la vignette"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove thumbnail"
+msgstr "Supprimer la vignette"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Video files"
+msgstr "Fichiers vidéo"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Audio files"
+msgstr "Fichiers audio"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Other files"
+msgstr "Autres fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Unavailable files"
+msgstr "Fichiers indisponibles"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Unknown durations"
+msgstr "Durées inconnues"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Created"
+msgstr "Création"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Saved in the VLC library"
+msgstr "Enregistrée dans la médiathèque VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Queue views"
+msgstr "Affichages de la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Edit external tracks"
+msgstr "Modifier les pistes externes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add external tracks"
+msgstr "Ajouter des pistes externes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Refresh"
+msgstr "Actualiser"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Refresh output devices"
+msgstr "Actualiser les périphériques de sortie"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No tracks available"
+msgstr "Aucune piste disponible"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Tracks saved. Stop and play this file to use all changes."
+msgstr "Pistes enregistrées. Arrêtez puis relancez la lecture de ce fichier pour appliquer toutes les modifications."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select track folder"
+msgstr "Sélectionner le dossier des pistes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "All languages"
+msgstr "Toutes les langues"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "From Computer"
+msgstr "Depuis l’ordinateur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "From OpenSubtitles"
+msgstr "Depuis OpenSubtitles"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "From Link"
+msgstr "Depuis un lien"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "To This File"
+msgstr "À ce fichier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "To This Folder"
+msgstr "À ce dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "To Playlist"
+msgstr "À une liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add Subtitles"
+msgstr "Ajouter des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read these files. Try again."
+msgstr "VLC ne peut pas lire ces fichiers. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this folder. Try again."
+msgstr "VLC ne peut pas lire ce dossier. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not search for subtitles. Try again."
+msgstr "VLC n’a pas pu rechercher de sous-titres. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not save the API key. Check it and try again."
+msgstr "VLC n’a pas pu enregistrer la clé API. Vérifiez-la et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not read these files. Try again."
+msgstr "VLC n’a pas pu lire ces fichiers. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save these tracks. Try again."
+msgstr "VLC ne peut pas enregistrer ces pistes. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC kept the changes that it saved. Try Save again for the other files."
+msgstr "VLC a conservé les modifications enregistrées. Sélectionnez de nouveau Enregistrer pour les autres fichiers."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search subtitles"
+msgstr "Rechercher des sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Paste a direct subtitle file link"
+msgstr "Collez un lien direct vers un fichier de sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Drop subtitle files, folders or links here"
+msgstr "Déposez ici des fichiers de sous-titres, des dossiers ou des liens"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Drop audio files or folders here"
+msgstr "Déposez ici des fichiers audio ou des dossiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select %1"
+msgstr "Sélectionner %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select tracks for %1"
+msgstr "Sélectionner les pistes pour %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Searching subtitles…"
+msgstr "Recherche de sous-titres…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Matching tracks…"
+msgstr "Association des pistes…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Loading files…"
+msgstr "Chargement des fichiers…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No subtitles found. Try another title or language."
+msgstr "Aucun sous-titre trouvé. Essayez un autre titre ou une autre langue."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Paste a direct subtitle file link, then select Add."
+msgstr "Collez un lien direct vers un fichier de sous-titres, puis sélectionnez Ajouter."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select a folder or choose track files from your computer."
+msgstr "Sélectionnez un dossier ou choisissez des fichiers de pistes sur votre ordinateur."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "There are no media files here."
+msgstr "Il n’y a aucun fichier multimédia ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Set up OpenSubtitles"
+msgstr "Configurer OpenSubtitles"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC will remove the saved folder matches."
+msgstr "VLC supprimera les associations enregistrées pour ce dossier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Automatic matching is off in Settings. These choices apply to the current files."
+msgstr "L’association automatique est désactivée dans les paramètres. Ces choix s’appliquent aux fichiers actuels."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC will use these matches for new files in this folder."
+msgstr "VLC utilisera ces associations pour les nouveaux fichiers de ce dossier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC will save these choices for the current files."
+msgstr "VLC enregistrera ces choix pour les fichiers actuels."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC will also save the folder matches."
+msgstr "VLC enregistrera aussi les associations du dossier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles setup"
+msgstr "Configuration d’OpenSubtitles"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Clear selected tracks"
+msgstr "Effacer les pistes sélectionnées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Keep folder matches"
+msgstr "Conserver les associations du dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove folder matches"
+msgstr "Supprimer les associations du dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose files…"
+msgstr "Choisir des fichiers…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Done"
+msgstr "Terminé"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Embedded Tracks"
+msgstr "Pistes intégrées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "External Tracks"
+msgstr "Pistes externes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Output Device"
+msgstr "Périphérique de sortie"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show Preferences"
+msgstr "Afficher les préférences"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "New Playlist"
+msgstr "Nouvelle liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Save the playlist with this name and thumbnail."
+msgstr "Enregistrez la liste de lecture avec ce nom et cette vignette."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "e.g., Favorite Videos"
+msgstr "Par exemple : Vidéos préférées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add thumbnail"
+msgstr "Ajouter une vignette"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select Files"
+msgstr "Sélectionner des fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "These files will be added to the playlist."
+msgstr "Ces fichiers seront ajoutés à la liste de lecture."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Drop files here or select files."
+msgstr "Déposez des fichiers ici ou sélectionnez-les."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select files"
+msgstr "Sélectionner des fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove %1"
+msgstr "Supprimer %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add files"
+msgstr "Ajouter des fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, c-format
+msgid "%n item"
+msgid_plural "%n items"
+msgstr[0] "%n élément"
+msgstr[1] "%n éléments"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, c-format
+msgid "%n bookmark"
+msgid_plural "%n bookmarks"
+msgstr[0] "%n signet"
+msgstr[1] "%n signets"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playback Statistics"
+msgstr "Statistiques de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Decoded video frames"
+msgstr "Images vidéo décodées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Displayed video frames"
+msgstr "Images vidéo affichées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Late video frames"
+msgstr "Images vidéo en retard"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Lost video frames"
+msgstr "Images vidéo perdues"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Decoded audio blocks"
+msgstr "Blocs audio décodés"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Played audio blocks"
+msgstr "Blocs audio lus"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Lost audio blocks"
+msgstr "Blocs audio perdus"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Corrupted packets"
+msgstr "Paquets endommagés"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles uses your saved API key."
+msgstr "OpenSubtitles utilise votre clé API enregistrée."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OpenSubtitles uses the app key. Downloads have a daily limit for each IP address."
+msgstr "OpenSubtitles utilise la clé de l’application. Le nombre de téléchargements par jour est limité pour chaque adresse IP."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add an API key to search for and download subtitles from OpenSubtitles."
+msgstr "Ajoutez une clé API pour rechercher et télécharger des sous-titres depuis OpenSubtitles."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Change API key"
+msgstr "Changer la clé API"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Orange"
+msgstr "Orange"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Cyan"
+msgstr "Cyan"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Pink"
+msgstr "Rose"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close setup"
+msgstr "Fermer la configuration"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Welcome to VLC!"
+msgstr "Bienvenue dans VLC !"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC is a free and open source media player.\nPlay videos and music from files, discs, and network streams.\nYou can change all settings later."
+msgstr "VLC est un lecteur multimédia libre et gratuit.\nLisez des vidéos et de la musique depuis des fichiers, des disques et des flux réseau.\nVous pourrez modifier tous les paramètres plus tard."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a media folder to start with"
+msgstr "Choisissez un dossier de médias pour commencer"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Media folder"
+msgstr "Dossier de médias"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This build has no media library. You can open files from the player."
+msgstr "Cette version ne comprend pas de médiathèque. Vous pouvez ouvrir des fichiers depuis le lecteur."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Get cover art and media information online"
+msgstr "Obtenir les pochettes et les informations sur les médias en ligne"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Online media information"
+msgstr "Informations sur les médias en ligne"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC does not collect personal data. If you allow online media information, VLC can request cover art and track details from online services. These requests can identify your media to those services. Clear the option to keep these requests off."
+msgstr "VLC ne collecte aucune donnée personnelle. Si vous autorisez les informations sur les médias en ligne, VLC peut demander des pochettes et des détails sur les pistes à des services en ligne. Ces requêtes peuvent révéler les médias que vous utilisez à ces services. Décochez cette option pour désactiver ces requêtes."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Select your preferred theme and color."
+msgstr "Choisissez votre thème et votre couleur préférés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Learn the basic keyboard shortcuts."
+msgstr "Découvrez les principaux raccourcis clavier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Find the full list in the menu."
+msgstr "La liste complète se trouve dans le menu."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC could not save this change. Check the key and try again."
+msgstr "VLC n’a pas pu enregistrer cette modification. Vérifiez la clé et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This app can use OpenSubtitles without a personal key. You can add your own application API key here. VLC stores it in your profile."
+msgstr "Cette application peut utiliser OpenSubtitles sans clé personnelle. Vous pouvez ajouter ici votre propre clé API d’application. VLC l’enregistre dans votre profil."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add your OpenSubtitles application API key. VLC stores it in your profile."
+msgstr "Ajoutez votre clé API d’application OpenSubtitles. VLC l’enregistre dans votre profil."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Get an API key"
+msgstr "Obtenir une clé API"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use app key"
+msgstr "Utiliser la clé de l’application"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove key"
+msgstr "Supprimer la clé"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Unwatched First"
+msgstr "Non visionnés en premier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Watched First"
+msgstr "Visionnés en premier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Newest First"
+msgstr "Plus récents en premier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Oldest First"
+msgstr "Plus anciens en premier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Title A-Z"
+msgstr "Titre de A à Z"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Title Z-A"
+msgstr "Titre de Z à A"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Artist A-Z"
+msgstr "Artiste de A à Z"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Artist Z-A"
+msgstr "Artiste de Z à A"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Album A-Z"
+msgstr "Album de A à Z"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Album Z-A"
+msgstr "Album de Z à A"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Track Number Ascending"
+msgstr "Numéro de piste croissant"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Track Number Descending"
+msgstr "Numéro de piste décroissant"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "URI Ascending"
+msgstr "URI croissante"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "URI Descending"
+msgstr "URI décroissante"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Disc Number Ascending"
+msgstr "Numéro de disque croissant"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Disc Number Descending"
+msgstr "Numéro de disque décroissant"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open player"
+msgstr "Ouvrir le lecteur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Hide mini player"
+msgstr "Masquer le mini-lecteur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Find artist"
+msgstr "Rechercher l’artiste"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Collapse Settings"
+msgstr "Réduire les paramètres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Expand Settings"
+msgstr "Développer les paramètres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close Equalizer"
+msgstr "Fermer l’égaliseur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open Equalizer"
+msgstr "Ouvrir l’égaliseur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid " gain in dB"
+msgstr " : gain en dB"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Gain in dB (−20 to 20)"
+msgstr "Gain en dB (de −20 à 20)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remember last volume"
+msgstr "Mémoriser le dernier volume"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Always starts at:"
+msgstr "Toujours démarrer à :"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Startup volume in percent"
+msgstr "Volume au démarrage en pourcentage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Volume on the next VLC startup (0–300%)."
+msgstr "Volume au prochain démarrage de VLC (0–300 %)."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sort by name"
+msgstr "Trier par nom"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sort by type"
+msgstr "Trier par type"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Priority"
+msgstr "Priorité"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sort by priority. VLC uses priority to select a plugin when more than one plugin can do the same task."
+msgstr "Trier par priorité. VLC utilise la priorité pour choisir un module lorsque plusieurs modules peuvent effectuer la même tâche."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1, %2, priority %3"
+msgstr "%1, %2, priorité %3"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1\nType: %2\nPriority: %3\nPlugin: %4"
+msgstr "%1\nType : %2\nPriorité : %3\nModule : %4"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No plugins found."
+msgstr "Aucun module trouvé."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search plugins"
+msgstr "Rechercher des modules"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reset %1"
+msgstr "Réinitialiser %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add to queue"
+msgstr "Ajouter à la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove from sidebar"
+msgstr "Retirer du panneau latéral"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Recent files"
+msgstr "Fichiers récents"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Recent"
+msgstr "Récents"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add media"
+msgstr "Ajouter des médias"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add item"
+msgstr "Ajouter un élément"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Create playlist"
+msgstr "Créer une liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add Network Stream"
+msgstr "Ajouter un flux réseau"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add to Queue"
+msgstr "Ajouter à la file d’attente"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add to sidebar"
+msgstr "Ajouter au panneau latéral"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Edit Subtitle Tracks"
+msgstr "Modifier les pistes de sous-titres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Edit Audio Tracks"
+msgstr "Modifier les pistes audio"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Resync"
+msgstr "Resynchroniser"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove from playlist"
+msgstr "Retirer de la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Most played first"
+msgstr "Plus lus en premier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Most visited first"
+msgstr "Plus visités en premier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlist order"
+msgstr "Ordre de la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Continue Watching"
+msgstr "Reprendre la lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Listen Again"
+msgstr "Réécouter"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Frequently Visited Folders"
+msgstr "Dossiers souvent consultés"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Frequently Visited Playlists"
+msgstr "Listes de lecture souvent consultées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Frequently Listened Artists"
+msgstr "Artistes souvent écoutés"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No videos in your history."
+msgstr "Votre historique ne contient aucune vidéo."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No music in your history."
+msgstr "Votre historique ne contient aucune musique."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open a library folder to see it here."
+msgstr "Ouvrez un dossier de la médiathèque pour le voir ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open a playlist to see it here."
+msgstr "Ouvrez une liste de lecture pour la voir ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Play music to see artists here."
+msgstr "Écoutez de la musique pour voir les artistes ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This playlist is empty."
+msgstr "Cette liste de lecture est vide."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Create a playlist to collect your favorite media."
+msgstr "Créez une liste de lecture pour regrouper vos médias préférés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open a network stream to add it here."
+msgstr "Ouvrez un flux réseau pour l’ajouter ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add a folder to your library to see your media here."
+msgstr "Ajoutez un dossier à votre médiathèque pour voir vos médias ici."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove from Favorites"
+msgstr "Retirer des favoris"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Export Playlist"
+msgstr "Exporter la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Mark as Unwatched"
+msgstr "Marquer comme non visionné"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Mark as Watched"
+msgstr "Marquer comme visionné"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Show in File Explorer"
+msgstr "Afficher dans l’explorateur de fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Go to Source"
+msgstr "Aller à la source"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add File"
+msgstr "Ajouter un fichier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add Folder"
+msgstr "Ajouter un dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Library settings"
+msgstr "Paramètres de la médiathèque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Edit playlist"
+msgstr "Modifier la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open compact library"
+msgstr "Ouvrir la médiathèque compacte"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Grid View"
+msgstr "Vue en grille"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "More library actions"
+msgstr "Autres actions de la médiathèque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Sort options"
+msgstr "Options de tri"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "View options"
+msgstr "Options d’affichage"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open full library"
+msgstr "Ouvrir la médiathèque complète"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search library"
+msgstr "Rechercher dans la médiathèque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Changes are saved automatically."
+msgstr "Les modifications sont enregistrées automatiquement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Move playlist item"
+msgstr "Déplacer l’élément de la liste de lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No media matches your search."
+msgstr "Aucun média ne correspond à votre recherche."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open File(s)"
+msgstr "Ouvrir des fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open Network Stream"
+msgstr "Ouvrir un flux réseau"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open Disc"
+msgstr "Ouvrir un disque"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open Capture Device"
+msgstr "Ouvrir un périphérique de capture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Recent files need the media library."
+msgstr "La médiathèque est nécessaire pour afficher les fichiers récents."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No recent files"
+msgstr "Aucun fichier récent"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Recent file history is off"
+msgstr "L’historique des fichiers récents est désactivé"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Clear Recent Files"
+msgstr "Effacer les fichiers récents"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Profile (%1)"
+msgstr "Profil (%1)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Customize Player"
+msgstr "Personnaliser le lecteur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "About VLC"
+msgstr "À propos de VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1 is already used for %2. Reassign it?"
+msgstr "%1 est déjà utilisé pour %2. Le réattribuer ?"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Shortcut already in use"
+msgstr "Raccourci déjà utilisé"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Folder Info"
+msgstr "Informations sur le dossier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot read this folder. Check the folder and try again."
+msgstr "VLC ne peut pas lire ce dossier. Vérifiez le dossier et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "%1 %2 (%3)"
+msgstr "%1 %2 (%3)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Loading folder…"
+msgstr "Chargement du dossier…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Counts and size apply to this folder only."
+msgstr "Les nombres et la taille concernent uniquement ce dossier."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Subfolders"
+msgstr "Sous-dossiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Size of files"
+msgstr "Taille des fichiers"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Modified"
+msgstr "Modification"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Access"
+msgstr "Accès"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Read and write"
+msgstr "Lecture et écriture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot open these streams. Check the links and try again."
+msgstr "VLC ne peut pas ouvrir ces flux. Vérifiez les liens et réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Network URL"
+msgstr "URL réseau"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Enter one link on each line."
+msgstr "Saisissez un lien par ligne."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "e.g., https://www.example.com/stream.avi"
+msgstr "Par exemple : https://www.example.com/stream.avi"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Network URLs"
+msgstr "URL réseau"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlist Name (optional)"
+msgstr "Nom de la liste de lecture (facultatif)"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Save these links in a playlist with this name."
+msgstr "Enregistrez ces liens dans une liste de lecture portant ce nom."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "To save a playlist, turn on the media library in Settings. Then restart VLC."
+msgstr "Pour enregistrer une liste de lecture, activez la médiathèque dans les paramètres, puis redémarrez VLC."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "e.g., Favorite TV Channels"
+msgstr "Par exemple : Chaînes TV préférées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Opening…"
+msgstr "Ouverture…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close shortcut editor"
+msgstr "Fermer l’éditeur de raccourcis"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search Keyboard Shortcuts…"
+msgstr "Rechercher des raccourcis clavier…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "All Fields"
+msgstr "Tous les champs"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Global Hotkey"
+msgstr "Raccourci global"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search fields"
+msgstr "Champs de recherche"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No matching shortcuts"
+msgstr "Aucun raccourci correspondant"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Record global shortcut for %1"
+msgstr "Enregistrer un raccourci global pour %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Record shortcut for %1"
+msgstr "Enregistrer un raccourci pour %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Other bindings: %1"
+msgstr "Autres raccourcis : %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Press a shortcut…"
+msgstr "Appuyez sur un raccourci…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Clear all shortcuts for this action"
+msgstr "Effacer tous les raccourcis de cette action"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playback\nSpeed"
+msgstr "Vitesse de\nlecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Forward\n10s"
+msgstr "Avancer\n10 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Backward\n10s"
+msgstr "Reculer\n10 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Forward\n15s"
+msgstr "Avancer\n15 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Backward\n15s"
+msgstr "Reculer\n15 s"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Picture in\nPicture"
+msgstr "Image dans\nl’image"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Right\nSidebar"
+msgstr "Panneau\ndroit"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Playlist\nName"
+msgstr "Nom de la liste\nde lecture"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot save this layout. Try again."
+msgstr "VLC ne peut pas enregistrer cette disposition. Réessayez."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Top center"
+msgstr "En haut au centre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Bottom center"
+msgstr "En bas au centre"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Above controls"
+msgstr "Au-dessus des commandes"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Remove from player"
+msgstr "Retirer du lecteur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Move %1"
+msgstr "Déplacer %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close player editor"
+msgstr "Fermer l’éditeur du lecteur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Drag items to the player to add or move them. Drag items into this box to remove them."
+msgstr "Faites glisser des éléments vers le lecteur pour les ajouter ou les déplacer. Faites-les glisser dans cette zone pour les retirer."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add %1"
+msgstr "Ajouter %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Welcome — VLC Media Player"
+msgstr "Bienvenue — Lecteur multimédia VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot add this add-on."
+msgstr "VLC ne peut pas ajouter cette extension."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot remove this add-on."
+msgstr "VLC ne peut pas supprimer cette extension."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Add-ons"
+msgstr "Extensions"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Adding…"
+msgstr "Ajout…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Removing…"
+msgstr "Suppression…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Unavailable"
+msgstr "Indisponible"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Loading add-ons…"
+msgstr "Chargement des extensions…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No add-ons found."
+msgstr "Aucune extension trouvée."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search add-ons"
+msgstr "Rechercher des extensions"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Loading…"
+msgstr "Chargement…"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Find more extensions"
+msgstr "Trouver d’autres extensions"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close add-on details"
+msgstr "Fermer les détails de l’extension"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot change this add-on because it was added manually."
+msgstr "VLC ne peut pas modifier cette extension, car elle a été ajoutée manuellement."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Open website"
+msgstr "Ouvrir le site web"
+
+#. Redesign translation by Codex (first pass; review welcome).
+#, c-format
+msgid "%n plugin"
+msgid_plural "%n plugins"
+msgstr[0] "%n module"
+msgstr[1] "%n modules"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Songs"
+msgstr "Morceaux"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "MC"
+msgstr "MC"
