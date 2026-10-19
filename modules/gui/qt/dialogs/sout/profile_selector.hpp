@@ -82,6 +82,8 @@ public:
 private:
     void registerCodecs();
     void registerFilters();
+    void retranslateFilters();
+    void updateMuxerWarning();
     void fillProfile( const QString& qs );
     void fillProfileOldFormat( const QString& qs );
     typedef QSet<QString> resultset;

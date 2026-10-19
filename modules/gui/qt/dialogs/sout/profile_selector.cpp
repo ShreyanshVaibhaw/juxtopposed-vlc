@@ -40,6 +40,7 @@
 #include <QUrl>
 #include <QListWidgetItem>
 #include <QFontMetrics>
+#include <QSignalBlocker>
 
 #include <cassert>
 #include <vlc_modules.h>
@@ -47,6 +48,11 @@
 #define CATPROP2NAME( val ) QString("valueholder_%1").arg( val )
 #define CATANDPROP( cat, prop ) QString("%1_%2").arg( cat ).arg( prop )
 #define OLDFORMAT "^\\w+;\\d+;\\d+;\\d+;"
+
+namespace {
+constexpr int FilterNameRole = Qt::UserRole + 1;
+constexpr int FilterHelpRole = Qt::UserRole + 2;
+}
 
 VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
 {
@@ -505,6 +511,23 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     fillProfile( value );
     muxSelected();
     codecSelected();
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this,
+                [this, editing = !qs_name.isEmpty(), saveButton, cancelButton] {
+            auto* scale = ui.valueholder_vcodec_scale;
+            const QString customScale = scale->currentText();
+            const bool hasCustomScale = customScale != scale->itemText(scale->currentIndex());
+            const QSignalBlocker blocker(scale);
+            ui.retranslateUi(this);
+            setWindowTitle(editing ? qtr("Edit Profile") : qtr("Create Profile"));
+            saveButton->setText(editing ? qtr("Save") : qtr("Create"));
+            cancelButton->setText(qtr("Cancel"));
+            scale->setItemText(0, qtr("Auto"));
+            if (hasCustomScale) scale->setEditText(customScale);
+            retranslateFilters();
+            updateMuxerWarning();
+        });
 }
 
 void VLCProfileEditor::loadCapabilities()
@@ -550,12 +573,30 @@ inline void VLCProfileEditor::registerFilters()
         item->setCheckState( Qt::Unchecked );
         item->setToolTip( QString( module_get_help( p_module ) ) );
         item->setData( Qt::UserRole, QString( module_get_object( p_module ) ) );
+        item->setData(FilterNameRole, QByteArray(module_GetLongName(p_module)));
+        item->setData(FilterHelpRole, QByteArray(module_get_help(p_module)));
         listWidget->addItem( item );
     }
     module_list_free (p_all);
 
     ui.valueholder_video_filters->sortItems();
     ui.valueholder_audio_filters->sortItems();
+    // Keep the canonical order when translating filter names.
+    retranslateFilters();
+}
+
+void VLCProfileEditor::retranslateFilters()
+{
+    for (auto* list : {ui.valueholder_video_filters, ui.valueholder_audio_filters})
+    {
+        const QSignalBlocker blocker(list);
+        for (int row = 0; row < list->count(); ++row)
+        {
+            auto* item = list->item(row);
+            item->setText(qtr(item->data(FilterNameRole).toByteArray().constData()));
+            item->setToolTip(qtr(item->data(FilterHelpRole).toByteArray().constData()));
+        }
+    }
 }
 
 inline void VLCProfileEditor::registerCodecs()
@@ -623,6 +664,7 @@ inline void VLCProfileEditor::registerCodecs()
 
 #define ADD_SCALING( factor ) ui.valueholder_vcodec_scale->addItem( factor );
     ADD_SCALING( qtr("Auto") );
+    ui.valueholder_vcodec_scale->setItemData(0, QStringLiteral("0"));
     ADD_SCALING( "1" )
     ADD_SCALING( "0.25" )
     ADD_SCALING( "0.5" )
@@ -664,6 +706,13 @@ void VLCProfileEditor::muxSelected()
     SETYESNOSTATE( capstream, "capstream" );
     SETYESNOSTATE( capchaps, "capchaps" );
 
+#undef SETYESNOSTATE
+    updateMuxerWarning();
+}
+
+void VLCProfileEditor::updateMuxerWarning()
+{
+    const auto* current = ui.buttonGroup->checkedButton();
     int textsize = QFontMetrics(ui.muxerwarning->font()).ascent();
     if( current->property("module").toString() == "avformat" )
         ui.muxerwarning->setText(
@@ -680,9 +729,6 @@ void VLCProfileEditor::muxSelected()
                     );
     else
         ui.muxerwarning->setText("");
-    return;
-
-#undef SETYESNOSTATE
 }
 
 void VLCProfileEditor::codecSelected()
@@ -744,6 +790,17 @@ void VLCProfileEditor::fillProfile( const QString& qs )
             {
                 QComboBox *box = qobject_cast<QComboBox *>( object );
                 box->setCurrentIndex( box->findData( value ) );
+                if (box == ui.valueholder_vcodec_scale)
+                {
+                    // Old profiles can contain a translated Auto caption.
+                    bool numeric;
+                    const double factor = value.toDouble(&numeric);
+                    if (!numeric || factor <= 0)
+                    {
+                        box->setCurrentIndex(0);
+                        continue;
+                    }
+                }
                 if ( box->lineEdit() && box->currentIndex() == -1 )
                     box->lineEdit()->setText( value );
             }
@@ -796,7 +853,7 @@ void VLCProfileEditor::fillProfileOldFormat( const QString& qs )
 
     ui.valueholder_video_codec->setCurrentIndex( ui.valueholder_video_codec->findData( options[4] ) );
     ui.valueholder_vcodec_bitrate->setValue( options[5].toInt() );
-    if ( options[6].toInt() > 0 )
+    if ( options[6].toDouble() > 0 )
         ui.valueholder_vcodec_scale->setEditText( options[6] );
     else
         ui.valueholder_vcodec_scale->setCurrentIndex( 0 );
@@ -880,6 +937,8 @@ QString VLCProfileEditor::transcodeValue()
         {
             const QComboBox *box = qobject_cast<const QComboBox *>( object );
             value = currentData( box ).toString();
+            if (box->isEditable() && box->currentText() != box->itemText(box->currentIndex()))
+                value = box->currentText();
             if ( value.isEmpty() && box->lineEdit() ) value = box->lineEdit()->text();
         }
         else if( object->inherits( "QLineEdit" ) )
