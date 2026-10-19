@@ -36728,3 +36728,16 @@ msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 #, fuzzy
 #~ msgid "Select the protocol for the URL."
 #~ msgstr "ជ្រើស​ពណ៌​មួយ​នៅ​ក្នុង​វីដេអូ"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "ភាសាប្រព័ន្ធ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ជ្រើសរើសភាសាសម្រាប់ចំណុចប្រទាក់។ ការផ្លាស់ប្ដូរមានប្រសិទ្ធភាពភ្លាមៗ។ អត្ថបទដែលមិនទាន់បកប្រែនឹងបង្ហាញជាភាសាអង់គ្លេស។"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC មិនអាចផ្ទុកភាសានេះបានទេ។"

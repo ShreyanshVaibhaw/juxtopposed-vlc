@@ -35433,3 +35433,16 @@ msgstr "Lista del gestionari de mèdias"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Dobrir sostítols"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Lenga del sistèma"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Causissètz una lenga per l’interfàcia. Los cambiaments s’aplican sul pic. Lo tèxte sens traduccion es afichat en anglés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC pòt pas cargar aquesta lenga."

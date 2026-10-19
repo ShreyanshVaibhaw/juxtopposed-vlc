@@ -31720,3 +31720,16 @@ msgstr "મીડિયા સંચાલક યાદી"
 #, fuzzy
 #~ msgid "Video Filters..."
 #~ msgstr "વિડિઓ ફાઇલો"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "સિસ્ટમની ભાષા"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ઇન્ટરફેસ માટે ભાષા પસંદ કરો. ફેરફારો તરત જ લાગુ થાય છે. અનુવાદ ન થયેલું લખાણ અંગ્રેજીમાં દેખાય છે."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC આ ભાષા લોડ કરી શકતું નથી."

@@ -30609,3 +30609,16 @@ msgstr ""
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Open onderskrifte..."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Stelseltaal"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Kies ’n taal vir die koppelvlak. Veranderings word dadelik toegepas. Teks sonder ’n vertaling word in Engels gewys."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC kan nie hierdie taal laai nie."

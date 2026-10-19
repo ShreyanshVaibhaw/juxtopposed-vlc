@@ -33046,3 +33046,16 @@ msgstr "Тасушы меңгеру тізімі"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Субтитрлер ашу..."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Жүйе тілі"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Интерфейс тілін таңдаңыз. Өзгерістер бірден қолданылады. Аударылмаған мәтін ағылшын тілінде көрсетіледі."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC бұл тілді жүктей алмайды."

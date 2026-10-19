@@ -31207,3 +31207,16 @@ msgstr "මාධ්‍ය කළමණාකරණ ලැයිස්තුව"
 #, fuzzy
 #~ msgid "Show the current item"
 #~ msgstr "වත්මන් අයිතමය පුනරාවර්තනය කරන්න"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "පද්ධතියේ භාෂාව"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "අතුරු මුහුණත සඳහා භාෂාවක් තෝරන්න. වෙනස්කම් වහාම යෙදේ. පරිවර්තනය නොකළ පෙළ ඉංග්‍රීසියෙන් පෙන්වයි."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC හට මෙම භාෂාව පූරණය කළ නොහැක."

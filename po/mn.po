@@ -30097,3 +30097,16 @@ msgstr "Дамжуулга зохицуулагчийн жагсаалт"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Дэд бичвэр нээх..."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Системийн хэл"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Интерфейсийн хэлийг сонгоно уу. Өөрчлөлтүүд шууд хэрэгжинэ. Орчуулаагүй текстийг англи хэлээр харуулна."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC энэ хэлийг ачаалж чадсангүй."

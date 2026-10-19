@@ -30455,3 +30455,16 @@ msgstr ""
 #, fuzzy
 #~ msgid "Advanced video filter controls"
 #~ msgstr "&Ardrialtáin"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Teanga an chórais"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Roghnaigh teanga don chomhéadan. Cuirtear athruithe i bhfeidhm láithreach. Taispeántar téacs gan aistriúchán i mBéarla."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "Ní féidir le VLC an teanga seo a lódáil."

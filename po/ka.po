@@ -35121,3 +35121,16 @@ msgstr "Meta-ინფორმაცია"
 
 #~ msgid "Open Subtitles"
 #~ msgstr "ტიტრების გახსნა"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "სისტემის ენა"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "აირჩიეთ ინტერფეისის ენა. ცვლილებები დაუყოვნებლივ გამოიყენება. უთარგმნელი ტექსტი ინგლისურად გამოჩნდება."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ვერ ტვირთავს ამ ენას."

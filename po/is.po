@@ -30870,3 +30870,16 @@ msgstr "Listi fyrir miðlastjórnun"
 
 #~ msgid "Streaming Output"
 #~ msgstr "Frálag streymis"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Tungumál kerfis"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Veldu tungumál viðmótsins. Breytingar taka strax gildi. Óþýddur texti birtist á ensku."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC getur ekki hlaðið inn þessu tungumáli."

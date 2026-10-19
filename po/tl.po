@@ -31388,3 +31388,16 @@ msgstr "_Nabigit"
 #, fuzzy
 #~ msgid "&Save Playlist..."
 #~ msgstr "_Fayl"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Wika ng sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Pumili ng wika para sa interface. Agad na ilalapat ang mga pagbabago. Ipapakita sa Ingles ang tekstong walang salin."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "Hindi ma-load ng VLC ang wikang ito."

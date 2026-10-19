@@ -32995,3 +32995,16 @@ msgstr "ਮੀਡਿਆ ਮੈਨੇਜਰ ਲਿਸਟ"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "ਐਡ-ਐਨ ਮੈਨੇਜਰ"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "ਸਿਸਟਮ ਦੀ ਭਾਸ਼ਾ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ਇੰਟਰਫੇਸ ਲਈ ਭਾਸ਼ਾ ਚੁਣੋ। ਤਬਦੀਲੀਆਂ ਤੁਰੰਤ ਲਾਗੂ ਹੁੰਦੀਆਂ ਹਨ। ਬਿਨਾਂ ਅਨੁਵਾਦ ਵਾਲਾ ਪਾਠ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਦਿਖਾਇਆ ਜਾਂਦਾ ਹੈ।"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ਇਹ ਭਾਸ਼ਾ ਲੋਡ ਨਹੀਂ ਕਰ ਸਕਦਾ।"

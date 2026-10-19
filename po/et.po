@@ -36727,3 +36727,16 @@ msgstr "Meediahalduri loend"
 
 #~ msgid "Addon Manager"
 #~ msgstr "Lisade haldur"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Süsteemi keel"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Vali kasutajaliidese keel. Muudatused rakenduvad kohe. Tõlkimata tekst kuvatakse inglise keeles."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ei saa seda keelt laadida."

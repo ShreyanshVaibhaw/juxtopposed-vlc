@@ -27333,3 +27333,16 @@ msgstr "የ መገናኛ ዝርዝር አስታዳዳሪ"
 #, fuzzy
 #~ msgid "Don't Send"
 #~ msgstr "አታሳይ"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "የስርዓት ቋንቋ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ለበይነገጹ ቋንቋ ይምረጡ። ለውጦች ወዲያውኑ ይተገበራሉ። ያልተተረጎመ ጽሑፍ በእንግሊዝኛ ይታያል።"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ይህን ቋንቋ መጫን አይችልም።"

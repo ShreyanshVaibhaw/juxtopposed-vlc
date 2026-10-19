@@ -29146,3 +29146,16 @@ msgstr ""
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Titra "
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Gjuha e sistemit"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Zgjidhni një gjuhë për ndërfaqen. Ndryshimet zbatohen menjëherë. Teksti pa përkthim shfaqet në anglisht."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nuk mund ta ngarkojë këtë gjuhë."

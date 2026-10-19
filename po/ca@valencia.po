@@ -32185,3 +32185,16 @@ msgstr "Llista de gestió d'elements multimèdia"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Llindar de filtre (%)"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Llengua del sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Trieu una llengua per a la interfície. Els canvis s’apliquen de seguida. El text sense traducció es mostra en anglés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "El VLC no pot carregar esta llengua."

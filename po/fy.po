@@ -32227,3 +32227,16 @@ msgstr "Mediabeherlist"
 
 #~ msgid "Filter threshold (%)"
 #~ msgstr "Filterdrempel (%)"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Systeemtaal"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Kies in taal foar de ynterface. Feroarings wurde daliks tapast. Tekst sûnder oersetting wurdt yn it Ingelsk werjûn."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC kin dizze taal net lade."

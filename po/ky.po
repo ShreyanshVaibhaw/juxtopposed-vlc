@@ -28540,3 +28540,16 @@ msgstr "Медиа-менеджер тизмеси"
 #, fuzzy
 #~ msgid "Subtitles Language"
 #~ msgstr "Субтитр тили"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Системанын тили"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Интерфейстин тилин тандаңыз. Өзгөртүүлөр дароо колдонулат. Которулбаган текст англис тилинде көрсөтүлөт."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC бул тилди жүктөй албайт."

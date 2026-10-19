@@ -30556,3 +30556,16 @@ msgstr "Rhestr Rheolwyr Cyfryngau"
 #, fuzzy
 #~ msgid "Black slot"
 #~ msgstr "Slot Ddu"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Iaith y system"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Dewiswch iaith y rhyngwyneb. Mae newidiadau’n dod i rym ar unwaith. Dangosir testun heb gyfieithiad yn Saesneg."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "Ni all VLC lwytho’r iaith hon."

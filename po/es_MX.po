@@ -32023,3 +32023,16 @@ msgstr "Lista del administrador multimedia"
 #, fuzzy
 #~ msgid "Configure Media Library"
 #~ msgstr "Biblioteca multimedia"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Idioma del sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Elija un idioma para la interfaz. Los cambios se aplican al instante. El texto sin traducción se muestra en inglés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC no puede cargar este idioma."

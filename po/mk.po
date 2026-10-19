@@ -28197,3 +28197,16 @@ msgstr ""
 #, fuzzy
 #~ msgid "Random off"
 #~ msgstr "Случајно"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Јазик на системот"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Изберете јазик за интерфејсот. Промените се применуваат веднаш. Непреведениот текст се прикажува на англиски."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC не може да го вчита овој јазик."

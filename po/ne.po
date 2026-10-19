@@ -36023,3 +36023,16 @@ msgstr "मिडिया प्रबन्धक सूची"
 #, fuzzy
 #~ msgid "Streaming Output"
 #~ msgstr "प्रवाह निर्गत"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "प्रणालीको भाषा"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "इन्टरफेसको भाषा छान्नुहोस्। परिवर्तनहरू तुरुन्त लागू हुन्छन्। अनुवाद नभएको पाठ अङ्ग्रेजीमा देखाइन्छ।"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ले यो भाषा लोड गर्न सक्दैन।"

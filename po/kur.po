@@ -28557,3 +28557,16 @@ msgstr ""
 
 #~ msgid "top"
 #~ msgstr "jor"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Zimanê pergalê"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Ji bo navrûyê zimanekî hilbijêre. Guherîn yekser tên sepandin. Nivîsa bê werger bi îngilîzî tê nîşandan."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nikare vî zimanî bar bike."

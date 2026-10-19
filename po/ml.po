@@ -32150,3 +32150,16 @@ msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 #, fuzzy
 #~ msgid "Random off"
 #~ msgstr "റാന്‍ഡം ഓഫ്"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "സിസ്റ്റത്തിന്റെ ഭാഷ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ഇന്റർഫേസിനായി ഒരു ഭാഷ തിരഞ്ഞെടുക്കുക. മാറ്റങ്ങൾ ഉടൻ പ്രാബല്യത്തിൽ വരും. പരിഭാഷയില്ലാത്ത വാചകം ഇംഗ്ലീഷിൽ കാണിക്കും."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC-ക്ക് ഈ ഭാഷ ലോഡ് ചെയ്യാനാകില്ല."

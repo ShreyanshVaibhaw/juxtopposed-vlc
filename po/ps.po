@@ -30850,3 +30850,16 @@ msgstr "_نويكيد"
 #, fuzzy
 #~ msgid "&Save Playlist..."
 #~ msgstr "_فايل"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "د سیستم ژبه"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "د کارن‌مخ لپاره ژبه وټاکئ. بدلونونه سمدستي پلي کېږي. نه ژباړل شوی متن په انګلیسي ښودل کېږي."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC دا ژبه نه شي پورته کولای."

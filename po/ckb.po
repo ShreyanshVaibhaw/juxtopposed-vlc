@@ -31374,3 +31374,16 @@ msgstr "لیستی بەڕێوەبەری ڕەنگاڵە"
 
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "کاتی ماوە: %i چرکە"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "زمانی سیستەم"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "زمانێک بۆ ڕووکارەکە هەڵبژێرە. گۆڕانکارییەکان دەستبەجێ جێبەجێ دەکرێن. دەقی وەرنەگێڕدراو بە ئینگلیزی پیشان دەدرێت."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ناتوانێت ئەم زمانە بار بکات."

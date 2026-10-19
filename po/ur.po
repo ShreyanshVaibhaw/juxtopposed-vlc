@@ -27040,3 +27040,16 @@ msgstr ""
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr ""
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "نظام کی زبان"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "انٹرفیس کے لیے زبان منتخب کریں۔ تبدیلیاں فوراً لاگو ہوتی ہیں۔ جس متن کا ترجمہ نہیں ہوا وہ انگریزی میں دکھایا جاتا ہے۔"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC یہ زبان لوڈ نہیں کر سکتا۔"

@@ -36771,3 +36771,16 @@ msgstr "Спіс медыякіраўніка"
 #, fuzzy
 #~ msgid "Automate picture coding mode"
 #~ msgstr "Рэжым кадавання відарысу"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Мова сістэмы"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Выберыце мову інтэрфейсу. Змены ўжываюцца адразу. Неперакладзены тэкст паказваецца па-англійску."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC не можа загрузіць гэтую мову."

@@ -32286,3 +32286,16 @@ msgstr "ಮಾಧ್ಯಮ ಮ್ಯಾನೇಜರ್ ಪಟ್ಟಿ"
 #, fuzzy
 #~ msgid "General Input"
 #~ msgstr "ಸಾಮಾನ್ಯ"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "ವ್ಯವಸ್ಥೆಯ ಭಾಷೆ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ಇಂಟರ್‌ಫೇಸ್‌ಗಾಗಿ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ. ಬದಲಾವಣೆಗಳು ತಕ್ಷಣ ಅನ್ವಯವಾಗುತ್ತವೆ. ಅನುವಾದಿಸದ ಪಠ್ಯವನ್ನು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ತೋರಿಸಲಾಗುತ್ತದೆ."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLCಗೆ ಈ ಭಾಷೆಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ."

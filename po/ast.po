@@ -33942,3 +33942,16 @@ msgstr "Llista del alministrador multimedia"
 #, fuzzy
 #~ msgid "Color fun"
 #~ msgstr "Color"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Llingua del sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Escueyi una llingua pa la interfaz. Los cambeos aplíquense nel intre. El testu ensin traducción amuésase n’inglés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nun pue cargar esta llingua."

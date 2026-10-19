@@ -30310,3 +30310,16 @@ msgstr "Liosta Media Manager"
 #, fuzzy
 #~ msgid "Speed of the subtitles:"
 #~ msgstr "Fosgail na fo-thiotalan"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Cànan an t-siostaim"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Tagh cànan airson an eadar-aghaidh. Bidh na h-atharraichean an gnìomh sa bhad. Nochdaidh teacsa gun eadar-theangachadh sa Bheurla."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "Chan urrainn do VLC an cànan seo a luchdadh."

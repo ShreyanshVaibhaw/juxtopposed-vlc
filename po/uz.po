@@ -28562,3 +28562,16 @@ msgstr "Media menejeri ro‘yxati"
 #, fuzzy
 #~ msgid "Save this Log..."
 #~ msgstr "...&sifatida saqlash"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Tizim tili"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Interfeys uchun tilni tanlang. O‘zgarishlar darhol qo‘llanadi. Tarjima qilinmagan matn ingliz tilida ko‘rsatiladi."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC bu tilni yuklay olmaydi."

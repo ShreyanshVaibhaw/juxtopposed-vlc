@@ -34679,3 +34679,16 @@ msgstr "Multimedijos tvarkytuvės sąrašas"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Atverti subtitrus"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Sistemos kalba"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Pasirinkite sąsajos kalbą. Pakeitimai pritaikomi iš karto. Neišverstas tekstas rodomas anglų kalba."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC negali įkelti šios kalbos."

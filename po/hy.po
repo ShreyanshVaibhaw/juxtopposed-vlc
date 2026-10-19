@@ -36144,3 +36144,16 @@ msgstr "Մեդիա Ղեկավարումների Ցուցակ"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Բացել ենթագրեր..."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Համակարգի լեզուն"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Ընտրեք միջերեսի լեզուն։ Փոփոխությունները կիրառվում են անմիջապես։ Չթարգմանված տեքստը ցուցադրվում է անգլերեն։"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC-ն չի կարող բեռնել այս լեզուն։"

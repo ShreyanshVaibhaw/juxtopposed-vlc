@@ -28950,3 +28950,16 @@ msgstr "မီဒီယာနှင့်အချက်အလက်(&I)"
 #, fuzzy
 #~ msgid "About this application"
 #~ msgstr "ပရိုဂရမ်"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "စနစ်ဘာသာစကား"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "မျက်နှာပြင်အတွက် ဘာသာစကားတစ်ခု ရွေးပါ။ အပြောင်းအလဲများ ချက်ချင်း အကျိုးသက်ရောက်မည်။ ဘာသာမပြန်ရသေးသော စာသားကို အင်္ဂလိပ်လို ပြမည်။"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC သည် ဤဘာသာစကားကို မတင်နိုင်ပါ။"

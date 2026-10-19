@@ -27958,3 +27958,16 @@ msgstr ""
 
 #~ msgid "Select the directory to save to"
 #~ msgstr "Saxlamaq üçün direktiv seçin"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Sistem dili"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "İnterfeys üçün dil seçin. Dəyişikliklər dərhal tətbiq olunur. Tərcümə edilməmiş mətn ingilis dilində göstərilir."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC bu dili yükləyə bilmir."

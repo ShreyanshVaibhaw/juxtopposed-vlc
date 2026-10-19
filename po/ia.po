@@ -28084,3 +28084,16 @@ msgstr ""
 #, fuzzy
 #~ msgid "Instances"
 #~ msgstr "Installar"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Lingua del systema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Selige un lingua pro le interfacie. Le cambios se applica immediatemente. Le texto sin traduction es monstrate in anglese."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC non pote cargar iste lingua."
