@@ -46755,3 +46755,21 @@ msgstr "出力ファイルの音量を増減します。\n0 = 変更なし。100
 #, qt-format
 msgid "No change"
 msgstr "変更なし"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:255
+#, qt-format
+msgid "This window shows up to %1 log lines."
+msgstr "このウィンドウには最大 %1 行のログを表示します。"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:257
+#, qt-format
+msgid "Log messages not shown: %1"
+msgstr "表示されなかったログメッセージ: %1"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:259
+#, qt-format
+msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
+msgstr "長いログメッセージは、このウィンドウに一部しか表示されないことがあります。完全なログを保存するには、設定で「ログを保存」をオンにしてください。変更後は VLC を再起動してください。"
