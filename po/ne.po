@@ -19864,9 +19864,11 @@ msgstr ""
 msgid "Update"
 msgstr "अद्यावधिक गर्नुहोस्"
 
+#. Qt placeholder correction by Codex (first pass; review welcome).
+#, qt-format
 #: modules/gui/qt/dialogs/epg.cpp:161
 msgid " (%1+ rated)"
-msgstr "(१ प्रतिशत + श्रेणी निर्धारण)"
+msgstr " (%1+ उमेर समूह)"
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -36023,7 +36025,6 @@ msgstr "मिडिया प्रबन्धक सूची"
 #, fuzzy
 #~ msgid "Streaming Output"
 #~ msgstr "प्रवाह निर्गत"
-
 
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "System language"
