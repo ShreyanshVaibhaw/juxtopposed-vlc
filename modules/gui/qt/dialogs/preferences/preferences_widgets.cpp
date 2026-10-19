@@ -34,6 +34,7 @@
 #include "widgets/native/searchlineedit.hpp"
 #include "util/vlchotkeyconverter.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/interface_translator.hpp"
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -63,6 +64,8 @@
 #include <QMenu>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QPointer>
+#include <QSignalBlocker>
 #include <QFont>
 #include <QToolButton>
 
@@ -167,6 +170,85 @@ ConfigControl *ConfigControl::createControl( module_config_t *item,
     return control;
 }
 
+namespace {
+void watchConfigProperty(QWidget* widget, const char* property, const char* source)
+{
+    const QByteArray text(source ? source : "");
+    const QByteArray name(property);
+    const auto update = [widget, name, text] {
+        widget->setProperty(name.constData(), qtr(text.constData()));
+    };
+    update();
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, widget, update);
+}
+
+template<typename Widget>
+Widget* translatedConfigWidget(const char* source, QWidget* parent, const char* property = "text")
+{
+    auto* widget = new Widget(source ? qtr(source) : QString(), parent);
+    watchConfigProperty(widget, property, source);
+    return widget;
+}
+
+void watchConfigHelp(QWidget* editor, QLabel* label, const module_config_t* config)
+{
+    if (!config->psz_longtext) return;
+    const QByteArray source(config->psz_longtext);
+    const QPointer<QLabel> caption(label);
+    const auto update = [editor, caption, source] {
+        const QString help = formatTooltip(qtr(source.constData()));
+        editor->setToolTip(help);
+        if (caption) caption->setToolTip(help);
+    };
+    update();
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, editor, update);
+}
+
+void watchConfigChoices(QComboBox* combo, const module_config_t* config)
+{
+    QList<QPair<QVariant, QByteArray>> sources;
+    const bool string = CONFIG_CLASS(config->i_type) == CONFIG_ITEM_STRING;
+    const bool directShow = qstrcmp(config->psz_name, "dshow-vdev") == 0
+                         || qstrcmp(config->psz_name, "dshow-adev") == 0;
+    for (int row = 0; row < combo->count(); ++row) {
+        const QVariant value = combo->itemData(row);
+        const char* source = nullptr;
+        if (config->i_type == CONFIG_ITEM_MODULE || config->i_type == CONFIG_ITEM_MODULE_CAT) {
+            if (!value.isValid()) source = N_("Default");
+            else if (value.toString() == QLatin1String("any")) source = N_("Automatic");
+            else if (value.toString() == QLatin1String("none")) source = N_("Disable");
+            else if (auto* module = module_find(value.toString().toUtf8().constData()))
+                source = module_GetLongName(module);
+        } else if (config->list_text) {
+            for (int item = 0; item < config->list_count; ++item) {
+                const bool matches = string
+                    ? config->list.psz[item] && value.toString() == qfu(config->list.psz[item])
+                    : value.toLongLong() == config->list.i[item];
+                if (matches) { source = config->list_text[item]; break; }
+            }
+        } else if (directShow) {
+            if (value.toString().isEmpty()) source = N_("Default");
+            else if (value.toString() == QLatin1String("none")) source = N_("None");
+        }
+        if (source) sources.append({value, QByteArray(source)});
+    }
+    if (sources.isEmpty()) return;
+    // Keep dynamic device names and item values intact. No device scan is needed.
+    const auto update = [combo, sources] {
+        const QSignalBlocker blocker(combo);
+        for (const auto& choice : sources) {
+            const int row = combo->findData(choice.first);
+            if (row >= 0) combo->setItemText(row, qtr(choice.second.constData()));
+        }
+    };
+    update();
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, combo, update);
+}
+}
+
 /*******************************************************
  * Simple widgets
  *******************************************************/
@@ -227,7 +309,7 @@ StringConfigControl::StringConfigControl( module_config_t *_p_item,
                                           QWidget *_parent ) :
     VStringConfigControl( _p_item )
 {
-    label = new QLabel( p_item->psz_text ? qfut(p_item->psz_text) : "", _parent );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, _parent);
     text = new QLineEdit( p_item->value.psz ? qfu(p_item->value.psz) : "", _parent );
     finish();
 }
@@ -266,6 +348,7 @@ void StringConfigControl::finish()
     }
     if( label )
         label->setBuddy( text );
+    watchConfigHelp(text, label, p_item);
 }
 
 void StringConfigControl::changeVisibility( bool visible )
@@ -303,9 +386,9 @@ void PasswordConfigControl::finish()
 FileConfigControl::FileConfigControl( module_config_t *_p_item, QWidget *p ) :
     VStringConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     text = new QLineEdit( qfu(p_item->value.psz), p );
-    browse = new QPushButton( qtr( "Browse..." ), p );
+    browse = translatedConfigWidget<QPushButton>(N_("Browse..."), p);
 
     BUTTONACT( browse, &FileConfigControl::updateField );
 
@@ -374,6 +457,7 @@ void FileConfigControl::finish()
     }
     if( label )
         label->setBuddy( text );
+    watchConfigHelp(text, label, p_item);
 }
 
 void FileConfigControl::changeVisibility( bool visible )
@@ -417,7 +501,7 @@ void DirectoryConfigControl::updateField()
 FontConfigControl::FontConfigControl( module_config_t *_p_item, QWidget *p ) :
     VStringConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     font = new QFontComboBox( p );
     font->setCurrentFont( QFont( qfu( p_item->value.psz) ) );
 
@@ -425,6 +509,7 @@ FontConfigControl::FontConfigControl( module_config_t *_p_item, QWidget *p ) :
     {
         label->setToolTip( formatTooltip( qfut(p_item->psz_longtext) ) );
     }
+    watchConfigHelp(font, label, p_item);
 }
 
 FontConfigControl::FontConfigControl( module_config_t *_p_item,
@@ -440,6 +525,7 @@ FontConfigControl::FontConfigControl( module_config_t *_p_item,
     {
         label->setToolTip( formatTooltip( qfut(p_item->psz_longtext) ) );
     }
+    watchConfigHelp(font, label, p_item);
 }
 
 void FontConfigControl::insertInto( QGridLayout *l, int line )
@@ -470,7 +556,7 @@ StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
                                                   QWidget *p ) :
     VStringConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
@@ -546,6 +632,8 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
     }
     if( label )
         label->setBuddy( combo );
+    watchConfigHelp(combo, label, p_item);
+    watchConfigChoices(combo, p_item);
 }
 
 void StringListConfigControl::changeVisibility( bool visible )
@@ -571,7 +659,7 @@ void setfillVLCConfigCombo( const char *configname, QComboBox *combo )
         ssize_t count = config_GetPszChoices(configname, &values, &texts);
         for( ssize_t i = 0; i < count; i++ )
         {
-            combo->addItem( qfut(texts[i]), QVariant(qfu(values[i])) );
+            combo->addItem( qfu(texts[i]), QVariant(qfu(values[i])) );
             if( p_config->value.psz && !strcmp(p_config->value.psz, values[i]) )
                 combo->setCurrentIndex( i );
             free( texts[i] );
@@ -587,7 +675,7 @@ void setfillVLCConfigCombo( const char *configname, QComboBox *combo )
         ssize_t count = config_GetIntChoices(configname, &values, &texts);
         for( ssize_t i = 0; i < count; i++ )
         {
-            combo->addItem( qfut(texts[i]), QVariant(qlonglong(values[i])) );
+            combo->addItem( qfu(texts[i]), QVariant(qlonglong(values[i])) );
             if( p_config->value.i == values[i] )
                 combo->setCurrentIndex( i );
             free( texts[i] );
@@ -598,6 +686,8 @@ void setfillVLCConfigCombo( const char *configname, QComboBox *combo )
 
     if( p_config->psz_longtext != NULL )
         combo->setToolTip( qfu( p_config->psz_longtext ) );
+    watchConfigHelp(combo, nullptr, p_config);
+    watchConfigChoices(combo, p_config);
 }
 
 /********* Module **********/
@@ -605,7 +695,7 @@ ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
                                           QWidget *p ) :
     VStringConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
     finish( );
@@ -678,6 +768,8 @@ void ModuleConfigControl::finish( )
     }
     if( label )
         label->setBuddy( combo );
+    watchConfigHelp(combo, label, p_item);
+    watchConfigChoices(combo, p_item);
 }
 
 void ModuleConfigControl::changeVisibility( bool visible )
@@ -701,7 +793,7 @@ ModuleListConfigControl::ModuleListConfigControl( module_config_t *_p_item,
     /* Special Hack */
     if( !p_item->psz_text ) return;
 
-    groupBox = new QGroupBox( qfut(p_item->psz_text), p );
+    groupBox = translatedConfigWidget<QGroupBox>(p_item->psz_text, p, "title");
     text = new QLineEdit( p );
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
@@ -742,6 +834,7 @@ void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
     checkbox_lists( qfut( module_GetLongName( p_parser ) ),
                     help != NULL ? qfut( help ): "",
                     module_get_object( p_parser ) );
+    watchConfigProperty(modules.last()->checkBox, "text", module_GetLongName(p_parser));
 }
 
 void ModuleListConfigControl::checkbox_lists( QString label, QString help, const char* psz_module )
@@ -868,7 +961,7 @@ IntegerConfigControl::IntegerConfigControl( module_config_t *_p_item,
                                             QWidget *p ) :
     VIntConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     spin = new QSpinBox( p );
     spin->setMinimumWidth( MINWIDTH_BOX );
     spin->setAlignment( Qt::AlignRight );
@@ -912,6 +1005,7 @@ void IntegerConfigControl::finish()
     }
     if( label )
         label->setBuddy( spin );
+    watchConfigHelp(spin, label, p_item);
 }
 
 void IntegerConfigControl::changeVisibility( bool visible )
@@ -984,7 +1078,7 @@ IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
                                                     QWidget *p ) :
     VIntConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
 
@@ -1048,6 +1142,8 @@ void IntegerListConfigControl::finish( module_config_t *p_module_config )
     }
     if( label )
         label->setBuddy( combo );
+    watchConfigHelp(combo, label, p_item);
+    watchConfigChoices(combo, p_item);
 }
 
 void IntegerListConfigControl::changeVisibility( bool visible )
@@ -1065,7 +1161,7 @@ int IntegerListConfigControl::getValue() const
 BoolConfigControl::BoolConfigControl( module_config_t *_p_item, QWidget *p ) :
     VIntConfigControl( _p_item )
 {
-    checkbox = new QCheckBox( qfut(p_item->psz_text), p );
+    checkbox = translatedConfigWidget<QCheckBox>(p_item->psz_text, p);
     finish();
 }
 
@@ -1094,6 +1190,7 @@ void BoolConfigControl::finish()
     checkbox->setChecked( p_item->value.i );
     if( p_item->psz_longtext )
         checkbox->setToolTip( formatTooltip(qfut(p_item->psz_longtext)) );
+    watchConfigHelp(checkbox, nullptr, p_item);
 }
 
 void BoolConfigControl::changeVisibility( bool visible )
@@ -1147,7 +1244,7 @@ void ColorConfigControl::finish()
     color_but->setIcon( QIcon( *color_px ) );
     color_but->setMinimumWidth( 40 );
 
-    label->setText( qfut(p_item->psz_text) );
+    watchConfigProperty(label, "text", p_item->psz_text);
     if( p_item->psz_longtext )
     {
         label->setToolTip( formatTooltip(qfut(p_item->psz_longtext)) );
@@ -1155,6 +1252,7 @@ void ColorConfigControl::finish()
     }
 
     BUTTONACT( color_but, &ColorConfigControl::selectColor );
+    watchConfigHelp(color_but, label, p_item);
 }
 
 void ColorConfigControl::changeVisibility( bool visible )
@@ -1202,7 +1300,7 @@ FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
                                         QWidget *p ) :
     VFloatConfigControl( _p_item )
 {
-    label = new QLabel( qfut(p_item->psz_text), p );
+    label = translatedConfigWidget<QLabel>(p_item->psz_text, p);
     spin = new QDoubleSpinBox( p );
     spin->setMinimumWidth( MINWIDTH_BOX );
     spin->setMaximumWidth( MINWIDTH_BOX );
@@ -1247,6 +1345,7 @@ void FloatConfigControl::finish()
     }
     if( label )
         label->setBuddy( spin );
+    watchConfigHelp(spin, label, p_item);
 }
 
 void FloatConfigControl::changeVisibility( bool visible )

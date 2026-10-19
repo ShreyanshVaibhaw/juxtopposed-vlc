@@ -57,6 +57,7 @@
 #include <QDropEvent>
 #include <QRegularExpression>
 #include <QPushButton>
+#include <QSignalBlocker>
 
 #define I_DEVICE_TOOLTIP \
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
@@ -77,6 +78,29 @@
 
 static const char psz_devModule[][8] = { "v4l2", "pvr", "dtv",
                                        "dshow", "screen", "jack" };
+
+namespace {
+template<typename Widget>
+Widget* captureText(const char* source, QWidget* parent)
+{
+    auto* widget = new Widget(qtr(source), parent);
+    const QByteArray text(source);
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, widget,
+                         [widget, text] { widget->setText(qtr(text.constData())); });
+    return widget;
+}
+
+void watchCaptureMode(QComboBox* combo, int row, const char* source)
+{
+    const QByteArray text(source);
+    if (auto* translator = InterfaceTranslator::instance())
+        QObject::connect(translator, &InterfaceTranslator::languageChanged, combo, [combo, row, text] {
+            const QSignalBlocker blocker(combo);
+            combo->setItemText(row, qtr(text.constData()));
+        });
+}
+}
 
 /**************************************************************************
  * Open Files and subtitles                                               *
@@ -809,7 +833,8 @@ void CaptureOpenPanel::initialize()
     layout * name ## PropLayout = new layout;               \
     name ## DevPage->setLayout( name ## DevLayout );                  \
     name ## PropPage->setLayout( name ## PropLayout );                \
-    ui.deviceCombo->addItem( qfut( label ), QVariant( number ) );
+    ui.deviceCombo->addItem( qfut( label ), QVariant( number ) );        \
+    watchCaptureMode(ui.deviceCombo, ui.deviceCombo->count() - 1, label);
 
 #define CuMRL( widget, slot ) connect( widget, slot, this, &CaptureOpenPanel::updateMRL );
 
@@ -833,7 +858,7 @@ void CaptureOpenPanel::initialize()
     line++;
 
     /* dshow Properties */
-    QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
+    QLabel *dshowVSizeLabel = captureText<QLabel>(N_("Video size"), this);
     dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
 
     dshowVSizeLine = new QLineEdit;
@@ -858,7 +883,7 @@ void CaptureOpenPanel::initialize()
     addModuleAndLayouts( V4L2_DEVICE, v4l2, N_("Video camera"), QGridLayout );
 
     /* V4L2 main panel */
-    QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
+    QLabel *v4l2VideoDeviceLabel = captureText<QLabel>(N_("Video device name"), this);
     v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
 
     v4l2VideoDevice = new QComboBox( this );
@@ -866,7 +891,7 @@ void CaptureOpenPanel::initialize()
     POPULATE_WITH_DEVS( ppsz_v4lvdevices, v4l2VideoDevice );
     v4l2DevLayout->addWidget( v4l2VideoDevice, 0, 1 );
 
-    QLabel *v4l2AudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
+    QLabel *v4l2AudioDeviceLabel = captureText<QLabel>(N_("Audio device name"), this);
     v4l2DevLayout->addWidget( v4l2AudioDeviceLabel, 1, 0 );
 
     v4l2AudioDevice = new QComboBox( this );
@@ -886,7 +911,7 @@ void CaptureOpenPanel::initialize()
     v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
 
     /* v4l2 Props panel */
-    QLabel *v4l2StdLabel = new QLabel( qtr( "Video standard" ) );
+    QLabel *v4l2StdLabel = captureText<QLabel>(N_("Video standard"), this);
     v4l2PropLayout->addWidget( v4l2StdLabel, 0 , 0 );
 
     v4l2StdBox = new QComboBox;
@@ -913,7 +938,7 @@ void CaptureOpenPanel::initialize()
 
     /* Jack Main panel */
     /* Channels */
-    QLabel *jackChannelsLabel = new QLabel( qtr( "Channels:" ) );
+    QLabel *jackChannelsLabel = captureText<QLabel>(N_("Channels:"), this);
     jackDevLayout->addWidget( jackChannelsLabel, 1, 0 );
 
     jackChannels = new QSpinBox;
@@ -924,7 +949,7 @@ void CaptureOpenPanel::initialize()
     jackDevLayout->addWidget( jackChannels, 1, 1 );
 
     /* Selected ports */
-    QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports:" ) );
+    QLabel *jackPortsLabel = captureText<QLabel>(N_("Selected ports:"), this);
     jackDevLayout->addWidget( jackPortsLabel, 0 , 0 );
 
     jackPortsSelected = new QLineEdit( qfu( ".*" ) );
@@ -934,11 +959,11 @@ void CaptureOpenPanel::initialize()
     /* Jack Props panel */
 
     /* Pace */
-    jackPace = new QCheckBox(qtr( "Use VLC pace" ));
+    jackPace = captureText<QCheckBox>(N_("Use VLC pace"), this);
     jackPropLayout->addWidget( jackPace, 1, 1 );
 
     /* Auto Connect */
-    jackConnect = new QCheckBox( qtr( "Auto connection" ));
+    jackConnect = captureText<QCheckBox>(N_("Auto connection"), this);
     jackPropLayout->addWidget( jackConnect, 1, 2 );
 
     /* Jack CONNECTs */
@@ -957,8 +982,8 @@ void CaptureOpenPanel::initialize()
     addModuleAndLayouts( DTV_DEVICE, dvb, N_("TV - digital"), QGridLayout );
 
     /* DVB Main */
-    QLabel *dvbDeviceLabel = new QLabel( qtr( "Tuner card" ) );
-    QLabel *dvbTypeLabel = new QLabel( qtr( "Delivery system" ) );
+    QLabel *dvbDeviceLabel = captureText<QLabel>(N_("Tuner card"), this);
+    QLabel *dvbTypeLabel = captureText<QLabel>(N_("Delivery system"), this);
 
     dvbCard = new QSpinBox;
     dvbCard->setAlignment( Qt::AlignRight );
@@ -988,7 +1013,7 @@ void CaptureOpenPanel::initialize()
 
     /* DVB Props panel */
     QLabel *dvbFreqLabel =
-                    new QLabel( qtr( "Transponder/multiplex frequency" ) );
+                    captureText<QLabel>(N_("Transponder/multiplex frequency"), this);
     dvbPropLayout->addWidget( dvbFreqLabel, 0, 0 );
 
     dvbFreq = new QSpinBox;
@@ -998,7 +1023,7 @@ void CaptureOpenPanel::initialize()
     setSpinBoxFreq( dvbFreq  );
     dvbPropLayout->addWidget( dvbFreq, 0, 1 );
 
-    dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    dvbSrateLabel = captureText<QLabel>(N_("Transponder symbol rate"), this);
     dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
 
     dvbSrate = new QSpinBox;
@@ -1007,7 +1032,7 @@ void CaptureOpenPanel::initialize()
     setSpinBoxFreq( dvbSrate );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
 
-    dvbModLabel = new QLabel( qtr( "Modulation / Constellation" ) );
+    dvbModLabel = captureText<QLabel>(N_("Modulation / Constellation"), this);
     dvbPropLayout->addWidget( dvbModLabel, 2, 0 );
 
     dvbQamBox = new QComboBox;
@@ -1031,7 +1056,7 @@ void CaptureOpenPanel::initialize()
     dvbQamBox->hide();
     dvbPskBox->hide();
 
-    dvbBandLabel = new QLabel( qtr( "Bandwidth" ) );
+    dvbBandLabel = captureText<QLabel>(N_("Bandwidth"), this);
     dvbPropLayout->addWidget( dvbBandLabel, 2, 0 );
 
     dvbBandBox = new QComboBox;
@@ -1078,7 +1103,7 @@ void CaptureOpenPanel::initialize()
     addModuleAndLayouts( PVR_DEVICE, pvr, N_("TV - analog"), QGridLayout );
 
     /* PVR Main panel */
-    QLabel *pvrDeviceLabel = new QLabel( qtr( "Device name" ) );
+    QLabel *pvrDeviceLabel = captureText<QLabel>(N_("Device name"), this);
     pvrDevLayout->addWidget( pvrDeviceLabel, 0, 0 );
 
     pvrDevice = new QComboBox;
@@ -1087,7 +1112,7 @@ void CaptureOpenPanel::initialize()
     v4l2VideoDevice->clearEditText();
     pvrDevLayout->addWidget( pvrDevice, 0, 1 );
 
-    QLabel *pvrAudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
+    QLabel *pvrAudioDeviceLabel = captureText<QLabel>(N_("Audio device name"), this);
     pvrDevLayout->addWidget( pvrAudioDeviceLabel, 1, 0 );
 
     pvrAudioDevice = new QComboBox( this );
@@ -1107,14 +1132,14 @@ void CaptureOpenPanel::initialize()
     pvrDevLayout->addWidget( pvrAudioDevice, 1, 1 );
 
     /* PVR props panel */
-    QLabel *pvrNormLabel = new QLabel( qtr( "Video standard" ) );
+    QLabel *pvrNormLabel = captureText<QLabel>(N_("Video standard"), this);
     pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
 
     pvrNormBox = new QComboBox;
     setfillVLCConfigCombo( "v4l2-standard", pvrNormBox );
     pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
 
-    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
+    QLabel *pvrFreqLabel = captureText<QLabel>(N_("Frequency"), this);
     pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
 
     pvrFreq = new QSpinBox;
@@ -1138,13 +1163,12 @@ void CaptureOpenPanel::initialize()
      * Screen *
      **********/
     addModuleAndLayouts( SCREEN_DEVICE, screen, N_("Desktop"), QGridLayout );
-    QLabel *screenLabel = new QLabel( qtr( "Your display will be "
-            "opened and played in order to stream or save it." ) );
+    QLabel *screenLabel = captureText<QLabel>(N_("Your display will be "
+            "opened and played in order to stream or save it."), this);
     screenLabel->setWordWrap( true );
     screenDevLayout->addWidget( screenLabel, 0, 0 );
 
-    QLabel *screenFPSLabel = new QLabel(
-            qtr( "Desired frame rate for the capture." ) );
+    QLabel *screenFPSLabel = captureText<QLabel>(N_("Desired frame rate for the capture."), this);
     screenPropLayout->addWidget( screenFPSLabel, 0, 0 );
 
     screenFPS = new QDoubleSpinBox;
@@ -1165,6 +1189,14 @@ void CaptureOpenPanel::initialize()
         this->updateMRL();
         this->updateButtons();
     } );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+            ui.retranslateUi(this);
+            const QSignalBlocker blocker(screenFPS);
+            /* xgettext: frames per second */
+            screenFPS->setSuffix(qtr(" f/s"));
+        });
 
 #undef CuMRL
 #undef addModuleAndLayouts
@@ -1410,6 +1442,13 @@ void CaptureOpenPanel::advancedDialog()
     advButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
     mainLayout->addWidget( advButtonBox );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, adv, [dialog = adv, closeButton, cancelButton] {
+            dialog->setWindowTitle(qtr("Advanced Options"));
+            closeButton->setText(qtr("OK"));
+            cancelButton->setText(qtr("Cancel"));
+        });
 
     /* Creation of the MRL */
     if( adv->exec() )
