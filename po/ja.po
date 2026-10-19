@@ -46773,3 +46773,33 @@ msgstr "表示されなかったログメッセージ: %1"
 #, qt-format
 msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
 msgstr "長いログメッセージは、このウィンドウに一部しか表示されないことがあります。完全なログを保存するには、設定で「ログを保存」をオンにしてください。変更後は VLC を再起動してください。"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:416
+#, qt-format
+msgid "Playlist tree"
+msgstr "プレイリストツリー"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Playlist ID"
+msgstr "プレイリスト ID"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Item ID"
+msgstr "項目 ID"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Playlist flags"
+msgstr "プレイリストのフラグ"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Item flags"
+msgstr "項目のフラグ"
