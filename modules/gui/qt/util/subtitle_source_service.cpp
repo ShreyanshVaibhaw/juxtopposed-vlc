@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "subtitle_source_service.hpp"
 #include <QDir>
+#include <QCoreApplication>
+#include <QEvent>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QFileInfo>
@@ -56,10 +58,30 @@ SubtitleSourceService::SubtitleSourceService(QObject* parent)
 SubtitleSourceService::SubtitleSourceService(const Options& options, QObject* parent)
     : QObject(parent), m_options(options), m_network(this), m_apiKey(options.consumerApiKey)
 {
-    m_languages = {QVariantMap{{"code", "en"}, {"text", tr("English")}},
-        QVariantMap{{"code", "es"}, {"text", tr("Spanish")}}, QVariantMap{{"code", "ja"}, {"text", tr("Japanese")}},
-        QVariantMap{{"code", "de"}, {"text", tr("German")}}, QVariantMap{{"code", "nl"}, {"text", tr("Dutch")}},
-        QVariantMap{{"code", "fr"}, {"text", tr("French")}}};
+    m_languages = {QVariantMap{{"code", "en"}, {"text", QT_TR_NOOP("English")}},
+        QVariantMap{{"code", "es"}, {"text", QT_TR_NOOP("Spanish")}}, QVariantMap{{"code", "ja"}, {"text", QT_TR_NOOP("Japanese")}},
+        QVariantMap{{"code", "de"}, {"text", QT_TR_NOOP("German")}}, QVariantMap{{"code", "nl"}, {"text", QT_TR_NOOP("Dutch")}},
+        QVariantMap{{"code", "fr"}, {"text", QT_TR_NOOP("French")}}};
+    qApp->installEventFilter(this);
+}
+
+QVariantList SubtitleSourceService::languages() const
+{
+    auto languages = m_languages;
+    for (auto& entry : languages) {
+        auto row = entry.toMap();
+        const auto source = row.value(QStringLiteral("text")).toString().toUtf8();
+        row.insert(QStringLiteral("text"), tr(source.constData()));
+        entry = row;
+    }
+    return languages;
+}
+
+bool SubtitleSourceService::eventFilter(QObject* object, QEvent* event)
+{
+    if (object == qApp && event->type() == QEvent::LanguageChange)
+        emit languagesChanged();
+    return QObject::eventFilter(object, event);
 }
 
 SubtitleSourceService::~SubtitleSourceService()

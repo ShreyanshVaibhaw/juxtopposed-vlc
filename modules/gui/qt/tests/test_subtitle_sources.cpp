@@ -12,6 +12,8 @@
 #include <QFile>
 #include <QDir>
 #include <QUrlQuery>
+#include <QTranslator>
+#include <QEvent>
 #include "util/subtitle_source_service.hpp"
 
 #if defined(Q_OS_WIN) && defined(QT_STATIC)
@@ -57,6 +59,28 @@ class TestSubtitleSources : public QObject {
     static QVariantList search(SubtitleSourceService& client) { QSignalSpy spy(&client,&SubtitleSourceService::searchFinished);client.search("The Wand S01E04","en");return result(spy).value("sources").toList(); }
     static QVariantList row(const QStringList& tracks) { return {QVariantMap{{"url","file:///movie.mkv"},{"baseline",QStringList{}},{"initialTracks",QStringList{}},{"tracks",tracks}}}; }
 private slots:
+    void languageLabelsChangeWithoutReloadingSources() {
+        Server server;SubtitleSourceService client(options(server));
+        QCOMPARE(client.languages().first().toMap().value("text").toString(),QStringLiteral("English"));
+        class Translator : public QTranslator {
+        public:
+            bool isEmpty() const override { return false; }
+            QString translate(const char*, const char* source, const char*, int) const override {
+                if (qstrcmp(source,"English")==0) return QStringLiteral("Anglais");
+                return {};
+            }
+        } translator;
+        QSignalSpy changed(&client,&SubtitleSourceService::languagesChanged);
+        QVERIFY(QCoreApplication::installTranslator(&translator));
+        QEvent language(QEvent::LanguageChange);QCoreApplication::sendEvent(qApp,&language);
+        QVERIFY(!changed.isEmpty());
+        QCOMPARE(client.languages().first().toMap().value("text").toString(),QStringLiteral("Anglais"));
+        QCOMPARE(client.languages().first().toMap().value("code").toString(),QStringLiteral("en"));
+        QVERIFY(QCoreApplication::removeTranslator(&translator));
+        QCoreApplication::sendEvent(qApp,&language);
+        QCOMPARE(client.languages().first().toMap().value("text").toString(),QStringLiteral("English"));
+        QVERIFY(server.requests.isEmpty());
+    }
     void configurationAndMissingKey() {
         QTemporaryDir directory;Server server;SubtitleSourceService client(options(server));client.setStorageDirectory(directory.path());
         QSignalSpy spy(&client,&SubtitleSourceService::searchFinished);client.search("Film","en");

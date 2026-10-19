@@ -33,7 +33,7 @@ public:
     bool configured() const { return !m_apiKey.isEmpty(); }
     bool hasCustomKey() const { return m_customKey; }
     bool hasConsumerKey() const { return !m_options.consumerApiKey.isEmpty(); }
-    QVariantList languages() const { return m_languages; }
+    QVariantList languages() const;
     Q_INVOKABLE void fetchLanguages();
     bool preparing() const { return m_preparing; }
     Q_INVOKABLE bool setApiKey(const QString& key);
@@ -50,6 +50,8 @@ signals:
     void languagesChanged();
     void searchFinished(quint64 request, const QVariantMap& result);
     void preparationFinished(quint64 request, const QVariantMap& result);
+protected:
+    bool eventFilter(QObject* object, QEvent* event) override;
 private:
     struct Record { qint64 id; QString name; };
     struct Link { QUrl url; QString name; QString key; };
