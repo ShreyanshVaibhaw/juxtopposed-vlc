@@ -1416,10 +1416,10 @@ msgstr "Mostrar nombre"
 msgid "Actors"
 msgstr "Actores"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Artista"
+msgstr "Artista del álbum"
 
 #: src/input/meta.c:80
 #, fuzzy
@@ -16815,19 +16815,19 @@ msgstr "Analizador sintáctico de lista de reproducción"
 msgid "Service Discovery"
 msgstr "Descubrimiento de servicios"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
-#, fuzzy
 msgid "Interfaces"
-msgstr "Interfaz"
+msgstr "Interfaces"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:94
-#, fuzzy
 msgid "Art and meta fetchers"
-msgstr "Buscador de metadatos Lua"
+msgstr "Proveedores de imágenes y metadatos"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:112
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
@@ -20007,11 +20007,11 @@ msgstr "Proporción de Aspecto"
 msgid "No EPG Data Available"
 msgstr "Sin datos EPG"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/components/extended_panels.cpp:362
 #: modules/gui/qt/components/extended_panels.cpp:373
-#, fuzzy
 msgid "Image Files"
-msgstr "Pared de imagen"
+msgstr "Archivos de imagen"
 
 #: modules/gui/qt/components/extended_panels.cpp:364 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -20152,10 +20152,10 @@ msgstr ""
 "ganancia\n"
 "de maquillaje"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/components/extended_panels.cpp:1333
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "Ajustar prioridad de VLC"
+msgstr "Ajustar tono"
 
 #: modules/gui/qt/components/extended_panels.cpp:1367
 msgid "(Hastened)"
@@ -20880,10 +20880,10 @@ msgstr "Bytes"
 msgid "Convert"
 msgstr "Convertir"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/dialogs/convert.cpp:58
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "No hay archivo seleccionado"
+msgstr "Se han seleccionado varios archivos."
 
 #: modules/gui/qt/dialogs/convert.cpp:65 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -20897,19 +20897,20 @@ msgstr "Archivo destino:"
 msgid "Browse"
 msgstr "Explorar"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/dialogs/convert.cpp:86
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "&Abrir múltiples archivos..."
+msgstr "Se han seleccionado varios archivos."
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/dialogs/convert.cpp:88
 msgid "Files will be placed in the same directory with the same name."
-msgstr ""
+msgstr "Los archivos se guardarán en el mismo directorio con el mismo nombre."
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/dialogs/convert.cpp:91
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "Añadir a archivo"
+msgstr "Añadir «-converted» al nombre del archivo"
 
 #: modules/gui/qt/dialogs/convert.cpp:99
 msgid "Settings"
@@ -20960,10 +20961,10 @@ msgstr "Ocultar futuros errores"
 msgid "Adjustments and Effects"
 msgstr "Efectos y filtros"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Modo estéreo"
+msgstr "Ampliador estéreo"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -21108,10 +21109,10 @@ msgstr "Guarda todas las trazas mostradas en un archivo"
 msgid "Save log file as..."
 msgstr "Guardar archivo de trazas como..."
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "Archivos de texto y trazas (*.log *.txt);; Todo (*.*) "
+msgstr "Textos/Registros (*.log *.txt);; Todos (*.*)"
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -21684,10 +21685,10 @@ msgstr "&Vídeo"
 msgid "Subti&tle"
 msgstr "Subtí&tulo"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1076
-#, fuzzy
 msgid "Tool&s"
-msgstr "H&erramientas"
+msgstr "Herramien&tas"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1083
 msgid "V&iew"
@@ -21781,10 +21782,10 @@ msgstr "Ctrl+L"
 msgid "Docked Playlist"
 msgstr "Lista de reproducción anclada"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/menus.cpp:499
-#, fuzzy
 msgid "Always on &top"
-msgstr "Siempre sobre todo"
+msgstr "Siempre &encima"
 
 #: modules/gui/qt/menus.cpp:507
 msgid "Mi&nimal Interface"
@@ -21975,15 +21976,15 @@ msgstr "&Abrir medio"
 msgid "&Clear"
 msgstr "&Borrar"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/menus.cpp:1636
-#, fuzzy
 msgid "&Renderer"
-msgstr "Generador de texto"
+msgstr "&Dispositivo de reproducción"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/menus.cpp:1640
-#, fuzzy
 msgid "<Local>"
-msgstr "A capella"
+msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1653
 msgid "Scan"
@@ -22017,10 +22018,10 @@ msgstr ""
 msgid "Start VLC with only a systray icon"
 msgstr "Iniciar VLC con solo un icono en el área de notificación"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:92
-#, fuzzy
 msgid "VLC will start with just an icon in your taskbar."
-msgstr "VLC se iniciará con solo un icono en su área de notificación"
+msgstr "VLC se iniciará con solo un icono en la barra de tareas."
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -22105,13 +22106,11 @@ msgstr "Guardar los elementos reproducidos en el menú"
 msgid "List of words separated by | to filter"
 msgstr "Lista de palabras separadas por | para filtrar"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:135
-#, fuzzy
 msgid ""
 "Regular expression used to filter the recent items played in the player."
-msgstr ""
-"Expresión regular que filtra los elementos recientes reproducidos en el "
-"reproductor"
+msgstr "Expresión regular para filtrar los elementos reproducidos recientemente."
 
 #: modules/gui/qt/qt.cpp:138
 #, fuzzy
@@ -22131,10 +22130,10 @@ msgstr ""
 "Por defecto es '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "Una alternativa puede ser '30;30;50;40;40;100;50;50;160;150;150;255' "
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:144
-#, fuzzy
 msgid "Selection of the starting mode and look"
-msgstr "Selección del modo y aspecto inicial"
+msgstr "Selección del modo y la apariencia iniciales"
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -22161,21 +22160,19 @@ msgstr "Embeber el navegador de archivos en el diálogo abrir"
 msgid "Define which screen fullscreen goes"
 msgstr "Define que pantalla va a pantalla completa"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:155
-#, fuzzy
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
-msgstr ""
-"Número de pantalla a pantalla completa, en vez de la misma pantalla en la "
-"que está la interfaz"
+msgstr "Número de pantalla para el modo de pantalla completa, en lugar de la pantalla de la interfaz."
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
 msgstr "Cargar extensiones al iniciar"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "Cargar automáticamente las extensiones al iniciar"
+msgstr "Cargar automáticamente el módulo de extensiones al iniciar."
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -22194,15 +22191,15 @@ msgstr ""
 "está reproduciendo. Esto se puede deshabilitar para prevenir quemados de "
 "pantalla."
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:168
-#, fuzzy
 msgid "Expanding background cone or art"
-msgstr "Expandir cono de fondo de pantalla o carátula."
+msgstr "Ampliar el cono o la imagen de fondo"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:169
-#, fuzzy
 msgid "Background art fits window's size."
-msgstr "Arte de fondo se ajusta al tamaño de la ventana "
+msgstr "La imagen de fondo se ajusta al tamaño de la ventana."
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -22220,10 +22217,10 @@ msgstr ""
 "activada, los botones de volúmen cambiarán el volúmen de VLC cuando éste "
 "esté seleccionado, y el del sistema operativo cuando no lo esté."
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Preferencias para la interfaz principal"
+msgstr "Cuándo mostrar la interfaz en primer plano"
 
 #: modules/gui/qt/qt.cpp:189
 #, fuzzy
@@ -22360,10 +22357,10 @@ msgstr "Interfaz con piel"
 msgid "Select skin"
 msgstr "Seleccionar piel"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Abrir piel..."
+msgstr "Abrir apariencia..."
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -29603,10 +29600,10 @@ msgstr "MRL"
 msgid "Start Time"
 msgstr "Tiempo de inicio"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Tiempo de detención"
+msgstr "Hora de finalización"
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -29632,10 +29629,10 @@ msgstr "Cambia el tiempo de inicio para el medio"
 msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Cambia el tiempo de inicio para el medio"
+msgstr "Cambiar la hora de finalización del contenido multimedia"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -29730,40 +29727,43 @@ msgstr "Introducir una URL:"
 msgid "Profile edition"
 msgstr "Edición de perfil"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
-msgstr ""
+msgstr "FLAC"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr "MP&4/MOV"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
 msgstr "Ogg/Ogm"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:705
 msgid "M&KV"
-msgstr ""
+msgstr "M&KV"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
 msgstr "MPEG-PS"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:708
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr "&MPEG-TS"
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -29777,10 +29777,10 @@ msgstr "WAV"
 msgid "Webm"
 msgstr "Webm"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr "MPEG &1"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -29790,9 +29790,10 @@ msgstr "AVI"
 msgid "ASF/WMV"
 msgstr "ASF/WMV"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:716
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:717
 msgid "Features"
@@ -29810,10 +29811,10 @@ msgstr "Capítulos"
 msgid "Menus"
 msgstr "Menús"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Tasa de fotogramas"
+msgstr "Velocidad de fotogra&mas"
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -29827,10 +29828,10 @@ msgstr "fps"
 msgid "Custom options"
 msgstr "Opciones personalizadas"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Calidad"
+msgstr "&Calidad"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -29852,15 +29853,15 @@ msgstr "Tamaño de marco"
 msgid "px"
 msgstr "px"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Tasa de muestreo"
+msgstr "Frecuencia de m&uestreo"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Nombre de perfil"
+msgstr "&Nombre del perfil"
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -30093,12 +30094,10 @@ msgstr "Integrar vídeo en interfaz"
 msgid "Show systray icon"
 msgstr "Icono de área de notificación"
 
+#. First-pass Spanish translation; fluent-speaker review is welcome.
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr ""
-"Estás usando el Interfaz Qt4.\n"
-"\n"
+msgstr "Mostrar la interfaz en primer plano:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -30472,8 +30471,11 @@ msgstr "Lista del administrador multimedia"
 #~ msgstr ""
 #~ "El formato de «%s» no puede detectarse. Vea el log para más detalles."
 
-#~ msgid "Navigation"
-#~ msgstr "Navegación"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:61
+#, qt-format
+msgid "Navigation"
+msgstr "Navegación"
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "Deshabilita todos los mensajes de aviso e información."
@@ -31663,8 +31665,11 @@ msgstr "Finalizar"
 #~ msgid "T&ools"
 #~ msgstr "H&erramientas"
 
-#~ msgid "&Decrease Volume"
-#~ msgstr "&Decrementar volumen"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:411
+#, qt-format
+msgid "&Decrease Volume"
+msgstr "&Bajar volumen"
 
 #~ msgid "&Save To Playlist"
 #~ msgstr "&Guardar a lista de reproducción"
@@ -35522,8 +35527,13 @@ msgstr "Finalizar"
 #~ msgid "Open Messages Window"
 #~ msgstr "Abrir Ventana de Mensajes"
 
-#~ msgid "Dismiss"
-#~ msgstr "Desechar"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:254
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:220
+#: modules/gui/qt/player/qml/ResumeDialog.qml:152
+#, qt-format
+msgid "Dismiss"
+msgstr "Descartar"
 
 #~ msgid ""
 #~ "In fullscreen mode, crop the picture if necessary in order to fill the "
@@ -36818,8 +36828,11 @@ msgstr "Finalizar"
 #~ "La aceleración de la salida será deshabilitada. El rendimiento se puede "
 #~ "degradar severamente si la resolución es grande."
 
-#~ msgid "Select a matching identity"
-#~ msgstr "Seleccionar una identidad coincidente"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/fingerprint/fingerprintdialog.ui:36
+#, qt-format
+msgid "Select a matching identity"
+msgstr "Seleccionar una coincidencia"
 
 #~ msgid "---  DVD Menu"
 #~ msgstr "--- Menú de DVD"
@@ -37281,21 +37294,30 @@ msgstr "Finalizar"
 #~ msgid "Fetch Information"
 #~ msgstr "Información del &códec"
 
-#, fuzzy
-#~ msgid "Sort"
-#~ msgstr "Ordenar por"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:159
+#: modules/gui/qt/widgets/qml/GridSortFilterControls.qml:42
+#: modules/gui/qt/widgets/qml/SortControl.qml:64
+#, qt-format
+msgid "Sort"
+msgstr "Ordenar"
 
 #, fuzzy
 #~ msgid "No Repeat"
 #~ msgstr "Repetir"
 
-#, fuzzy
-#~ msgid "Add to Media Library"
-#~ msgstr "Biblioteca multimedia"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/macosx/library/VLCLibraryMenuController.m:110
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1023
+#, qt-format
+msgid "Add to Media Library"
+msgstr "Añadir a la biblioteca multimedia"
 
-#, fuzzy
-#~ msgid "Advanced Open..."
-#~ msgstr "Abrir avan&zado..."
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1157
+#, qt-format
+msgid "Advanced Open..."
+msgstr "Apertura avanzada..."
 
 #, fuzzy
 #~ msgid "Open Play&list..."
@@ -38411,9 +38433,11 @@ msgstr "Tamaño de letra"
 #~ msgid "TV (digital)"
 #~ msgstr "TV - digital"
 
-#, fuzzy
-#~ msgid "Add to playlist"
-#~ msgstr "Añadir a la lista de reproducción"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:927
+#, qt-format
+msgid "Add to playlist"
+msgstr "Añadir a una lista de reproducción"
 
 #, fuzzy
 #~ msgid "Clear playlist"
@@ -38509,9 +38533,11 @@ msgstr "Vista de lista"
 #~ "Debería empezar comprobando que la fuente concuerda con lo que desea que "
 #~ "sea la entrada y entonces presionar el botón «Siguiente» para continuar.\n"
 
-#, fuzzy
-#~ msgid "&Tools"
-#~ msgstr "H&erramientas"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:385
+#, qt-format
+msgid "&Tools"
+msgstr "&Herramientas"
 
 #, fuzzy
 #~ msgid "&Open (advanced)..."
@@ -38811,9 +38837,11 @@ msgstr "Idioma de audio"
 #~ msgid "Try to use hardware acceleration for subtitles/OSD blending."
 #~ msgstr "Pruebe a usar aceleración por hardware para mezclar subtítulo/OSD."
 
-#, fuzzy
-#~ msgid "Stream Name"
-#~ msgstr "Nombre de emisión"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/sout_widgets.cpp:438
+#, qt-format
+msgid "Stream Name"
+msgstr "Nombre de la emisión"
 
 #, fuzzy
 #~ msgid "Video Codec"
@@ -39290,9 +39318,18 @@ msgstr "Biblioteca"
 #~ msgid "Refresh Streams"
 #~ msgstr "Tiempo de refresco"
 
-#, fuzzy
-#~ msgid "Enqueue"
-#~ msgstr "&Encolar"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:181
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:152
+#: modules/gui/qt/medialibrary/qml/MusicAlbumSectionDelegate.qml:223
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:69
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:869
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:921
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:981
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1050
+#, qt-format
+msgid "Enqueue"
+msgstr "Añadir a la cola"
 
 #, fuzzy
 #~ msgid ""
@@ -39895,9 +39932,11 @@ msgstr "Biblioteca"
 #~ msgid "Trivial audio mixer"
 #~ msgstr "Audio original"
 
-#, fuzzy
-#~ msgid "default"
-#~ msgstr "Predeterminado"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:207
+#, qt-format
+msgid "default"
+msgstr "predeterminado"
 
 #, fuzzy
 #~ msgid "No Audio Device"
@@ -40253,21 +40292,29 @@ msgstr "Biblioteca"
 #~ msgid "Message filter"
 #~ msgstr "Filtro de escena"
 
-#, fuzzy
-#~ msgid "XSPF playlist (*.xspf)"
-#~ msgstr "Exportar lista de reproducción XSPF"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:993
+#, qt-format
+msgid "XSPF playlist (*.xspf)"
+msgstr "Lista de reproducción XSPF (*.xspf)"
 
-#, fuzzy
-#~ msgid "M3U8 playlist (*.m3u8)"
-#~ msgstr "Lista de reproducción M3U8"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:994
+#, qt-format
+msgid "M3U8 playlist (*.m3u8)"
+msgstr "Lista de reproducción M3U8 (*.m3u8)"
 
-#, fuzzy
-#~ msgid "M3U playlist (*.m3u)"
-#~ msgstr "Lista de reproducción M3U"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:993
+#, qt-format
+msgid "M3U playlist (*.m3u)"
+msgstr "Lista de reproducción M3U (*.m3u)"
 
-#, fuzzy
-#~ msgid "HTML playlist (*.html)"
-#~ msgstr "Lista de reproducción HTML"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:994
+#, qt-format
+msgid "HTML playlist (*.html)"
+msgstr "Lista de reproducción HTML (*.html)"
 
 #, fuzzy
 #~ msgid "&Streaming..."
@@ -40795,9 +40842,11 @@ msgstr "Abrir disco"
 #~ msgid "Prev Title"
 #~ msgstr "Título anterior"
 
-#, fuzzy
-#~ msgid "Next Title"
-#~ msgstr "Título siguiente"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:551
+#, qt-format
+msgid "Next Title"
+msgstr "Título siguiente"
 
 #, fuzzy
 #~ msgid "Go to Title"
@@ -40923,9 +40972,11 @@ msgstr "Velocidad"
 #~ msgid "Audio:"
 #~ msgstr "Audio"
 
-#, fuzzy
-#~ msgid "Channel:"
-#~ msgstr "Canales:"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:297
+#, qt-format
+msgid "Channel:"
+msgstr "Canal:"
 
 #, fuzzy
 #~ msgid "Norm:"
@@ -41700,9 +41751,11 @@ msgstr "Velocidad"
 #~ msgid "VLC - Controller"
 #~ msgstr "Control"
 
-#, fuzzy
-#~ msgid "Extended settings"
-#~ msgstr "Mostrar preferencias extendidas"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml:31
+#, qt-format
+msgid "Extended settings"
+msgstr "Ajustes ampliados"
 
 #, fuzzy
 #~ msgid "Open a device or a VIDEO_TS directory"
@@ -42213,9 +42266,11 @@ msgstr "Abrir archivo"
 #~ msgid "Stopped"
 #~ msgstr "Detener"
 
-#, fuzzy
-#~ msgid "Playing"
-#~ msgstr "Reproduciendo ahora"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/qml/PlaylistDelegate.qml:181
+#, qt-format
+msgid "Playing"
+msgstr "Reproduciendo"
 
 #, fuzzy
 #~ msgid "Quick &Open File...\tCtrl-O"
@@ -43780,9 +43835,11 @@ msgstr "Propiedades"
 #~ msgid "stream output (MRL)"
 #~ msgstr "Salida de emisión"
 
-#, fuzzy
-#~ msgid "Path:"
-#~ msgstr "Ruta"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:221
+#, qt-format
+msgid "Path:"
+msgstr "Ruta:"
 
 #, fuzzy
 #~ msgid "_File"
@@ -44260,14 +44317,23 @@ msgstr "Propiedades"
 #~ msgid "Addon Manager"
 #~ msgstr "Administrador de complementos"
 
-#~ msgid "Audio Fingerprinting"
-#~ msgstr "Huella digital de audio"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/fingerprint/fingerprintdialog.ui:17
+#, qt-format
+msgid "Audio Fingerprinting"
+msgstr "Identificación de audio"
 
-#~ msgid "No fingerprint has been found"
-#~ msgstr "No se ha encontrado huella digital"
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/fingerprint/fingerprintdialog.ui:57
+#, qt-format
+msgid "No fingerprint has been found"
+msgstr "No se encontró ninguna huella de audio"
 
-#~ msgid "Fingerprinting track..."
-#~ msgstr "Rastreo de huella digital..."
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/fingerprint/fingerprintdialog.ui:110
+#, qt-format
+msgid "Fingerprinting track..."
+msgstr "Generando huella de audio de la pista..."
 
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "System language"
@@ -47999,3 +48065,2878 @@ msgstr[1] "%n complementos"
 msgctxt "Settings"
 msgid "Recording"
 msgstr "Grabación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/CustomDialog.qml:40
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:387
+#, qt-format
+msgid "cancel"
+msgstr "cancelar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:201
+#, qt-format
+msgid "Warning notice"
+msgstr "Aviso de advertencia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:201
+#, qt-format
+msgid "Error notice"
+msgstr "Aviso de error"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:238
+#, qt-format
+msgid "Show details"
+msgstr "Mostrar detalles"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:351
+#, qt-format
+msgid "Save password"
+msgstr "Guardar contraseña"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml:403
+#, qt-format
+msgid "Ok"
+msgstr "Aceptar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:888
+#, qt-format
+msgid "Add folder to media library"
+msgstr "Añadir carpeta a la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:897
+#, qt-format
+msgid "Select files for playlist"
+msgstr "Seleccionar archivos para la lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:902
+#, qt-format
+msgid "Add files to media library"
+msgstr "Añadir archivos a la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:914
+#, qt-format
+msgid "Select playlist thumbnail"
+msgstr "Seleccionar miniatura de la lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:916
+#, qt-format
+msgid "Images (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;All files (*)"
+msgstr "Imágenes (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;Todos los archivos (*)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:1066
+#, qt-format
+msgid "Save play queue as..."
+msgstr "Guardar cola de reproducción como..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:1241
+#, qt-format
+msgid "Open audio..."
+msgstr "Abrir audio..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:1246
+#, qt-format
+msgid "Open video..."
+msgstr "Abrir vídeo..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:1300
+#, qt-format
+msgid "Select subtitle files"
+msgstr "Seleccionar archivos de subtítulos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/dialogs_provider.cpp:1300
+#, qt-format
+msgid "Select audio files"
+msgstr "Seleccionar archivos de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/audio_filter/expander.c:65
+#: modules/gui/qt/dialogs/extended/extended.cpp:76
+#, qt-format
+msgid "Expander"
+msgstr "Expansor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/audio_filter/limiter.c:68
+#: modules/gui/qt/dialogs/extended/extended.cpp:80
+#, qt-format
+msgid "Limiter"
+msgstr "Limitador"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/macosx/panels/VLCAudioEffectsWindowController.m:297
+#: modules/gui/qt/dialogs/extended/extended_panels.cpp:1423
+#, qt-format
+msgid "Adjust pan"
+msgstr "Ajustar panorámica"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/extended/extended_panels.cpp:1499
+#, qt-format
+msgid "Subtitle track synchronization"
+msgstr "Sincronización de pistas de subtítulos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/extended/extended_panels.cpp:1505
+#, qt-format
+msgid "Primary subtitle track:"
+msgstr "Pista de subtítulos principal:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/extended/extended_panels.cpp:1505
+#, qt-format
+msgid "Secondary subtitle track:"
+msgstr "Pista de subtítulos secundaria:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:62
+#, qt-format
+msgid "Select an existing folder, or clear the field to skip this step."
+msgstr "Seleccione una carpeta existente o borre el campo para omitir este paso."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:69
+#, qt-format
+msgid "Select a media folder"
+msgstr "Seleccionar una carpeta multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:79
+#, qt-format
+msgid "Not set"
+msgstr "Sin definir"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:86
+#, qt-format
+msgid "Seek Backward / Forward"
+msgstr "Retroceder / Avanzar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:87
+#, qt-format
+msgid "Previous / Next Item"
+msgstr "Elemento anterior / siguiente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:88
+#, qt-format
+msgid "Previous / Next Frame"
+msgstr "Fotograma anterior / siguiente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:89
+#, qt-format
+msgid "Cycle Subtitle Track"
+msgstr "Cambiar pista de subtítulos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:90
+#, qt-format
+msgid "Cycle Audio Track"
+msgstr "Cambiar pista de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:91
+#, qt-format
+msgid "Toggle Fullscreen"
+msgstr "Alternar pantalla completa"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:92
+#, qt-format
+msgid "Increase / Decrease Volume"
+msgstr "Subir / Bajar volumen"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:94
+#, qt-format
+msgid "Show / Hide Queue"
+msgstr "Mostrar / Ocultar cola"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:95
+#, qt-format
+msgid "Show / Hide File Browser"
+msgstr "Mostrar / Ocultar explorador de archivos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:96
+#, qt-format
+msgid "Take a Snapshot"
+msgstr "Tomar una instantánea"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:106
+#, qt-format
+msgid "Select a theme and color."
+msgstr "Seleccione un tema y un color."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp:121
+#, qt-format
+msgid "VLC cannot save the theme. Check the settings folder and try again."
+msgstr "VLC no puede guardar el tema. Compruebe la carpeta de configuración e inténtelo de nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/macosx/windows/VLCAboutWindowController.m:130
+#: modules/gui/qt/dialogs/help/help.cpp:115
+#, qt-format
+msgid ""
+"<p>VLC media player is a free and open source media player, encoder, and "
+"streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
+"\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+"span></a> community.</p><p>VLC uses its internal codecs, works on "
+"essentially every popular platform, and can read almost all files, CDs, "
+"DVDs, network streams, capture cards and other media formats!</p><p><a "
+"href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
+"decoration: underline; color:#0057ae;\">Help and join us!</span></a>"
+msgstr "<p>VLC media player es un reproductor, codificador y emisor multimedia gratuito y de código abierto, creado por los voluntarios de la comunidad <a href=\"https://www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utiliza sus propios códecs, funciona en prácticamente todas las plataformas populares y puede leer casi todos los archivos, CD, DVD, emisiones de red, tarjetas de captura y otros formatos multimedia.</p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;\">¡Colabore con nosotros!</span></a>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/help/help.cpp:556
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:96
+#, qt-format
+msgid "Checking for updates..."
+msgstr "Buscando actualizaciones..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:293
+#, qt-format
+msgid "Not editing a file"
+msgstr "No se está editando ningún archivo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:301
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:323
+#, qt-format
+msgid "Failed to save metadata"
+msgstr "No se pudieron guardar los metadatos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:420
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:436
+#, qt-format
+msgid "Property"
+msgstr "Propiedad"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:421
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:436
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:305
+#, qt-format
+msgid "Value"
+msgstr "Valor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:646
+#: modules/gui/qt/dialogs/mediainfo/info_panels.cpp:690
+#, qt-format
+msgid "Late"
+msgstr "Tardíos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:432
+#, qt-format
+msgid "Clear errors and warnings"
+msgstr "Borrar errores y advertencias"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open.cpp:231
+#, qt-format
+msgid "Select Media"
+msgstr "Seleccionar contenido multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open.cpp:257
+#, qt-format
+msgid "Add to &Queue"
+msgstr "Añadir a la &cola"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open.cpp:261
+#, qt-format
+msgid "&Open"
+msgstr "&Abrir"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open_panels.cpp:94
+#: modules/gui/qt/dialogs/open/open_panels.cpp:125
+#, qt-format
+msgid "File type:"
+msgstr "Tipo de archivo:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open_panels.cpp:858
+msgid "Video camera"
+msgstr "Cámara de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open_panels.cpp:911
+msgid "JACK Audio Connection Kit"
+msgstr "JACK Audio Connection Kit"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/playlists/playlists.cpp:64
+#, qt-format
+msgid "Existing Playlist"
+msgstr "Lista de reproducción existente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/playlists/playlists.cpp:136
+#, qt-format
+msgid "%1 Media"
+msgstr "%1 multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/plugins/plugins.cpp:373
+#, qt-format
+msgid ""
+"Service discoveries adds new sources to your play queue such as web radios, "
+"video websites, ..."
+msgstr "Los servicios de descubrimiento añaden nuevas fuentes a la cola de reproducción, como radios web y sitios de vídeo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/plugins/plugins.cpp:380
+#, qt-format
+msgid "Retrieves extra info and art for play queue items"
+msgstr "Obtiene información e imágenes adicionales para los elementos de la cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:208
+#, qt-format
+msgid "modified"
+msgstr "modificado"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:209
+#, qt-format
+msgid "true"
+msgstr "verdadero"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:210
+#, qt-format
+msgid "false"
+msgstr "falso"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:214
+#, qt-format
+msgid "color"
+msgstr "color"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:216
+#, qt-format
+msgid "password"
+msgstr "contraseña"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:217
+#, qt-format
+msgid "module"
+msgstr "módulo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:218
+#, qt-format
+msgid "module-list"
+msgstr "lista de módulos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:219
+#, qt-format
+msgid "file"
+msgstr "archivo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:220
+#, qt-format
+msgid "directory"
+msgstr "directorio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:221
+#, qt-format
+msgid "font"
+msgstr "tipo de letra"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:241
+#, qt-format
+msgid "Core"
+msgstr "Núcleo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_model.cpp:302
+#, qt-format
+msgid "Option"
+msgstr "Opción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:64
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1599
+#, qt-format
+msgid "&Reset"
+msgstr "&Restablecer"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:65
+#, qt-format
+msgid "&Toggle"
+msgstr "&Alternar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:66
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1576
+#, qt-format
+msgid "&Modify"
+msgstr "&Modificar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:67
+#, qt-format
+msgid "Copy &name"
+msgstr "Copiar &nombre"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:68
+#, qt-format
+msgid "Copy &value"
+msgstr "Copiar &valor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:227
+#, qt-format
+msgid "Set option value"
+msgstr "Establecer valor de la opción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/expert_view.cpp:236
+#, qt-format
+msgid "&Ok"
+msgstr "&Aceptar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences.cpp:78
+#: modules/gui/qt/qt.cpp:302
+#, qt-format
+msgid "Expert"
+msgstr "Experto"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences.cpp:79
+#, qt-format
+msgid "Switch to expert preferences view"
+msgstr "Cambiar a la vista de preferencias para expertos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences.cpp:203
+#, qt-format
+msgid "Modified only"
+msgstr "Solo modificadas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences.cpp:232
+#, qt-format
+msgid "Expert Preferences"
+msgstr "Preferencias para expertos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences.cpp:383
+#, qt-format
+msgid "Restart Required"
+msgstr "Es necesario reiniciar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences.cpp:384
+#, qt-format
+msgid ""
+"VLC needs to be restarted for the reset to take full effect.\n"
+"\n"
+"Restart now?"
+msgstr "Debe reiniciar VLC para que el restablecimiento tenga pleno efecto.\n\n¿Desea reiniciar ahora?"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1291
+#, qt-format
+msgid "Action hotkey mappings."
+msgstr "Asignaciones de atajos de teclado para las acciones."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1582
+#, qt-format
+msgid "&Copy value"
+msgstr "&Copiar valor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1592
+#, qt-format
+msgid "&Unset"
+msgstr "&Desasignar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1614
+#, qt-format
+msgid "Reset &all"
+msgstr "Restablecer &todo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1615
+#, qt-format
+msgid "Reset &all (column)"
+msgstr "Restablecer &todo (columna)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1771
+#, qt-format
+msgid "Key: <b>%1</b>"
+msgstr "Tecla: <b>%1</b>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1777
+#, qt-format
+msgid "Global Hotkey change"
+msgstr "Cambiar atajo de teclado global"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1782
+#, qt-format
+msgid "Press the new key or combination for <b>%1</b>"
+msgstr "Pulse la nueva tecla o combinación para <b>%1</b>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1829
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1894
+#, qt-format
+msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
+msgstr "Advertencia: esta tecla o combinación ya está asignada a «<b>%1</b>»"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1868
+#, qt-format
+msgid "Key or combination: <b>%1</b>"
+msgstr "Tecla o combinación: <b>%1</b>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1887
+#, qt-format
+msgid "Global Hotkey assignment conflict"
+msgstr "Conflicto de asignación de atajo global"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/preferences_widgets.cpp:1888
+#, qt-format
+msgid "Hotkey assignment conflict"
+msgstr "Conflicto de asignación de atajo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/simple_preferences.cpp:756
+#, qt-format
+msgid "System's default (%1)"
+msgstr "Predeterminado del sistema (%1)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: include/vlc_config_cat.h:59
+#: modules/gui/qt/dialogs/preferences/simple_preferences.cpp:1025
+#, qt-format
+msgid "Media Library Settings"
+msgstr "Configuración de la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/simple_preferences.cpp:1655
+#: modules/gui/qt/dialogs/preferences/simple_preferences.cpp:1665
+#, qt-format
+msgid "Please choose an entry point folder"
+msgstr "Seleccione una carpeta de origen"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/convert.cpp:119
+#, qt-format
+msgid "This displays the resulting media, but can slow things down."
+msgstr "Muestra el contenido multimedia resultante, pero puede ralentizar el proceso."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/sout_widgets.cpp:366
+#, qt-format
+msgid "This module outputs the transcoded stream to a network via SRT."
+msgstr "Este módulo envía la emisión transcodificada a una red mediante SRT."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/sout_widgets.cpp:421
+#, qt-format
+msgid "This module outputs the stream using the RIST protocol (TR06)."
+msgstr "Este módulo envía la emisión mediante el protocolo RIST (TR06)."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/sout_widgets.cpp:423
+#, qt-format
+msgid "Destination Address"
+msgstr "Dirección de destino"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/sout_widgets.cpp:428
+#, qt-format
+msgid "Destination Port"
+msgstr "Puerto de destino"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml:93
+#, qt-format
+msgid "L   E   F   T"
+msgstr "I   Z   Q   U   I   E   R   D   A"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml:99
+#, qt-format
+msgid "C   E   N   T   E   R"
+msgstr "C   E   N   T   R   O"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml:105
+#, qt-format
+msgid "R   I   G   H   T"
+msgstr "D   E   R   E   C   H   A"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml:271
+#, qt-format
+msgid "Drag items below to add them above: "
+msgstr "Arrastre los elementos de abajo para añadirlos arriba: "
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml:39
+#, qt-format
+msgid "Toolbar Editor"
+msgstr "Editor de barras de herramientas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml:65
+#, qt-format
+msgid "Please enter the new profile name:"
+msgstr "Introduzca el nombre del nuevo perfil:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml:155
+#, qt-format
+msgid "Profiles"
+msgstr "Perfiles"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml:159
+#, qt-format
+msgid "Clone the selected profile"
+msgstr "Clonar el perfil seleccionado"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml:177
+#, qt-format
+msgid ""
+"Delete the current profile.\n"
+"Deleting all profiles brings back the default styles."
+msgstr "Eliminar el perfil actual.\nAl eliminar todos los perfiles, se restauran los estilos predeterminados."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/mainctx.cpp:1046
+#, qt-format
+msgid "Paste from clipboard"
+msgstr "Pegar desde el portapapeles"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/mainctx.cpp:1047
+#, qt-format
+msgid "Do you want to enqueue the following URLs into the play queue?"
+msgstr "¿Desea añadir las siguientes URL a la cola de reproducción?"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/LocalTopbar.qml:36
+#, qt-format
+msgid "Local top bar"
+msgstr "Barra superior local"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/LocalTopbar.qml:110
+#, qt-format
+msgid "Show navigation menu"
+msgstr "Mostrar menú de navegación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/MainDisplay.qml:34
+#, qt-format
+msgid "Main display"
+msgstr "Pantalla principal"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/MainInterface.qml:46
+#, qt-format
+msgid "Main interface"
+msgstr "Interfaz principal"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/NoMedialibHome.qml:36
+#: modules/gui/qt/medialibrary/qml/HomeDisplay.qml:56
+#, qt-format
+msgid "Home View"
+msgstr "Vista de inicio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/OpenFileSplitButton.qml:34
+#, qt-format
+msgid "Open Multiple Files"
+msgstr "Abrir varios archivos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/OpenFileSplitButton.qml:39
+#, qt-format
+msgid "Open Location from clipboard"
+msgstr "Abrir ubicación desde el portapapeles"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/SideNavigationPane.qml:61
+#, qt-format
+msgid "Sidebar"
+msgstr "Panel lateral"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:85
+#, qt-format
+msgid "A new version of VLC is available: <font color=\"%1\">%2.%3.%4%5</font>"
+msgstr "Hay una nueva versión de VLC disponible: <font color=\"%1\">%2.%3.%4%5</font>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:91
+#, qt-format
+msgid ""
+"You have the latest version of VLC media player: <font color=\"%1\">%2</"
+"font>."
+msgstr "Tiene la última versión de VLC media player: <font color=\"%1\">%2</font>."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:94
+#, qt-format
+msgid ""
+"An <font color=\"%1\">error</font> occurred while checking for updates..."
+msgstr "Se ha producido un <font color=\"%1\">error</font> al buscar actualizaciones..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:133
+#, qt-format
+msgid "Details"
+msgstr "Detalles"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:165
+#, qt-format
+msgid "Re-check"
+msgstr "Volver a comprobar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/maininterface/qml/UpdatePane.qml:186
+#: modules/gui/qt/network/standardpathmodel.cpp:149
+#, qt-format
+msgid "Download"
+msgstr "Descargar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlbookmarkmodel.cpp:289
+#, qt-format
+msgid "Bookmark at %1"
+msgstr "Marcador en %1"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp:160
+#, qt-format
+msgid "Enter a playlist name, then try again."
+msgstr "Introduzca un nombre para la lista de reproducción e inténtelo de nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp:214
+#, qt-format
+msgid "Select a playlist or enter a new name."
+msgstr "Seleccione una lista de reproducción o introduzca un nombre nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp:225
+#, qt-format
+msgid "VLC cannot read this selection. Select the files again."
+msgstr "VLC no puede leer esta selección. Seleccione los archivos de nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp:267
+#, qt-format
+msgid "This selection has no media to add."
+msgstr "Esta selección no contiene archivos multimedia que se puedan añadir."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/macosx/library/VLCLibraryController.m:317
+#: modules/gui/macosx/library/VLCLibraryMenuController.m:126
+#: modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp:395
+#, qt-format
+msgid "Rename playlist"
+msgstr "Cambiar nombre de la lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/macosx/library/VLCLibraryController.m:318
+#: modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp:396
+#, qt-format
+msgid "Please enter the new playlist name:"
+msgstr "Introduzca el nuevo nombre de la lista de reproducción:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistmodel.cpp:76
+#, qt-format
+msgid "VLC cannot add these files. Try again."
+msgstr "VLC no puede añadir estos archivos. Inténtelo de nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistmodel.cpp:85
+#, qt-format
+msgid "The playlist changed. Use playlist order and try again."
+msgstr "La lista de reproducción ha cambiado. Use el orden de la lista e inténtelo de nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/mlplaylistmodel.cpp:114
+#, qt-format
+msgid "VLC cannot change this playlist. Try again."
+msgstr "VLC no puede modificar esta lista de reproducción. Inténtelo de nuevo."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml:40
+#, qt-format
+msgid "Artist banner"
+msgstr "Imagen del artista"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml:209
+#, qt-format
+msgid "No artist"
+msgstr "Sin artista"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml:220
+#, qt-format
+msgid "%1 Song"
+msgid_plural "%1 Songs"
+msgstr[0] "%1 canción"
+msgstr[1] "%1 canciones"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml:241
+#, qt-format
+msgid "Play all"
+msgstr "Reproducir todo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml:258
+#, qt-format
+msgid "Enqueue all"
+msgstr "Añadir todo a la cola"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/AudioGridItem.qml:35
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:245
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:322
+#: modules/gui/qt/medialibrary/qml/VideoGridItem.qml:45
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:174
+#: modules/gui/qt/medialibrary/qml/MusicAlbumSectionDelegate.qml:167
+#, qt-format
+msgid "Unknown title"
+msgstr "Título desconocido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/AudioGridItem.qml:36
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:273
+#: modules/gui/qt/medialibrary/qml/MusicAllArtists.qml:143
+#: modules/gui/qt/medialibrary/qml/MusicArtistDelegate.qml:217
+#: modules/gui/qt/medialibrary/qml/MusicAlbumSectionDelegate.qml:185
+#, qt-format
+msgid "Unknown artist"
+msgstr "Artista desconocido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/HomeDisplay.qml:126
+#: modules/gui/qt/medialibrary/qml/HomePage.qml:273
+#, qt-format
+msgid "Favorites"
+msgstr "Favoritos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/HomeDisplay.qml:158
+#: modules/gui/qt/medialibrary/qml/HomePage.qml:348
+#, qt-format
+msgid "New Videos"
+msgstr "Vídeos nuevos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/HomeDisplay.qml:198
+#: modules/gui/qt/medialibrary/qml/HomePage.qml:428
+#, qt-format
+msgid "New Music"
+msgstr "Música nueva"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/HomePage.qml:37
+#: modules/gui/qt/medialibrary/qml/MediaView.qml:75
+#: modules/gui/qt/medialibrary/qml/MusicAlbums.qml:56
+#: modules/gui/qt/medialibrary/qml/MusicAllArtists.qml:77
+#: modules/gui/qt/medialibrary/qml/MusicGenres.qml:60
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:105
+#: modules/gui/qt/medialibrary/qml/VideoAll.qml:88
+#: modules/gui/qt/network/qml/BrowseDisplay.qml:108
+#: modules/gui/qt/network/qml/BrowseDisplay.qml:147
+#: modules/gui/qt/network/qml/BrowseHomeDisplay.qml:49
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:73
+#, qt-format
+msgid "Alphabetic"
+msgstr "Alfabético"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:60
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:933
+#, qt-format
+msgid "Play as audio"
+msgstr "Reproducir como audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:64
+#, qt-format
+msgid "Play as album"
+msgstr "Reproducir como álbum"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:72
+#, qt-format
+msgid "Enqueue as album"
+msgstr "Añadir como álbum a la cola"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:77
+#, qt-format
+msgid "Add to favorites"
+msgstr "Añadir a favoritos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:81
+#, qt-format
+msgid "Remove from favorites"
+msgstr "Quitar de favoritos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:85
+#, qt-format
+msgid "Add to a video-only playlist"
+msgstr "Añadir a una lista solo de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:85
+#, qt-format
+msgid "Add to an audio-only playlist"
+msgstr "Añadir a una lista solo de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:88
+#, qt-format
+msgid "Add to a playlist"
+msgstr "Añadir a una lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:91
+#, qt-format
+msgid "Mark as seen"
+msgstr "Marcar como visto"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:95
+#, qt-format
+msgid "Mark as unseen"
+msgstr "Marcar como no visto"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:99
+#, qt-format
+msgid "Open Containing Folder"
+msgstr "Abrir carpeta contenedora"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:111
+#, qt-format
+msgid "Delete File From System"
+msgstr "Eliminar archivo del sistema"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MLContextMenu.qml:198
+#, qt-format
+msgid "Are you sure you want to delete this file?"
+msgstr "¿Seguro que desea eliminar este archivo?"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MediaView.qml:36
+#, qt-format
+msgid "Media view"
+msgstr "Vista multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MediaView.qml:166
+#: modules/gui/qt/playlist/qml/PlaylistDelegate.qml:286
+#: modules/gui/qt/widgets/qml/TableColumns.qml:47
+#, qt-format
+msgid "Unknown Title"
+msgstr "Título desconocido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MediaView.qml:317
+#, qt-format
+msgid ""
+"No media found\n"
+"Please try adding sources"
+msgstr "No se encontró contenido multimedia.\nAñada fuentes."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:70
+#: modules/gui/qt/medialibrary/qml/MusicAlbumSectionDelegate.qml:192
+#: modules/gui/qt/widgets/qml/DragItem.qml:619
+#: modules/gui/qt/widgets/qml/TableColumns.qml:75
+#, qt-format
+msgid "%1 track"
+msgid_plural "%1 tracks"
+msgstr[0] "%1 pista"
+msgstr[1] "%1 pistas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAlbums.qml:298
+#, qt-format
+msgid ""
+"No albums found\n"
+"Please try adding sources"
+msgstr "No se encontraron álbumes.\nAñada fuentes."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:256
+#, qt-format
+msgid "Close Panel"
+msgstr "Cerrar panel"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:272
+#, qt-format
+msgid "%1 - %2 - %3 - %4"
+msgstr "%1 - %2 - %3 - %4"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml:395
+#: modules/gui/qt/medialibrary/qml/MusicArtist.qml:938
+#, qt-format
+msgid "#"
+msgstr "#"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAllArtists.qml:78
+#, qt-format
+msgid "Tracks Count"
+msgstr "Número de pistas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAllArtists.qml:144
+#, qt-format
+msgid "%1 song"
+msgid_plural "%1 songs"
+msgstr[0] "%1 canción"
+msgstr[1] "%1 canciones"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicAllArtists.qml:256
+#: modules/gui/qt/medialibrary/qml/MusicArtistsAlbums.qml:329
+#, qt-format
+msgid ""
+"No artists found\n"
+"Please try adding sources"
+msgstr "No se encontraron artistas.\nAñada fuentes."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicArtistsAlbums.qml:60
+#: modules/gui/qt/medialibrary/qml/MusicArtistsAlbums.qml:63
+#, qt-format
+msgid "Release Year"
+msgstr "Año de publicación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicArtistsAlbums.qml:64
+#, qt-format
+msgid "Album Title"
+msgstr "Título del álbum"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicDisplay.qml:33
+#, qt-format
+msgid "Music view"
+msgstr "Vista de música"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicGenres.qml:196
+#, qt-format
+msgid "Unknown genre"
+msgstr "Género desconocido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicGenres.qml:203
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:328
+#, qt-format
+msgid "%1 Track"
+msgid_plural "%1 Tracks"
+msgstr[0] "%1 pista"
+msgstr[1] "%1 pistas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicGenres.qml:313
+#, qt-format
+msgid ""
+"No genres found\n"
+"Please try adding sources"
+msgstr "No se encontraron géneros.\nAñada fuentes."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicGenresDisplay.qml:86
+#, qt-format
+msgid "Genres - %1"
+msgstr "Géneros - %1"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/MusicTracksDisplay.qml:98
+#, qt-format
+msgid ""
+"No tracks found\n"
+"Please try adding sources"
+msgstr "No se encontraron pistas.\nAñada fuentes."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMedia.qml:32
+#, qt-format
+msgid "Playlist media"
+msgstr "Contenido de la lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaDisplay.qml:140
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:235
+#, qt-format
+msgid "Processing..."
+msgstr "Procesando..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaDisplay.qml:230
+#, qt-format
+msgid "No media found"
+msgstr "No se encontró contenido multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:37
+#, qt-format
+msgid "Playlist media list"
+msgstr "Lista de contenido multimedia de la lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:199
+#, qt-format
+msgid "Do you really want to delete the selected playlist?"
+msgid_plural "Do you really want to delete the selected playlists?"
+msgstr[0] "¿Seguro que desea eliminar la lista de reproducción seleccionada?"
+msgstr[1] "¿Seguro que desea eliminar las listas de reproducción seleccionadas?"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:202
+#, qt-format
+msgid "Delete playlist"
+msgid_plural "Delete playlists"
+msgstr[0] "Eliminar lista de reproducción"
+msgstr[1] "Eliminar listas de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:330
+#, qt-format
+msgid "%1 Video"
+msgid_plural "%1 Videos"
+msgstr[0] "%1 vídeo"
+msgstr[1] "%1 vídeos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:332
+#, qt-format
+msgid "%1 Other"
+msgid_plural "%1 Other"
+msgstr[0] "%1 de otro tipo"
+msgstr[1] "%1 de otros tipos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:444
+#, qt-format
+msgid "Items"
+msgstr "Elementos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:531
+#, qt-format
+msgid "No playlists found"
+msgstr "No se encontraron listas de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml:532
+#, qt-format
+msgid ""
+"Right click on a media\n"
+"to add it to a playlist"
+msgstr "Haga clic con el botón derecho en un elemento multimedia\npara añadirlo a una lista de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ScanProgressBar.qml:39
+#, qt-format
+msgid "Scanning %1"
+msgstr "Explorando %1"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/ScanProgressBar.qml:41
+#, qt-format
+msgid "Indexing Medias (%1%)"
+msgstr "Indexando contenido multimedia (%1%)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/UrlListDisplay.qml:58
+#: modules/gui/qt/network/qml/BrowseDeviceView.qml:273
+#: modules/gui/qt/network/qml/BrowseDisplay.qml:109
+#: modules/gui/qt/network/qml/BrowseDisplay.qml:148
+#: modules/gui/qt/network/qml/BrowseHomeDisplay.qml:50
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:74
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:260
+#, qt-format
+msgid "Url"
+msgstr "URL"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/UrlListDisplay.qml:72
+#, qt-format
+msgid "Last played date"
+msgstr "Fecha de la última reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoAll.qml:255
+#, qt-format
+msgid ""
+"No video found\n"
+"Please try adding sources"
+msgstr "No se encontraron vídeos.\nAñada fuentes."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoAllSubDisplay.qml:185
+#: modules/gui/qt/medialibrary/qml/VideoAllSubDisplay.qml:244
+#, qt-format
+msgid "%1 Videos"
+msgstr "%1 vídeos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoDisplay.qml:59
+#, qt-format
+msgid "Video view"
+msgstr "Vista de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:204
+#, qt-format
+msgid "File Name:"
+msgstr "Nombre de archivo:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:217
+#, qt-format
+msgid "Folder:"
+msgstr "Carpeta:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:241
+#, qt-format
+msgid "View Less"
+msgstr "Ver menos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:241
+#, qt-format
+msgid "View More"
+msgstr "Ver más"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: src/libvlc-module.c:678
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:278
+#, qt-format
+msgid "Video track"
+msgstr "Pista de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:283
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:295
+#, qt-format
+msgid "Codec:"
+msgstr "Códec:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:284
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:296
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:308
+#, qt-format
+msgid "Language:"
+msgstr "Idioma:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml:285
+#, qt-format
+msgid "FPS:"
+msgstr "FPS:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/custom_menus.cpp:131
+#, qt-format
+msgid "Scanning..."
+msgstr "Explorando..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/custom_menus.cpp:417
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:654
+#, qt-format
+msgid "&Add Bookmark"
+msgstr "&Añadir marcador"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:224
+#, qt-format
+msgid "Quit at the end of play queue"
+msgstr "Salir al terminar la cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:312
+#, qt-format
+msgid "Play &Queue"
+msgstr "Cola de &reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:319
+#, qt-format
+msgid "Docked Play Queue"
+msgstr "Cola de reproducción acoplada"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:335
+#, qt-format
+msgid "&Big Player View"
+msgstr "Vista de reproductor &grande"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:349
+#, qt-format
+msgid "&Minimal View"
+msgstr "Vista &mínima"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:355
+#, qt-format
+msgid "&View Items as Grid"
+msgstr "Ver elementos como &cuadrícula"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:360
+#, qt-format
+msgid "&Color Scheme"
+msgstr "Esquema de &color"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:424
+#, qt-format
+msgid "&Audio Device"
+msgstr "&Dispositivo de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:430
+#, qt-format
+msgid "&Mix Mode"
+msgstr "&Modo de mezcla"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:461
+#, qt-format
+msgid "&3D Output"
+msgstr "&Salida 3D"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:477
+#, qt-format
+msgid "&Fit"
+msgstr "&Ajustar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:550
+#, qt-format
+msgid "Previous Title"
+msgstr "Título anterior"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:552
+#, qt-format
+msgid "Previous Chapter"
+msgstr "Capítulo anterior"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:553
+#, qt-format
+msgid "Next Chapter"
+msgstr "Capítulo siguiente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:855
+#, qt-format
+msgid "Previous Item"
+msgstr "Elemento anterior"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:859
+#, qt-format
+msgid "Next Item"
+msgstr "Elemento siguiente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:865
+#, qt-format
+msgid "Stop Recording"
+msgstr "Detener grabación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:879
+#, qt-format
+msgid "Show UI"
+msgstr "Mostrar interfaz"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:879
+#, qt-format
+msgid "Hide UI"
+msgstr "Ocultar interfaz"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:900
+#, qt-format
+msgid "More Settings"
+msgstr "Más ajustes"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:909
+#, qt-format
+msgid "Show Queue"
+msgstr "Mostrar cola"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/menus.cpp:918
+#, qt-format
+msgid "Repeat Current Item"
+msgstr "Repetir elemento actual"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:215
+msgid "Do not group videos"
+msgstr "No agrupar vídeos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:216
+msgid "Group by name"
+msgstr "Agrupar por nombre"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:217
+msgid "Group by folder"
+msgstr "Agrupar por carpeta"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:254
+#, qt-format
+msgid "Album sections"
+msgstr "Secciones de álbumes"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:383
+#, qt-format
+msgid "&Subtitle"
+msgstr "&Subtítulo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:606
+#, qt-format
+msgid "Titles"
+msgstr "Títulos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:776
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:813
+#, qt-format
+msgid "Synchronize"
+msgstr "Sincronizar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:781
+#, qt-format
+msgid "Search online"
+msgstr "Buscar en línea"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:788
+#, qt-format
+msgid "Select multiple"
+msgstr "Seleccionar varios"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:863
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:915
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:976
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1045
+#, qt-format
+msgid "Add and play"
+msgstr "Añadir y reproducir"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1022
+#, qt-format
+msgid "Remove from Media Library"
+msgstr "Quitar de la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1108
+#, qt-format
+msgid "Jump to current playing"
+msgstr "Ir al elemento en reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1167
+#, qt-format
+msgid "Save Play Queue to File..."
+msgstr "Guardar cola de reproducción en un archivo..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: src/libvlc-module.c:1529 modules/gui/qt/menus/qml_menu_wrapper.cpp:1184
+#, qt-format
+msgid "Clear the play queue"
+msgstr "Vaciar la cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1217
+#, qt-format
+msgid "%1 Ascending"
+msgstr "%1 ascendente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1218
+#, qt-format
+msgid "%1 Descending"
+msgstr "%1 descendente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1221
+#, qt-format
+msgid "Shuffle the play queue"
+msgstr "Mezclar la cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/menus/qml_menu_wrapper.cpp:1235
+#, qt-format
+msgid "Discard the filtered out items"
+msgstr "Descartar los elementos excluidos por el filtro"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/addonsmodel.cpp:750
+#, qt-format
+msgid "VLC cannot add %1."
+msgstr "VLC no puede añadir %1."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/addonsmodel.cpp:750
+#, qt-format
+msgid "VLC cannot remove %1."
+msgstr "VLC no puede quitar %1."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseDisplay.qml:57
+#, qt-format
+msgid "Browse view"
+msgstr "Vista del explorador"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseHomeDisplay.qml:120
+#, qt-format
+msgid "No network shares found"
+msgstr "No se encontraron recursos compartidos de red"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseHomeDisplay.qml:207
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:27
+#, qt-format
+msgid "Folders"
+msgstr "Carpetas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseHomeDisplay.qml:234
+#, qt-format
+msgid "Computer"
+msgstr "Equipo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/playlist_controller_p.hpp:95
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:75
+#, qt-format
+msgid "File size"
+msgstr "Tamaño de archivo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/playlist_controller_p.hpp:96
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:76
+#, qt-format
+msgid "File modified"
+msgstr "Modificación del archivo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:116
+#, qt-format
+msgid "Unknown Share"
+msgstr "Recurso compartido desconocido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseTreeDisplay.qml:338
+#, qt-format
+msgid "Nothing to see here, go back."
+msgstr "No hay nada que mostrar. Vuelva atrás."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseTreeHeader.qml:104
+#, qt-format
+msgid "Remove from medialibrary"
+msgstr "Quitar de la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/BrowseTreeHeader.qml:105
+#, qt-format
+msgid "Add to medialibrary"
+msgstr "Añadir a la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/DiscoverDisplay.qml:51
+#, qt-format
+msgid "Discover view"
+msgstr "Vista de descubrimiento"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/DiscoverUrlDisplay.qml:73
+#, qt-format
+msgid "Paste or write the URL here"
+msgstr "Pegue o escriba la URL aquí"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/NetworkGridItem.qml:64
+#, qt-format
+msgid "Unknown share"
+msgstr "Recurso compartido desconocido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:30
+#, qt-format
+msgid "Install services"
+msgstr "Instalar servicios"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:127
+#, qt-format
+msgid "by <b>%1</b>"
+msgstr "por <b>%1</b>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:127
+#, qt-format
+msgid "by <b>Unknown</b>"
+msgstr "por <b>Desconocido</b>"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:146
+#, qt-format
+msgid "Installing"
+msgstr "Instalando"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:148
+#, qt-format
+msgid "Uninstalling"
+msgstr "Desinstalando"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:163
+#, qt-format
+msgid "No information available"
+msgstr "No hay información disponible"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesManage.qml:172
+#, qt-format
+msgid "Score: %1/5  Downloads: %2"
+msgstr "Puntuación: %1/5  Descargas: %2"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesSources.qml:71
+#, qt-format
+msgid "Add a service"
+msgstr "Añadir un servicio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/qml/ServicesSources.qml:119
+#, qt-format
+msgid "Configure..."
+msgstr "Configurar..."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/network/standardpathmodel.cpp:146
+#, qt-format
+msgid "Documents"
+msgstr "Documentos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/input_models.cpp:44
+#: modules/gui/qt/player/input_models.cpp:46
+#, qt-format
+msgid "Forced"
+msgstr "Forzados"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/player_controlbar_model.cpp:29
+msgid "Video player"
+msgstr "Reproductor de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/player_controlbar_model.cpp:30
+msgid "Audio player"
+msgstr "Reproductor de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/MiniPlayer.qml:30
+#: modules/gui/qt/player/player_controlbar_model.cpp:31
+#, qt-format
+msgid "Mini player"
+msgstr "Minirreproductor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/ControlBar.qml:69
+#, qt-format
+msgid "Player controls"
+msgstr "Controles del reproductor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/ControlBar.qml:209
+#, qt-format
+msgid "%1 (%2x)"
+msgstr "%1 (%2x)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/ControlBar.qml:223
+#, qt-format
+msgid "Progress"
+msgstr "Progreso"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/NavigationBox.qml:38
+#, qt-format
+msgid "DVD navigation"
+msgstr "Navegación de DVD"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/NavigationBox.qml:83
+#, qt-format
+msgid "Close navigation"
+msgstr "Cerrar navegación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PIPPlayer.qml:47
+#, qt-format
+msgid "video content"
+msgstr "contenido de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PIPPlayer.qml:149
+#, qt-format
+msgid "play/pause"
+msgstr "reproducir/pausar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PIPPlayer.qml:174
+#, qt-format
+msgid "close video"
+msgstr "cerrar vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PIPPlayer.qml:197
+#, qt-format
+msgid "maximize player"
+msgstr "maximizar reproductor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlaybackSpeed.qml:177
+#, qt-format
+msgid "4.00"
+msgstr "4.00"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlaybackSpeed.qml:244
+#, qt-format
+msgid "Presets:"
+msgstr "Preajustes:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:68
+#, qt-format
+msgid "Player"
+msgstr "Reproductor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:686
+#, qt-format
+msgid "album"
+msgstr "álbum"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:711
+#, qt-format
+msgid "artist"
+msgstr "artista"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:809
+#: modules/gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml:33
+#, qt-format
+msgid "Step back"
+msgstr "Retroceder un paso"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:831
+#, qt-format
+msgid "Toggle lyrics view"
+msgstr "Mostrar u ocultar letras"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:867
+#, qt-format
+msgid "Sync lyrics to playback"
+msgstr "Sincronizar letras con la reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:882
+#, qt-format
+msgid "Sync lyrics to playback position"
+msgstr "Sincronizar letras con la posición de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/Player.qml:902
+#, qt-format
+msgid "Volume %1%"
+msgstr "Volumen %1%"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: include/vlc_config_cat.h:43 src/libvlc-module.c:2222
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:42
+#: modules/gui/qt/player/qml/TopBar.qml:489
+#: modules/gui/qt/player/qml/controlbarcontrols/PlaylistButton.qml:39
+#: modules/gui/qt/playlist/qml/PlaylistDetachedWindow.qml:37
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:65
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:148
+#, qt-format
+msgid "Play Queue"
+msgstr "Cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:45
+#, qt-format
+msgid "A-B Loop"
+msgstr "Bucle A-B"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:46
+#, qt-format
+msgid "Next Frame"
+msgstr "Fotograma siguiente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:47
+#, qt-format
+msgid "Previous Frame"
+msgstr "Fotograma anterior"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:56
+#, qt-format
+msgid "Bookmark Button"
+msgstr "Botón de marcador"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:59
+#, qt-format
+msgid "Volume Widget"
+msgstr "Control de volumen"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:60
+#, qt-format
+msgid "Navigation Box"
+msgstr "Cuadro de navegación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:63
+#, qt-format
+msgid "Program Button"
+msgstr "Botón de programa"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:65
+#, qt-format
+msgid "Renderer Button"
+msgstr "Botón de dispositivo de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:69
+#: modules/gui/qt/player/qml/controlbarcontrols/PlayerSwitchButton.qml:33
+#, qt-format
+msgid "Switch Player"
+msgstr "Cambiar reproductor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:70
+#, qt-format
+msgid "Artwork Info"
+msgstr "Información de la portada"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/PlayerControlbarControls.qml:72
+#, qt-format
+msgid "High Resolution Time"
+msgstr "Tiempo de alta resolución"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/ResumeDialog.qml:44
+#, qt-format
+msgid "Resume dialog"
+msgstr "Diálogo para reanudar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/ResumeDialog.qml:118
+#, qt-format
+msgid "Do you want to restart the playback where you left off?"
+msgstr "¿Desea reanudar la reproducción donde la dejó?"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TopBar.qml:86
+#, qt-format
+msgid "Player topbar"
+msgstr "Barra superior del reproductor"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksListPage.qml:53
+#: modules/gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml:74
+#, qt-format
+msgid "%1x"
+msgstr "%1x"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksListPage.qml:99
+#, qt-format
+msgid "Video Tracks"
+msgstr "Pistas de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksListPage.qml:216
+#, qt-format
+msgid "Track list"
+msgstr "Lista de pistas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageAudio.qml:37
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:37
+#: modules/gui/qt/util/vlctick.cpp:71 modules/gui/qt/util/vlctick.cpp:108
+#, qt-format
+msgid "%1 ms"
+msgstr "%1 ms"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageAudio.qml:55
+#, qt-format
+msgid "Audio track synchronization"
+msgstr "Sincronización de pista de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageAudio.qml:67
+#: modules/gui/qt/player/qml/TracksPageAudio.qml:78
+#, qt-format
+msgid "Audio track delay"
+msgstr "Retardo de pista de audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageAudio.qml:150
+#, qt-format
+msgid "Sound Heard"
+msgstr "Sonido escuchado"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageAudio.qml:164
+#, qt-format
+msgid "Sound Spotted"
+msgstr "Sonido identificado"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:45
+#, qt-format
+msgid "%1 fps"
+msgstr "%1 fps"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:63
+#, qt-format
+msgid "Subtitle synchronization"
+msgstr "Sincronización de subtítulos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:75
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:94
+#, qt-format
+msgid "Primary subtitle delay"
+msgstr "Retardo de subtítulos principales"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:172
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:298
+#, qt-format
+msgid "Voice Heard"
+msgstr "Voz escuchada"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:186
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:312
+#, qt-format
+msgid "Text Seen"
+msgstr "Texto visto"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:204
+#: modules/gui/qt/player/qml/TracksPageSubtitle.qml:223
+#, qt-format
+msgid "Secondary subtitle delay"
+msgstr "Retardo de subtítulos secundarios"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml:185
+#, qt-format
+msgid ""
+"%1\n"
+"%2\n"
+"%3"
+msgstr "%1\n%2\n%3"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/AtoBButton.qml:29
+#, qt-format
+msgid "A to B Loop"
+msgstr "Bucle de A a B"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/Fallback.qml:46
+#, qt-format
+msgid ""
+"WIDGET\n"
+"NOT\n"
+"FOUND"
+msgstr "CONTROL\nNO\nENCONTRADO"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: src/libvlc-module.c:1435 src/player/input.c:975
+#: modules/gui/qt/player/qml/controlbarcontrols/FramePrevButton.qml:34
+#, qt-format
+msgid "Previous frame"
+msgstr "Fotograma anterior"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/FullscreenButton.qml:32
+#, qt-format
+msgid "fullscreen"
+msgstr "pantalla completa"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/LangButton.qml:50
+#, qt-format
+msgid "Languages and tracks"
+msgstr "Idiomas y pistas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/NavigationBoxButton.qml:31
+#, qt-format
+msgid "Navigation Buttons"
+msgstr "Botones de navegación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/OpenButton.qml:31
+#, qt-format
+msgid "Open media"
+msgstr "Abrir contenido multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml:36
+#, qt-format
+msgid "change playback speed"
+msgstr "cambiar velocidad de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml:75
+#, qt-format
+msgid "1x"
+msgstr "1x"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml:34
+#, qt-format
+msgid "record"
+msgstr "grabar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/macosx/menus/VLCMainMenu.m:410
+#: modules/gui/qt/player/qml/controlbarcontrols/RendererButton.qml:35
+#, qt-format
+msgid "Renderer"
+msgstr "Dispositivo de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml:180
+#, qt-format
+msgid "Index key"
+msgstr "Tecla de índice"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml:197
+#, qt-format
+msgid "Red key"
+msgstr "Tecla roja"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml:216
+#, qt-format
+msgid "Green key"
+msgstr "Tecla verde"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml:235
+#, qt-format
+msgid "Yellow key"
+msgstr "Tecla amarilla"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml:254
+#, qt-format
+msgid "Blue key"
+msgstr "Tecla azul"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/playlist_controller_p.hpp:92
+#: modules/gui/macosx/playqueue/VLCPlayQueueSortingMenuController.m:59
+#, qt-format
+msgid "Disc Number"
+msgstr "Número de disco"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/MediaCover.qml:87
+#: modules/gui/qt/playlist/qml/PlaylistDelegate.qml:185
+#, qt-format
+msgid "Media cover"
+msgstr "Portada multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:252
+#, qt-format
+msgid "%1 elements, %2"
+msgstr "%1 elementos, %2"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:595
+#, qt-format
+msgid "No results"
+msgstr "Sin resultados"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:596
+#, qt-format
+msgid "No content yet"
+msgstr "Aún no hay contenido"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/playlist/qml/PlaylistPane.qml:609
+#, qt-format
+msgid "Drag & Drop some content here!"
+msgstr "Arrastre y suelte contenido aquí."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:148
+msgid "Select the initial preferences view"
+msgstr "Seleccionar la vista inicial de preferencias"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:149
+msgid ""
+"Select which preferences view to show upon opening the preferences dialog."
+msgstr "Seleccione la vista que se mostrará al abrir el diálogo de preferencias."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:162
+msgid ""
+"Keep the window size or resize it to fit each video. Audio visualizations do "
+"not change the window size."
+msgstr "Conserve el tamaño de la ventana o ajústelo a cada vídeo. Las visualizaciones de audio no cambian el tamaño de la ventana."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:171
+msgid ""
+"Show a notification popup with the artist and track name when the current "
+"play queue item changes, when VLC is minimized or hidden."
+msgstr "Mostrar una notificación con el artista y el nombre de la pista cuando cambie el elemento de la cola de reproducción y VLC esté minimizado u oculto."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:175
+msgid ""
+"Sets the windows opacity between 0.1 and 1 for main interface, play queue "
+"and extended panel. This option only works with Windows and X11 with "
+"composite extensions."
+msgstr "Establece la opacidad de la ventana entre 0,1 y 1 para la interfaz principal, la cola de reproducción y el panel ampliado. Esta opción solo funciona en Windows y en X11 con extensiones de composición."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:181
+msgid ""
+"Sets the fullscreen controller opacity between 0.1 and 1 for main interface, "
+"play queue and extended panel. This option only works with Windows and X11 "
+"with composite extensions."
+msgstr "Establece la opacidad del controlador de pantalla completa entre 0,1 y 1 para la interfaz principal, la cola de reproducción y el panel ampliado. Esta opción solo funciona en Windows y en X11 con extensiones de composición."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:186
+msgid "Initial user scale factor for the interface, between 0.3 and 3.0"
+msgstr "Factor de escala inicial de la interfaz, entre 0,3 y 3,0"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:195
+msgid "set the options for qml debugger"
+msgstr "establecer las opciones del depurador QML"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:196
+msgid ""
+"set the options for qml debugger (see http://doc.qt.io/qt-5/qtquick-"
+"debugging.html#starting-applications)"
+msgstr "establecer las opciones del depurador QML (consulte http://doc.qt.io/qt-5/qtquick-debugging.html#starting-applications)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:253
+msgid ""
+"This option allows the interface to be shown and raised automatically when a "
+"video/audio playback starts, or never."
+msgstr "Esta opción permite mostrar la interfaz en primer plano automáticamente al iniciar la reproducción de vídeo o audio, o impedirlo siempre."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:256
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:279
+#, qt-format
+msgid "Enable window titlebar"
+msgstr "Activar barra de título de la ventana"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:257
+msgid ""
+"This option enables the title bar. Disabling it will remove the titlebar and "
+"move window buttons within the interface (Client Side Decoration)"
+msgstr "Esta opción activa la barra de título. Al desactivarla, se elimina la barra de título y se trasladan los botones de la ventana a la interfaz (decoración del lado del cliente)."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:261
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:396
+#, qt-format
+msgid "Show the menu bar"
+msgstr "Mostrar la barra de menús"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:262
+msgid "This option displays the classic menu bar"
+msgstr "Esta opción muestra la barra de menús clásica"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:264
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:416
+#, qt-format
+msgid "Pin video controls"
+msgstr "Fijar los controles de vídeo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:265
+msgid "Place video controls above and below the video instead of above"
+msgstr "Colocar los controles de vídeo encima y debajo del vídeo en vez de superponerlos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:269
+msgid "Select Qt video integration backend"
+msgstr "Seleccionar el sistema de integración de vídeo de Qt"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:270
+msgid ""
+"Select Qt video integration backend. Use with care, the interface may not "
+"start if an incompatible compositor is selected"
+msgstr "Seleccione el sistema de integración de vídeo de Qt. Tenga cuidado: la interfaz puede no iniciarse si el compositor seleccionado es incompatible."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:272
+msgid "Use smooth scrolling in Flickable based views"
+msgstr "Usar desplazamiento suave en las vistas basadas en Flickable"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:273
+msgid ""
+"Deactivating this option will disable smooth scrolling in Flickable based "
+"views (such as the Play Queue). This option is only respected with a scroll "
+"handler, see option `qt-use-scroll-handler`."
+msgstr "Al desactivar esta opción, se desactiva el desplazamiento suave en las vistas basadas en Flickable, como la cola de reproducción. Esta opción solo se aplica con un controlador de desplazamiento. Consulte la opción «qt-use-scroll-handler»."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:276
+msgid "Use Kirigami scroll handler for Flickable based views"
+msgstr "Usar el controlador de desplazamiento Kirigami en las vistas basadas en Flickable"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:277
+msgid "Using Kirigami scroll handler may improve scrolling behavior."
+msgstr "El controlador de desplazamiento Kirigami puede mejorar el desplazamiento."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:279
+msgid "Safe area for the user interface"
+msgstr "Área segura de la interfaz de usuario"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:280
+msgid ""
+"Sets the safe area percentage between 0.0 and 100 when you want to ensure "
+"the visibility of the user interface on a constrained viewport"
+msgstr "Establece el porcentaje de área segura entre 0,0 y 100 para mantener visible la interfaz de usuario en un área de visualización limitada."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:284
+msgid "Print Qt's important internal messages"
+msgstr "Mostrar los mensajes internos importantes de Qt"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:285
+msgid "Enable Qt's all own messaging categories except the debug category."
+msgstr "Activar todas las categorías de mensajes de Qt excepto la de depuración."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:287
+msgid "Hide the window on close"
+msgstr "Ocultar la ventana al cerrarla"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:288
+msgid ""
+"Instead of closing the application, hide the window. This setting is only "
+"applicable when system tray icon is enabled."
+msgstr "Ocultar la ventana en lugar de cerrar la aplicación. Esta opción solo se aplica cuando está activado el icono de la bandeja del sistema."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:291
+msgid ""
+"Use transparent panels and menus with a blurred background. Turn this off to "
+"use solid backgrounds."
+msgstr "Usar paneles y menús transparentes con el fondo desenfocado. Desactive esta opción para usar fondos opacos."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:294
+msgid "Enable picture-in-picture (PiP) mode"
+msgstr "Activar el modo de imagen en imagen (PiP)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:295
+msgid ""
+"Picture-in-picture mode allows playing video contained in a smaller area so "
+"that the interface remains usable."
+msgstr "El modo de imagen en imagen permite reproducir vídeo en un área más pequeña para mantener accesible la interfaz."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:298
+msgid ""
+"Adjusts the accent color, special values are 'default' and 'system' "
+"(requires Qt 6.6) ."
+msgstr "Ajusta el color de acento. Los valores especiales son «default» y «system» (requiere Qt 6.6)."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:351
+msgid "In fullscreen only"
+msgstr "Solo en pantalla completa"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:369
+msgid "Show a video frame when you point to the seekbar."
+msgstr "Mostrar un fotograma del vídeo al apuntar a la barra de progreso."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:370
+msgid "Keep custom buffer values editable"
+msgstr "Mantener editables los valores de búfer personalizados"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:371
+msgid "Keep the buffer value fields editable when they match a preset."
+msgstr "Mantener editables los campos de valores de búfer cuando coincidan con un preajuste."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:375
+msgid "Playback controls hide delay (ms)"
+msgstr "Tiempo para ocultar los controles de reproducción (ms)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:377
+msgid "Track notification duration (ms)"
+msgstr "Duración de la notificación de pista (ms)"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:453
+msgid ""
+"Show short notices for warnings in VLC's log. Warnings that arrive together "
+"share a notice."
+msgstr "Mostrar avisos breves sobre las advertencias del registro de VLC. Las advertencias que llegan juntas comparten un aviso."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:467
+msgid ""
+"Search for cast devices when you open the device list. Turn this off to stop "
+"the search. This does not stop a cast that is in use."
+msgstr "Buscar dispositivos de transmisión al abrir la lista de dispositivos. Desactive esta opción para detener la búsqueda. Esto no detiene una transmisión en curso."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/qt.cpp:504
+msgid "Show or hide the file browser"
+msgstr "Mostrar u ocultar el explorador de archivos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/color_scheme_model.cpp:25
+#, qt-format
+msgid "Day"
+msgstr "Día"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/color_scheme_model.cpp:25
+#, qt-format
+msgid "Night"
+msgstr "Noche"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/csdmenu.cpp:111
+#, qt-format
+msgid "Restore"
+msgstr "Restaurar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/csdmenu.cpp:120
+#, qt-format
+msgid "Maximized"
+msgstr "Maximizado"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/model_recovery_agent.hpp:73
+#, qt-format
+msgid "play queue"
+msgstr "cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/model_recovery_agent.hpp:74
+#, qt-format
+msgid ""
+"VLC did not close normally.\n"
+"Restore the %1 saved on %2?"
+msgstr "VLC no se cerró correctamente.\n¿Desea restaurar la %1 guardada el %2?"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/model_recovery_agent.hpp:76
+#, qt-format
+msgid "Restore saved items"
+msgstr "Restaurar elementos guardados"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/ui_notifier.cpp:36
+#, qt-format
+msgid "Scale: %1%"
+msgstr "Escala: %1%"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/ui_notifier.cpp:43
+#, qt-format
+msgid "Controls hidden"
+msgstr "Controles ocultos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/vlctick.cpp:88
+#, qt-format
+msgid "%1 h %2 min"
+msgstr "%1 h %2 min"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/vlctick.cpp:100
+#, qt-format
+msgid "%1 min %2 s"
+msgstr "%1 min %2 s"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/vlctick.cpp:104
+#, qt-format
+msgid "%1 sec"
+msgstr "%1 s"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/vlctick.cpp:125
+#, qt-format
+msgid "%1h%2"
+msgstr "%1h%2"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/util/vlctick.cpp:143
+#, qt-format
+msgid "%1ms"
+msgstr "%1ms"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:39
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:169
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:158
+#, qt-format
+msgid "Reload"
+msgstr "Volver a cargar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:104
+#, qt-format
+msgid "Failed to add \"%1\""
+msgstr "No se pudo añadir «%1»"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:107
+#, qt-format
+msgid "Failed to remove \"%1\""
+msgstr "No se pudo quitar «%1»"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:110
+#, qt-format
+msgid "Failed to ban \"%1\""
+msgstr "No se pudo excluir «%1»"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:113
+#, qt-format
+msgid "Failed to unban \"%1\""
+msgstr "No se pudo dejar de excluir «%1»"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/native/mlfolderseditor.cpp:117
+#, qt-format
+msgid "Medialibrary error"
+msgstr "Error de la biblioteca multimedia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/DragItem.qml:253
+#, qt-format
+msgid "drag item"
+msgstr "arrastrar elemento"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/DragItem.qml:620
+#, qt-format
+msgid "%1 item"
+msgid_plural "%1 items"
+msgstr[0] "%1 elemento"
+msgstr[1] "%1 elementos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/DragItem.qml:630
+#, qt-format
+msgid "1 selected"
+msgstr "1 seleccionado"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/DragItem.qml:633
+#, qt-format
+msgid "%1 selected"
+msgstr "%1 seleccionados"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/EmptyLabel.qml:54
+#, qt-format
+msgid "Empty view"
+msgstr "Vista vacía"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/GridSortFilterControls.qml:30
+#, qt-format
+msgid "List/Grid"
+msgstr "Lista/Cuadrícula"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/SearchBox.qml:175
+#, qt-format
+msgid "filter"
+msgstr "filtro"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/SearchBox.qml:245
+#, qt-format
+msgid "Case sensitive"
+msgstr "Distinguir mayúsculas y minúsculas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/SearchBox.qml:266
+#, qt-format
+msgid "Use regular expression"
+msgstr "Usar expresión regular"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/SplitButton.qml:138
+#, qt-format
+msgid "More options"
+msgstr "Más opciones"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/TableColumns.qml:77
+#, qt-format
+msgid "%1 video"
+msgid_plural "%1 videos"
+msgstr[0] "%1 vídeo"
+msgstr[1] "%1 vídeos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/widgets/qml/ViewHeader.qml:108
+#, qt-format
+msgid "See All"
+msgstr "Ver todo"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open_disk.ui:65
+#, qt-format
+msgid "DVD-Audio"
+msgstr "DVD-Audio"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open_net.ui:78
+#, qt-format
+msgid "Clear History"
+msgstr "Borrar historial"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/open/open_net.ui:81
+#, qt-format
+msgid "Clear the network URL browsing history"
+msgstr "Borrar el historial de URL de red"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/audio_output/mmdevice.c:1566
+#: modules/gui/qt/dialogs/preferences/sprefs_audio.ui:267
+#, qt-format
+msgid "HDMI/SPDIF audio passthrough"
+msgstr "Paso directo de audio por HDMI/SPDIF"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:75
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:98
+#, qt-format
+msgid "VLC will use custom skin."
+msgstr "VLC usará una apariencia personalizada."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:112
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:137
+#, qt-format
+msgid ""
+"VLC will use a modern layout with\n"
+"no menubar or pinned controls but\n"
+"with client-side decoration."
+msgstr "VLC usará un diseño moderno sin\nbarra de menús ni controles fijos, pero\ncon decoración del lado del cliente."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:142
+#, qt-format
+msgid "Modern"
+msgstr "Moderno"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:156
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:181
+#, qt-format
+msgid ""
+"VLC will use a classic layout with\n"
+"a menubar and pinned controls but\n"
+"with no client-side decoration."
+msgstr "VLC usará un diseño clásico con\nbarra de menús y controles fijos, pero\nsin decoración del lado del cliente."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:186
+#, qt-format
+msgid "Classic"
+msgstr "Clásico"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:205
+#, qt-format
+msgid "Customize Toolbar"
+msgstr "Personalizar barra de herramientas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:339
+#, qt-format
+msgid "Color scheme:"
+msgstr "Esquema de color:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:386
+#, qt-format
+msgid "Interface scale factor:"
+msgstr "Factor de escala de la interfaz:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:413
+#, qt-format
+msgid "Disables autohiding of controls when playing videos"
+msgstr "Desactiva la ocultación automática de controles al reproducir vídeos"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:540
+#, qt-format
+msgid "Play Queue and Instances"
+msgstr "Cola de reproducción e instancias"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: src/libvlc-module.c:1339
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:553
+#, qt-format
+msgid "Display play queue tree"
+msgstr "Mostrar árbol de la cola de reproducción"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: src/libvlc-module.c:1230
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:574
+#, qt-format
+msgid "Enqueue items into play queue in one instance mode"
+msgstr "Añadir elementos a la cola de reproducción en el modo de una sola instancia"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_interface.ui:627
+#, qt-format
+msgid "Clear Recently Played Items"
+msgstr "Borrar elementos reproducidos recientemente"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:33
+#, qt-format
+msgid "Folders scanned by the Media Library:"
+msgstr "Carpetas exploradas por la biblioteca multimedia:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:59
+#, qt-format
+msgid "Add banned folder"
+msgstr "Añadir carpeta excluida"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:62
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:91
+#, qt-format
+msgid "+"
+msgstr "+"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:88
+#, qt-format
+msgid "Add scanned folder"
+msgstr "Añadir carpeta para explorar"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:138
+#, qt-format
+msgid "Banned folders:"
+msgstr "Carpetas excluidas:"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:145
+#, qt-format
+msgid "Reload All Folders"
+msgstr "Volver a cargar todas las carpetas"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_medialibrary.ui:161
+#, qt-format
+msgid "⟳"
+msgstr "⟳"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_subtitles.ui:325
+#, qt-format
+msgid "Dual Subtitles"
+msgstr "Subtítulos dobles"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_subtitles.ui:343
+#, qt-format
+msgid "Align"
+msgstr "Alineación"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_subtitles.ui:372
+#, qt-format
+msgid "Offset"
+msgstr "Desplazamiento"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_video.ui:86
+#, qt-format
+msgid "Fullscreen video device"
+msgstr "Dispositivo de vídeo para pantalla completa"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/video_output/win32/direct3d9.c:80
+#: modules/gui/qt/dialogs/preferences/sprefs_video.ui:105
+#, qt-format
+msgid "Use hardware YUV to RGB conversions"
+msgstr "Usar conversiones YUV a RGB por hardware"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/preferences/sprefs_video.ui:199
+#, qt-format
+msgid "Force aspect ratio"
+msgstr "Forzar relación de aspecto"
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/profiles.ui:734
+#, qt-format
+msgid ""
+"Boost or reduce the audio volume of the output file.\n"
+"0 = No change. 100% = original volume. 200% = double volume."
+msgstr "Amplíe o reduzca el volumen de audio del archivo de salida.\n0 = Sin cambios. 100% = volumen original. 200% = volumen doble."
+
+#. First-pass Spanish translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/sout/profiles.ui:741
+#, qt-format
+msgid "No change"
+msgstr "Sin cambios"
