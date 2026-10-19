@@ -36,6 +36,8 @@
 #include <QLocale>
 #include <QShowEvent>
 #include <QHideEvent>
+#include <QEvent>
+#include <QStyleHints>
 
 #include <cassert>
 #include <limits>
@@ -52,6 +54,8 @@
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "util/interface_translator.hpp"
 #include "util/message_log.hpp"
+#include "util/colorizedsvgicon.hpp"
+#include "util/color_scheme_model.hpp"
 
 MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
                : QVLCFrame( _p_intf )
@@ -104,7 +108,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     ui.filterEdit->setText( getSettings()->value( "Messages/messages-filter" ).toString() );
 
     updateButton = new QToolButton;
-    updateButton->setIcon( QIcon(":/menu/update.svg") );
+    updateButton->setObjectName(QStringLiteral("logActionButton"));
     updateButton->setAutoRaise( true );
     ui.mainTab->setCornerWidget( updateButton );
 
@@ -120,6 +124,8 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
 #endif
 
     tabChanged(0);
+    if (p_intf->p_mi)
+        connect(p_intf->p_mi, &MainCtx::intfScaleFactorChanged, this, &MessagesDialog::updateActionIcon);
 
     BUTTONACT( updateButton, &MessagesDialog::updateOrClear );
     BUTTONACT( ui.saveLogButton, &MessagesDialog::save );
@@ -272,6 +278,31 @@ void MessagesDialog::hideEvent(QHideEvent* event)
     QVLCFrame::hideEvent(event);
 }
 
+void MessagesDialog::changeEvent(QEvent* event)
+{
+    QVLCFrame::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange) updateActionIcon();
+}
+
+void MessagesDialog::updateActionIcon()
+{
+    if (!updateButton) return;
+    const auto resource = ui.mainTab->currentIndex() > 1
+        ? QStringLiteral(":/menu/redesign/refresh.svg") : QStringLiteral(":/menu/redesign/remove.svg");
+    QColor foreground = palette().color(QPalette::WindowText);
+    if (const auto ctx = p_intf->p_mi)
+    {
+        const auto scheme = ctx->getColorScheme()->currentScheme();
+        const bool light = scheme == ColorSchemeModel::Day ||
+            (scheme == ColorSchemeModel::System && qApp->styleHints()->colorScheme() == Qt::ColorScheme::Light);
+        foreground = QColor(light ? "#404040" : "#8f8f8f");
+    }
+    updateButton->setIcon(ColorizedSvgIcon(resource, {}, {}, {},
+        {{QStringLiteral("#8f8f8f"), foreground.name()}}));
+    const int size = qRound(24 * (p_intf->p_mi ? p_intf->p_mi->getIntfScaleFactor() : 1));
+    updateButton->setIconSize(QSize(size, size));
+}
+
 bool MessagesDialog::save()
 {
     drainMessages();
@@ -382,7 +413,7 @@ void MessagesDialog::tabChanged( int i )
         m_logTimer.start();
     }
     else m_logTimer.stop();
-    updateButton->setIcon( i > 1 ? QIcon(":/menu/update.svg") : QIcon(":/menu/clear.svg") );
+    updateActionIcon();
     updateButton->setToolTip( i > 1 ? qtr("Update the tree")
                                      : i == 0 ? qtr("Clear the messages")
                                               : qtr("Clear errors and warnings"));

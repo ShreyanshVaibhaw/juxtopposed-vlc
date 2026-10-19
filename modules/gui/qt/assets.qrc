@@ -36,6 +36,8 @@
         <file alias="playlist.svg">pixmaps/menu/redesign/playlist.svg</file>
         <file alias="open.svg">pixmaps/menu/redesign/open.svg</file>
         <file alias="quit.svg">pixmaps/menu/redesign/quit.svg</file>
+        <file alias="remove.svg">pixmaps/menu/redesign/remove.svg</file>
+        <file alias="refresh.svg">pixmaps/menu/redesign/refresh.svg</file>
     </qresource>
     <qresource prefix="/menu">
         <file alias="add.svg">pixmaps/menu/add.svg</file>

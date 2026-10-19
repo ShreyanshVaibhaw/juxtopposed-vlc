@@ -965,6 +965,8 @@ libqt_plugin_la_RES = \
 	pixmaps/menu/redesign/playlist.svg \
 	pixmaps/menu/redesign/open.svg \
 	pixmaps/menu/redesign/quit.svg \
+	pixmaps/menu/redesign/remove.svg \
+	pixmaps/menu/redesign/refresh.svg \
 	pixmaps/menu/add.svg \
 	pixmaps/menu/capture-card.svg \
 	pixmaps/menu/clear.svg \
