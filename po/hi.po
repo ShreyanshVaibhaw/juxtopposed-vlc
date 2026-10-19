@@ -30231,3 +30231,16 @@ msgstr "मीडिया प्रबंधन सूची"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "उपशीर्षक"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "सिस्टम की भाषा"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "इंटरफ़ेस की भाषा चुनें। बदलाव तुरंत लागू होते हैं। जिस पाठ का अनुवाद नहीं हुआ है, वह अंग्रेज़ी में दिखता है।"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC इस भाषा को लोड नहीं कर सकता।"

@@ -38580,3 +38580,16 @@ msgstr "媒体管理器列表"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "插件管理器"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "系统语言"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "选择界面语言。更改将立即生效。未翻译的文字将以英语显示。"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC 无法加载此语言。"

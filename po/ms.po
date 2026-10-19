@@ -41815,3 +41815,16 @@ msgstr "Senarai Pengurus Media"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "Pengurus Tambahan"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Bahasa sistem"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Pilih bahasa antara muka. Perubahan digunakan serta-merta. Teks tanpa terjemahan dipaparkan dalam bahasa Inggeris."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC tidak dapat memuatkan bahasa ini."

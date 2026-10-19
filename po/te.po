@@ -29640,3 +29640,16 @@ msgstr "మాధ్యమ నిర్వాహకం జాబితా"
 #, fuzzy
 #~ msgid "Effect"
 #~ msgstr "ప్రభావాలు"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "వ్యవస్థ భాష"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ఇంటర్‌ఫేస్ కోసం భాషను ఎంచుకోండి. మార్పులు వెంటనే అమలవుతాయి. అనువదించని వచనం ఆంగ్లంలో కనిపిస్తుంది."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ఈ భాషను లోడ్ చేయలేదు."

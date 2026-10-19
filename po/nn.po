@@ -37074,3 +37074,16 @@ msgstr ""
 
 #~ msgid "Uncompressed RAR"
 #~ msgstr "Dekomprimert RAR"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Systemspråk"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Vel eit språk for grensesnittet. Endringane gjeld med ein gong. Tekst utan omsetjing vert vist på engelsk."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC kan ikkje laste inn dette språket."

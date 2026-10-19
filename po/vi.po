@@ -34475,3 +34475,16 @@ msgstr "Danh sách quản lý tập tin"
 #, fuzzy
 #~ msgid "Remaining time: %i seconds"
 #~ msgstr "Thời gian tổng cộng/còn lại"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Ngôn ngữ hệ thống"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Chọn ngôn ngữ giao diện. Thay đổi được áp dụng ngay. Văn bản chưa được dịch sẽ hiển thị bằng tiếng Anh."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC không thể tải ngôn ngữ này."

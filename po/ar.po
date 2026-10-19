@@ -37482,3 +37482,16 @@ msgstr "لائحة مدير الوسائط"
 #~ msgstr ""
 #~ "وهذا يتيح لك الاتصال اعطاء العنوان البريدي للتيار ، وسوف يعلن في SDP "
 #~ "(دورة توصيف)."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "لغة النظام"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "اختر لغة الواجهة. تُطبّق التغييرات فورًا. يظهر النص غير المترجم باللغة الإنجليزية."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "يتعذر على VLC تحميل هذه اللغة."

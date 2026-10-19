@@ -41288,3 +41288,16 @@ msgstr "Λίστα διαχειριστή πολυμέσων"
 #, fuzzy
 #~ msgid "Fingerprinting track..."
 #~ msgstr "&Αποτύπωμα"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Γλώσσα συστήματος"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Επιλέξτε γλώσσα για τη διεπαφή. Οι αλλαγές εφαρμόζονται αμέσως. Το κείμενο χωρίς μετάφραση εμφανίζεται στα αγγλικά."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "Το VLC δεν μπορεί να φορτώσει αυτή τη γλώσσα."

@@ -35104,3 +35104,16 @@ msgstr "Lista gestionarului media"
 
 #~ msgid "Streaming Output"
 #~ msgstr "Flux de ieșire"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Limba sistemului"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Alegeți o limbă pentru interfață. Modificările se aplică imediat. Textul fără traducere este afișat în engleză."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nu poate încărca această limbă."

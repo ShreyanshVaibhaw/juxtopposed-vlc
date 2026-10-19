@@ -40317,3 +40317,16 @@ msgstr "Mediabeheerlijst"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "Addon-beheerder"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Systeemtaal"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Kies een taal voor de interface. Wijzigingen worden direct toegepast. Tekst zonder vertaling wordt in het Engels weergegeven."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC kan deze taal niet laden."

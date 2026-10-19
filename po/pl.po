@@ -39691,3 +39691,16 @@ msgstr "Lista menedżera mediów"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "Menedżer dodatków"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Język systemu"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Wybierz język interfejsu. Zmiany są stosowane od razu. Tekst bez tłumaczenia jest wyświetlany po angielsku."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nie może wczytać tego języka."

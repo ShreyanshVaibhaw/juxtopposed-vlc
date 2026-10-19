@@ -44649,3 +44649,16 @@ msgstr "Elenco gestore multimediale"
 #~ "Se il tuo framebuffer supporta l'accelerazione hardware o esegue il "
 #~ "doppio buffering hardware, dovresti disabilitare questa opzione. Sarà "
 #~ "eseguito il doppio buffering software."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Lingua del sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Scegli una lingua per l’interfaccia. Le modifiche si applicano subito. Il testo senza traduzione viene mostrato in inglese."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC non può caricare questa lingua."

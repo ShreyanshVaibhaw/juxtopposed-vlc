@@ -32179,3 +32179,16 @@ msgstr "Список медіаменеджеру"
 
 #~ msgid "Streaming Output"
 #~ msgstr "Потоковий вивід"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Мова системи"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Виберіть мову інтерфейсу. Зміни застосовуються одразу. Текст без перекладу відображається англійською мовою."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC не може завантажити цю мову."

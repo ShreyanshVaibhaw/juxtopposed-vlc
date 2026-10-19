@@ -38546,3 +38546,16 @@ msgstr "Médiakezelési lista"
 
 #~ msgid "Select a matching identity"
 #~ msgstr "Válasszon illeszkedő identitást"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "A rendszer nyelve"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Válassza ki a felület nyelvét. A módosítások azonnal érvénybe lépnek. A le nem fordított szöveg angolul jelenik meg."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "A VLC nem tudja betölteni ezt a nyelvet."

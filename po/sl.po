@@ -40215,3 +40215,16 @@ msgstr "Seznam upravljalnika predstavnih datotek"
 #~ msgstr ""
 #~ "Možnost omogoča določanje kategorije seje, ki bo najavljena če je za "
 #~ "uporabo izbran protokol SAP."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Jezik sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Izberite jezik vmesnika. Spremembe se uveljavijo takoj. Neprevedeno besedilo je prikazano v angleščini."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ne more naložiti tega jezika."

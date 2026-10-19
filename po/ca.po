@@ -42928,3 +42928,16 @@ msgstr "Llista de gestió d'elements multimèdia"
 #~ msgstr ""
 #~ "Permet especificar una categoria per a la sessió que s'anunciarà si trieu "
 #~ "utilitzar SAP."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Llengua del sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Trieu una llengua per a la interfície. Els canvis s’apliquen de seguida. El text sense traducció es mostra en anglès."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "El VLC no pot carregar aquesta llengua."

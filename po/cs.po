@@ -29535,3 +29535,16 @@ msgstr "Seznam správců médií"
 #, fuzzy
 #~ msgid "Configure Media Library"
 #~ msgstr "Knihovna médií"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Jazyk systému"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Vyberte jazyk rozhraní. Změny se použijí ihned. Nepřeložený text se zobrazí anglicky."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nemůže načíst tento jazyk."

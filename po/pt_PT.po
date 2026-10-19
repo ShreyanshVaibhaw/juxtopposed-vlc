@@ -38014,3 +38014,16 @@ msgstr "Lista do gestor multimédia"
 
 #~ msgid "Fingerprinting track..."
 #~ msgstr "A identificar faixa..."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Idioma do sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Escolha um idioma para a interface. As alterações são aplicadas de imediato. O texto sem tradução é apresentado em inglês."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "O VLC não consegue carregar este idioma."

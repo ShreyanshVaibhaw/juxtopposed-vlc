@@ -40177,3 +40177,16 @@ msgstr "Multimedia-fitxategien kudeatzaileen zerrenda"
 #, fuzzy
 #~ msgid "Shoutcast TV"
 #~ msgstr "Shoutcast"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Sistemaren hizkuntza"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Aukeratu interfazearen hizkuntza. Aldaketak berehala aplikatzen dira. Itzuli gabeko testua ingelesez erakusten da."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLCk ezin du hizkuntza hau kargatu."

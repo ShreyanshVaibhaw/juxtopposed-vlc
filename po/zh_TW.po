@@ -35506,3 +35506,16 @@ msgstr "媒體管理員清單"
 #~ msgid ""
 #~ "Allows you to specify the audio sample rate used for the streaming output."
 #~ msgstr "指定輸入的「作者」詮釋資料。"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "系統語言"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "選擇介面語言。變更會立即生效。尚未翻譯的文字會以英文顯示。"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC 無法載入此語言。"

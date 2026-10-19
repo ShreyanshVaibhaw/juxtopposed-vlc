@@ -38885,3 +38885,16 @@ msgstr "Mediebehandlerliste"
 
 #~ msgid "Streaming Output"
 #~ msgstr "Strømmeutdata"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Systemspråk"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Velg et språk for grensesnittet. Endringene gjelder med en gang. Tekst uten oversettelse vises på engelsk."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC kan ikke laste inn dette språket."

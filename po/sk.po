@@ -38317,3 +38317,16 @@ msgstr "Zoznam správcov médií"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "Manažér doplnkov"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Jazyk systému"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Vyberte jazyk rozhrania. Zmeny sa použijú ihneď. Nepreložený text sa zobrazí v angličtine."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC nemôže načítať tento jazyk."

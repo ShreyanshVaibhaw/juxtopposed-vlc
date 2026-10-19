@@ -36249,3 +36249,16 @@ msgstr ""
 #~ msgstr ""
 #~ "Ово Вам дозвољава да дате контакт е-mail адресу, која ће бити најављена у "
 #~ "SDP-у (Дескриптор Сесије)."
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Језик система"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Изаберите језик интерфејса. Промене се примењују одмах. Текст без превода се приказује на енглеском."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC не може да учита овај језик."

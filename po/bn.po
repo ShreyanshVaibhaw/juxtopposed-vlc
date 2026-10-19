@@ -35056,3 +35056,16 @@ msgstr "মিডিয়া ব্যবস্থাপকের তালিক�
 #, fuzzy
 #~ msgid "Automate picture coding mode"
 #~ msgstr "ছবি কোডিং মোড"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "সিস্টেমের ভাষা"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "ইন্টারফেসের ভাষা বেছে নিন। পরিবর্তন সঙ্গে সঙ্গে কার্যকর হয়। অনুবাদ না করা লেখা ইংরেজিতে দেখানো হয়।"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC এই ভাষা লোড করতে পারছে না।"

@@ -31746,3 +31746,16 @@ msgstr "مدیریت لیست رسانه"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "باز کردن زیرنویس ها"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "زبان سیستم"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "زبانی برای رابط کاربری انتخاب کنید. تغییرات بلافاصله اعمال می‌شوند. متن ترجمه‌نشده به انگلیسی نمایش داده می‌شود."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC نمی‌تواند این زبان را بارگیری کند."

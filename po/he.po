@@ -28367,3 +28367,16 @@ msgstr ""
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "רשימת מנהל המדיה"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "שפת המערכת"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "יש לבחור שפה לממשק. השינויים חלים מיד. טקסט שלא תורגם מוצג באנגלית."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "אין אפשרות לטעון שפה זו ב־VLC."

@@ -37718,3 +37718,16 @@ msgstr "メディアマネージャーリスト"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "アドオン管理"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "システムの言語"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "インターフェースの言語を選択します。変更はすぐに反映されます。翻訳されていないテキストは英語で表示されます。"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLCはこの言語を読み込めません。"

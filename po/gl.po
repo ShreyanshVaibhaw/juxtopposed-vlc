@@ -38287,3 +38287,16 @@ msgstr "Lista do xestor multimedia"
 #, fuzzy
 #~ msgid "Select the protocol for the URL."
 #~ msgstr "Seleccionar unha cor no vídeo"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Idioma do sistema"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Escolla un idioma para a interface. Os cambios aplícanse de inmediato. O texto sen tradución móstrase en inglés."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "O VLC non pode cargar este idioma."

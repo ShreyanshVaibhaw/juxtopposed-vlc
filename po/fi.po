@@ -38534,3 +38534,16 @@ msgstr "Mediahallinnan lista"
 #, fuzzy
 #~ msgid "VLC media player - Flash Viewer"
 #~ msgstr "VLC-mediasoitin - web-käyttöliittymä"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Järjestelmän kieli"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Valitse käyttöliittymän kieli. Muutokset tulevat voimaan heti. Kääntämätön teksti näytetään englanniksi."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ei voi ladata tätä kieltä."

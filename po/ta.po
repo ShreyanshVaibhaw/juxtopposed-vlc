@@ -29428,3 +29428,16 @@ msgstr ""
 #, fuzzy
 #~ msgid "Set"
 #~ msgstr "ஈரம்"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "கணினியின் மொழி"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "இடைமுகத்திற்கான மொழியைத் தேர்ந்தெடுக்கவும். மாற்றங்கள் உடனடியாகச் செயல்படும். மொழிபெயர்க்கப்படாத உரை ஆங்கிலத்தில் காட்டப்படும்."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC இந்த மொழியை ஏற்ற முடியவில்லை."

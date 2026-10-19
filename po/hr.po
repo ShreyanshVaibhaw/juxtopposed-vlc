@@ -38046,3 +38046,16 @@ msgstr "Popis medijskog upravitelja"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Otvori podnaslove"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Jezik sustava"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Odaberite jezik sučelja. Promjene se primjenjuju odmah. Tekst bez prijevoda prikazuje se na engleskom."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ne može učitati ovaj jezik."

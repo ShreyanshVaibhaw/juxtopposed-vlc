@@ -31055,3 +31055,16 @@ msgstr "รายการตัวจัดการสื่อ"
 #, fuzzy
 #~ msgid "Addon Manager"
 #~ msgstr "จัตจัดการส่วนเสริม"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "ภาษาของระบบ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "เลือกภาษาสำหรับส่วนติดต่อ การเปลี่ยนแปลงจะมีผลทันที ข้อความที่ยังไม่ได้แปลจะแสดงเป็นภาษาอังกฤษ"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC ไม่สามารถโหลดภาษานี้ได้"

@@ -35591,3 +35591,16 @@ msgstr "Daftar Media Manager"
 #, fuzzy
 #~ msgid "Open Subtitles"
 #~ msgstr "Buka subtitle"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Bahasa sistem"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Pilih bahasa antarmuka. Perubahan langsung diterapkan. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC tidak dapat memuat bahasa ini."

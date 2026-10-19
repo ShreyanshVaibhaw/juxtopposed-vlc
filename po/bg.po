@@ -35460,3 +35460,16 @@ msgstr "Управление на списъка с медии"
 #, fuzzy
 #~ msgid "Mute "
 #~ msgstr "Без звук"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System language"
+msgstr "Език на системата"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose a language for the interface. Changes apply at once. Text without a translation is shown in English."
+msgstr "Изберете език за интерфейса. Промените се прилагат веднага. Текстът без превод се показва на английски."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot load this language."
+msgstr "VLC не може да зареди този език."
