@@ -22764,10 +22764,10 @@ msgstr ""
 msgid "Info"
 msgstr "Détails"
 
+#. Redesign translation by Codex (first pass; review welcome).
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "mise au point"
+msgstr "Débogage"
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -38169,7 +38169,6 @@ msgstr "Ce lien ne contient pas de fichier de sous-titres. Utilisez un lien dire
 msgid "<p>Interface design adapted from <a href=\"https://www.figma.com/community/file/1691465999134370980/vlc-redesign\">VLC Redesign</a> by <a href=\"https://www.juxtopposed.com/\">Juxtopposed</a>, licensed under <a href=\"https://creativecommons.org/licenses/by/4.0/\">CC BY 4.0</a>. Modified for VLC's native interface, responsive layouts, controls, and settings.</p><p>Interface font: <a href=\"https://rsms.me/inter/\">Inter</a> by Rasmus Andersson and contributors. Licensed under the <a href=\"https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt\">SIL Open Font License 1.1</a>. The full font license is in the License tab.</p>"
 msgstr "<p>Conception de l’interface adaptée de <a href=\"https://www.figma.com/community/file/1691465999134370980/vlc-redesign\">VLC Redesign</a> par <a href=\"https://www.juxtopposed.com/\">Juxtopposed</a>, sous licence <a href=\"https://creativecommons.org/licenses/by/4.0/\">CC BY 4.0</a>. Modifiée pour l’interface native de VLC, les mises en page adaptatives, les commandes et les paramètres.</p><p>Police de l’interface : <a href=\"https://rsms.me/inter/\">Inter</a> par Rasmus Andersson et ses contributeurs. Sous licence <a href=\"https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt\">SIL Open Font License 1.1</a>. La licence complète de la police se trouve dans l’onglet Licence.</p>"
 
-
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Network streams"
 msgstr "Flux réseau"
@@ -39009,3 +39008,164 @@ msgstr "Se reconnecter automatiquement"
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "Connection timeout (ms)"
 msgstr "Délai de connexion (ms)"
+
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Light"
+msgstr "Clair"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "System"
+msgstr "Système"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Retry"
+msgstr "Réessayer"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reset to default"
+msgstr "Rétablir la valeur par défaut"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Restart VLC to use this change."
+msgstr "Redémarrez VLC pour appliquer cette modification."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use this value"
+msgstr "Utiliser cette valeur"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "ON"
+msgstr "OUI"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "OFF"
+msgstr "NON"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search languages"
+msgstr "Rechercher des langues"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "No languages found"
+msgstr "Aucune langue trouvée"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Cancel language order"
+msgstr "Annuler l’ordre des langues"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Language names or codes, separated by commas"
+msgstr "Noms ou codes de langue, séparés par des virgules"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use this language order"
+msgstr "Utiliser cet ordre des langues"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Choose %1"
+msgstr "Choisir %1"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "This action replaces all VLC settings with the default settings. Restart VLC after this action."
+msgstr "Cette action remplace tous les paramètres de VLC par les valeurs par défaut. Redémarrez VLC après cette action."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC cannot open the settings folder."
+msgstr "VLC ne peut pas ouvrir le dossier de configuration."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "VLC saved the default settings. Restart VLC to use all settings."
+msgstr "VLC a enregistré les paramètres par défaut. Redémarrez VLC pour appliquer tous les paramètres."
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "App"
+msgstr "Application"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Privacy"
+msgstr "Confidentialité"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Media"
+msgstr "Médias"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Performance"
+msgstr "Performances"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Search results"
+msgstr "Résultats de recherche"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Close settings"
+msgstr "Fermer les paramètres"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Interface language"
+msgstr "Langue de l’interface"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Theme"
+msgstr "Thème"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Accent color"
+msgstr "Couleur d’accentuation"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Custom accent color"
+msgstr "Couleur d’accentuation personnalisée"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Defaults"
+msgstr "Valeurs par défaut"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Edit Keyboard Shortcuts"
+msgstr "Modifier les raccourcis clavier"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Reset all shortcuts"
+msgstr "Réinitialiser tous les raccourcis"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Online Subtitles"
+msgstr "Sous-titres en ligne"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "API key"
+msgstr "Clé API"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Hide Advanced Options"
+msgstr "Masquer les options avancées"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Hide all VLC options"
+msgstr "Masquer toutes les options de VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "All VLC options"
+msgstr "Toutes les options de VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Errors only"
+msgstr "Erreurs uniquement"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Errors and warnings"
+msgstr "Erreurs et avertissements"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Information, warnings and errors"
+msgstr "Informations, avertissements et erreurs"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Use VLC log level"
+msgstr "Utiliser le niveau du journal de VLC"
+
+#. Redesign translation by Codex (first pass; review welcome).
+msgid "Silent"
+msgstr "Silencieux"
