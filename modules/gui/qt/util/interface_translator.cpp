@@ -48,7 +48,7 @@ InterfaceTranslator::InterfaceTranslator(QString directory, QStringList systemLa
 
 InterfaceTranslator::~InterfaceTranslator()
 {
-    QCoreApplication::removeTranslator(this);
+    if (qApp) QCoreApplication::removeTranslator(this);
 }
 
 InterfaceTranslator* InterfaceTranslator::instance()
