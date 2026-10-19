@@ -49707,3 +49707,21 @@ msgstr "Çıkış dosyasının sesini yükseltir veya azaltır.\n0 = Değişikli
 #, qt-format
 msgid "No change"
 msgstr "Değişiklik yok"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:255
+#, qt-format
+msgid "This window shows up to %1 log lines."
+msgstr "Bu pencere en fazla %1 günlük satırı gösterir."
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:257
+#, qt-format
+msgid "Log messages not shown: %1"
+msgstr "Gösterilmeyen günlük iletileri: %1"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:259
+#, qt-format
+msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
+msgstr "Bu pencere uzun günlük iletilerinin yalnızca bir bölümünü gösterebilir. Günlüğün tamamını saklamak için Ayarlar'da Günlük kaydet seçeneğini açın. Bu değişiklikten sonra VLC'yi yeniden başlatın."
