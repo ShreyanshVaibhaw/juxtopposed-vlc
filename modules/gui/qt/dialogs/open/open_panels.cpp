@@ -38,6 +38,7 @@
 #include "dialogs/dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
 #include "util/validators.hpp"
+#include "util/interface_translator.hpp"
 #include "util/colorizedsvgicon.hpp"
 #include "widgets/native/embedded_file_browser.hpp"
 #include <vlc_intf_strings.h>
@@ -85,6 +86,14 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
 {
     /* Classic UI Setup */
     ui.setupUi( this );
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+            ui.retranslateUi(this);
+            if (dialogBox) {
+                dialogBox->setLabelText(QFileDialog::FileName, qtr("File names:"));
+                dialogBox->setLabelText(QFileDialog::FileType, qtr("File type:"));
+            }
+        });
 
     setAcceptDrops( true );
 
@@ -294,6 +303,13 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+            ui.retranslateUi(this);
+            ui.browseDiscButton->setToolTip(qfut(I_DEVICE_TOOLTIP));
+            ui.deviceCombo->setToolTip(qfut(I_DEVICE_TOOLTIP));
+            ui.titleLabel->setText(m_discType == Vcd ? qtr("Entry") : m_discType == Cdda ? qtr("Track") : qtr("Title"));
+        });
 
     /* Get the default configuration path for the devices */
     psz_dvddiscpath = var_InheritString( p_intf, "dvd" );
@@ -651,6 +667,8 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] { ui.retranslateUi(this); });
     connect( ui.urlComboBox, &QComboBox::editTextChanged, this, &NetOpenPanel::updateMRL );
     connect( ui.clearHistoryButton, &QPushButton::clicked, this, &NetOpenPanel::clearHistory );
 

@@ -27,6 +27,7 @@
 #include "dialogs/open/open.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/interface_translator.hpp"
 #include "playlist/playlist_controller.hpp"
 
 #include <QRegularExpression>
@@ -176,6 +177,20 @@ OpenDialog::OpenDialog(qt_intf_t *_p_intf, QWindow* parent, OpenTab sourceKind)
     setMinimumSize( sizeHint() );
     setMaximumWidth( 900 );
     resize(getSettings()->value(settingsGroup + "/size", QSize(500, 400)).toSize());
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this] {
+            ui.retranslateUi(this);
+            const char* const tabs[] = {N_("&File"), N_("&Disc"), N_("&Network"), N_("Capture &Device")};
+            for (int tab = 0; tab < OPEN_TAB_MAX; ++tab)
+                if (sourcePanels[tab]) ui.Tab->setTabText(ui.Tab->indexOf(sourcePanels[tab]), qtr(tabs[tab]));
+            cancelButton->setText(qtr("&Cancel"));
+            selectButton->setText(qtr("&Select"));
+            const char* const actions[] = {N_("&Enqueue"), N_("&Play"), N_("&Stream"), N_("C&onvert")};
+            const auto menu = playButton->menu()->actions();
+            for (int i = 0; i < menu.size() && i < int(ARRAY_SIZE(actions)); ++i)
+                menu[i]->setText(qtr(actions[i]));
+            setMenuAction();
+        });
 }
 
 void OpenDialog::setActionFlag(OpenDialog::ActionFlag flag)
