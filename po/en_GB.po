@@ -39503,3 +39503,21 @@ msgstr "Boost or reduce the audio volume of the output file.\n0 = No change. 100
 #, qt-format
 msgid "No change"
 msgstr "No change"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:255
+#, qt-format
+msgid "This window shows up to %1 log lines."
+msgstr "This window shows up to %1 log lines."
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:257
+#, qt-format
+msgid "Log messages not shown: %1"
+msgstr "Log messages not shown: %1"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:259
+#, qt-format
+msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
+msgstr "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
