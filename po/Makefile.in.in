@@ -151,7 +151,8 @@ CHECK_MACRO_VERSION = \
 # timestamp would not be necessary if updating the $(CATALOGS) would always
 # touch them; however, the rule for $(POFILES) has been designed to not touch
 # files that don't need to be changed.
-$(srcdir)/stamp-po: $(srcdir)/$(DOMAIN).pot
+# A locale edit must rebuild its catalog even when the template is unchanged.
+$(srcdir)/stamp-po: $(srcdir)/$(DOMAIN).pot $(POFILES)
 	@$(CHECK_MACRO_VERSION)
 	test ! -f $(srcdir)/$(DOMAIN).pot || \
 	  test -z "$(GMOFILES)" || $(MAKE) $(GMOFILES)
