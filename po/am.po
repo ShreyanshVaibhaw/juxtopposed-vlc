@@ -20658,13 +20658,13 @@ msgstr ""
 msgid "Application"
 msgstr "መተግበሪያ  "
 
+#. Qt placeholder correction by Codex (first pass; review welcome).
+#, qt-format
 #: modules/gui/qt/dialogs/messages.cpp:268
 msgid ""
 "Cannot write to file %1:\n"
 "%2."
-msgstr ""
-"ለ ፋይል  %1:\n"
-" መጻፍ አልተቻለም "
+msgstr "ወደ ፋይሉ %1 መጻፍ አይቻልም፦\n%2."
 
 #: modules/gui/qt/dialogs/messages.cpp:334
 #, fuzzy
@@ -32010,7 +32010,6 @@ msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 
 #~ msgid "...when VLC is in background"
 #~ msgstr "ቪኤልሲ በዳራ በሚሆንበት ጊዜ ... "
-
 
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "System language"
