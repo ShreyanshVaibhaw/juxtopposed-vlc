@@ -77,6 +77,7 @@ private:
 #ifndef NDEBUG
     QTreeWidget *pldebugTree;
     void updatePLTree();
+    void retranslatePLTree();
 #endif
 
 public:

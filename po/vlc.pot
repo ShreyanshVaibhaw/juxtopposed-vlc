@@ -38753,3 +38753,28 @@ msgstr ""
 #, qt-format
 msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
 msgstr ""
+
+#: modules/gui/qt/dialogs/messages/messages.cpp:416
+#, qt-format
+msgid "Playlist tree"
+msgstr ""
+
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Playlist ID"
+msgstr ""
+
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Item ID"
+msgstr ""
+
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Playlist flags"
+msgstr ""
+
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Item flags"
+msgstr ""

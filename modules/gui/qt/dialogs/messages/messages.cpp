@@ -112,15 +112,11 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     QWidget *pldebugTab = new QWidget();
     QVBoxLayout *pldebugTabLayout = new QVBoxLayout();
     pldebugTab->setLayout( pldebugTabLayout );
-    ui.mainTab->addTab( pldebugTab, "Playlist Tree" );
+    ui.mainTab->addTab( pldebugTab, QString() );
     pldebugTree = new QTreeWidget();
-    pldebugTree->headerItem()->setText( 0, "Name" );
-    pldebugTree->headerItem()->setText( 1, "PL id" );
-    pldebugTree->headerItem()->setText( 2, "Item id" );
-    pldebugTree->headerItem()->setText( 3, "PL flags" );
-    pldebugTree->headerItem()->setText( 4, "Item flags" );
-    pldebugTree->setColumnCount( 5 );
+    pldebugTree->setObjectName(QStringLiteral("playlistDebugTree"));
     pldebugTabLayout->addWidget( pldebugTree );
+    retranslatePLTree();
 #endif
 
     tabChanged(0);
@@ -143,6 +139,9 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
             closeButton->setText(qtr("&Close"));
             ui.verbosityBox->retranslate();
             updateHistoryInfo();
+#ifndef NDEBUG
+            retranslatePLTree();
+#endif
             tabChanged(ui.mainTab->currentIndex());
         });
 
@@ -411,6 +410,13 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
 }
 
 #ifndef NDEBUG
+
+void MessagesDialog::retranslatePLTree()
+{
+    ui.mainTab->setTabText(ui.mainTab->indexOf(pldebugTree->parentWidget()), qtr("Playlist tree"));
+    pldebugTree->setHeaderLabels({qtr("Name"), qtr("Playlist ID"), qtr("Item ID"),
+                                qtr("Playlist flags"), qtr("Item flags")});
+}
 
 void MessagesDialog::updatePLTree()
 {
