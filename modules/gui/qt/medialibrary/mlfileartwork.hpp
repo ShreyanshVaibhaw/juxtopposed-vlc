@@ -29,11 +29,15 @@ public:
     MainCtx* ctx() const { return m_ctx; }
     void setCtx(MainCtx* ctx);
     Q_INVOKABLE void request(const QUrl& url, bool generateVideo);
+    Q_INVOKABLE void requestWatchStates(const QList<QUrl>& urls, quint64 serial);
+    Q_INVOKABLE void cancelWatchStates();
     Q_INVOKABLE void clear();
 signals:
     void ctxChanged();
     void artworkChanged(const QUrl& url, const QString& artwork);
     void mediaProgressChanged(const QUrl& url, qreal progress);
+    void mediaPlayedChanged(const QUrl& url, bool played);
+    void watchStatesReady(quint64 serial);
 private:
     void mediaUpdated(const QString& mrl, const MLMedia& media);
     struct ExportedFile {
@@ -48,6 +52,7 @@ private:
     MediaLib* m_ml = nullptr;
     std::unique_ptr<MLMediaStore> m_store;
     QHash<QString, bool> m_requested;
+    QSet<QString> m_stateRequested;
     QSet<int64_t> m_attempted;
     std::deque<Work> m_pending;
     vlc_preparser_t* m_preparser = nullptr;

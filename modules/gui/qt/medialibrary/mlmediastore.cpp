@@ -24,6 +24,7 @@
 #include "mlhelper.hpp"
 #include "medialib.hpp"
 #include "mlmedia.hpp"
+#include <QTimer>
 
 static const char *UPDATE_QUEUE = "MLMEDIASTORE_UPDATEQUEUE";
 
@@ -89,9 +90,72 @@ void MLMediaStore::remove(const MLItemId &id)
     m_revisions.remove(mrl);
 }
 
+void MLMediaStore::insertMany(const QStringList &mrls, std::function<void()> completed)
+{
+    auto batch = std::make_shared<Batch>();
+    batch->generation = m_generation;
+    batch->completed = std::move(completed);
+    QSet<QString> unique;
+    batch->entries.reserve(mrls.size());
+    for (const auto& mrl : mrls) {
+        if (unique.contains(mrl)) continue;
+        unique.insert(mrl);
+        m_files.insert(mrl);
+        batch->entries.push_back({mrl, ++m_revisions[mrl]});
+    }
+    // Replace queued work, but let the one in-flight chunk finish before starting
+    // another. Rapid searches cannot build up a queue of database jobs.
+    cancelBatch();
+    m_batch = std::move(batch);
+    QTimer::singleShot(0, this, &MLMediaStore::readNextBatch);
+}
+
+void MLMediaStore::readNextBatch()
+{
+    if (m_batchRunning || !m_batch) return;
+    const auto batch = m_batch;
+    if (batch->offset == batch->entries.size()) {
+        m_batch.reset();
+        if (batch->completed) batch->completed();
+        return;
+    }
+    const auto chunk = batch->entries.mid(batch->offset, 64);
+    m_batchRunning = true;
+    m_ml->runOnMLThread<QVector<MLMedia>>(this,
+        [batch, chunk](vlc_medialibrary_t* ml, QVector<MLMedia>& result) {
+            result.reserve(chunk.size());
+            for (const auto& entry : chunk) {
+                if (batch->cancelled) break;
+                ml_unique_ptr<vlc_ml_media_t> media {vlc_ml_get_media_by_mrl(ml, qtu(entry.mrl))};
+                result.push_back(media ? MLMedia(media.get()) : MLMedia {});
+            }
+        },
+        [this, batch, chunk](quint64, QVector<MLMedia>& result) {
+            m_batchRunning = false;
+            if (batch == m_batch && batch->generation == m_generation) {
+                for (qsizetype i = 0; i < chunk.size(); ++i) {
+                    if (batch != m_batch || batch->generation != m_generation) break;
+                    const auto& entry = chunk[i];
+                    if (m_revisions.value(entry.mrl) != entry.revision) continue;
+                    if (result[i].valid()) setMedia(entry.mrl, std::move(result[i]));
+                    else emit updated(entry.mrl, result[i]);
+                }
+                batch->offset += chunk.size();
+            }
+            QTimer::singleShot(0, this, &MLMediaStore::readNextBatch);
+        });
+}
+
+void MLMediaStore::cancelBatch()
+{
+    if (m_batch) m_batch->cancelled = true;
+    m_batch.reset();
+}
+
 void MLMediaStore::clear()
 {
     ++m_generation;
+    cancelBatch();
     m_files.clear();
     m_mrls.clear();
     m_revisions.clear();

@@ -22,6 +22,7 @@
 
 #include "../medialibrary/mlbasemodel.hpp"
 #include "../medialibrary/mlmedia.hpp"
+#include "../medialibrary/mlmediastore.hpp"
 #include "vlc_stub_modules.hpp"
 
 #include <memory>
@@ -38,6 +39,8 @@
 #include <QDir>
 #include <QSettings>
 #include <QScopeGuard>
+#include <QSemaphore>
+#include <atomic>
 #include <QSignalSpy>
 #include "../util/playlist_cover_store.hpp"
 
@@ -174,6 +177,72 @@ private slots:
         m_env->mediaGet = {};
         m_env->mediaControl = {};
         m_env->mediaList = {};
+    }
+
+    void testMetadataBatchesReplaceQueuedRequestsAndKeepTheUiResponsive()
+    {
+        QSemaphore started, release;
+        std::atomic<int> lookups {0}, unexpected {0};
+        m_env->mediaGet = [&](int query, va_list) -> void* {
+            if (query != VLC_ML_GET_MEDIA_BY_MRL) { ++unexpected; return nullptr; }
+            if (++lookups == 1) { started.release(); release.acquire(); }
+            return nullptr;
+        };
+        m_env->mediaControl = [&](int, va_list) { ++unexpected; return VLC_EGENERIC; };
+        MLMediaStore store(m_medialib.get());
+        auto unblock = qScopeGuard([&] { release.release(); });
+        QStringList files;
+        for (int i = 0; i < 500; ++i) files.append(QStringLiteral("file:///library/%1.mkv").arg(i));
+        bool oldFinished = false, latestFinished = false;
+        store.insertMany(files, [&] { oldFinished = true; });
+        QTRY_VERIFY(started.available() > 0);
+        for (int i = 0; i < 100; ++i)
+            store.insertMany({QStringLiteral("file:///latest/%1.mkv").arg(i)}, [&, i] { latestFinished = i == 99; });
+        QCOMPARE(lookups.load(), 1); // The worker is blocked; the GUI still accepts every replacement.
+        QSignalSpy updated(&store, &MLMediaStore::updated);
+        release.release();
+        unblock.dismiss();
+        QTRY_VERIFY(latestFinished);
+        QVERIFY(!oldFinished);
+        QCOMPARE(lookups.load(), 2); // Finish the in-flight lookup, then use the final replacement only.
+        QCOMPARE(updated.count(), 1);
+        QCOMPARE(updated[0][0].toString(), QStringLiteral("file:///latest/99.mkv"));
+        QCOMPARE(unexpected.load(), 0); // No import, parsing or decoder API.
+    }
+
+    void testClearingMetadataBatchesRejectsInFlightResults_data()
+    {
+        QTest::addColumn<bool>("clearStore");
+        QTest::newRow("clear store") << true;
+        QTest::newRow("cancel batch") << false;
+    }
+    void testClearingMetadataBatchesRejectsInFlightResults()
+    {
+        QFETCH(bool, clearStore);
+        QSemaphore started, release;
+        std::atomic<int> lookups {0};
+        m_env->mediaGet = [&](int query, va_list) -> void* {
+            if (query == VLC_ML_GET_MEDIA_BY_MRL && ++lookups == 1) {
+                started.release(); release.acquire();
+            }
+            return nullptr;
+        };
+        MLMediaStore store(m_medialib.get());
+        auto unblock = qScopeGuard([&] { release.release(); });
+        bool oldFinished = false, nextFinished = false;
+        store.insertMany({QStringLiteral("file:///old.mkv")}, [&] { oldFinished = true; });
+        QTRY_VERIFY(started.available() > 0);
+        if (clearStore) store.clear();
+        else store.cancelBatch();
+        store.insertMany({QStringLiteral("file:///next.mkv"), QStringLiteral("file:///next.mkv")}, [&] { nextFinished = true; });
+        QSignalSpy updated(&store, &MLMediaStore::updated);
+        release.release();
+        unblock.dismiss();
+        QTRY_VERIFY(nextFinished);
+        QVERIFY(!oldFinished);
+        QCOMPARE(lookups.load(), 2);
+        QCOMPARE(updated.count(), 1);
+        QCOMPARE(updated[0][0].toString(), QStringLiteral("file:///next.mkv"));
     }
 
     void testFolderResyncQueuesOnlyTheChosenUrl()

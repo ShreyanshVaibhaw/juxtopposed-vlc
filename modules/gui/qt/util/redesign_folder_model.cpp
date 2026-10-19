@@ -6,6 +6,7 @@
 #include <QThreadPool>
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 namespace {
 QUrl normalizeFolderUrl(const QUrl& folder)
@@ -23,6 +24,34 @@ QUrl normalizeFolderUrl(const QUrl& folder)
 #endif
     return folder;
 }
+
+void sortEntries(QFileInfoList& entries, const QString& sort, bool reversed,
+                 const QHash<QUrl, bool>& played)
+{
+    std::sort(entries.begin(), entries.end(), [&sort, reversed, &played](const QFileInfo& a, const QFileInfo& b) {
+        if (a.isDir() != b.isDir()) return a.isDir();
+        int primary;
+        if (sort == "played") {
+            const bool av = !a.isDir() && played.value(QUrl::fromLocalFile(a.absoluteFilePath()), false);
+            const bool bv = !b.isDir() && played.value(QUrl::fromLocalFile(b.absoluteFilePath()), false);
+            if (av != bv) return reversed ? av : !av;
+            // Watch groups keep a predictable title order in both directions.
+            primary = QString::compare(a.fileName(), b.fileName(), Qt::CaseInsensitive);
+            if (primary) return primary < 0;
+        } else {
+            if (sort == "insertion") {
+                const auto av = a.lastModified();
+                const auto bv = b.lastModified();
+                primary = av < bv ? -1 : av > bv ? 1 : 0;
+            } else if (sort == "uri") {
+                primary = QUrl::fromLocalFile(a.absoluteFilePath()).toEncoded().compare(
+                    QUrl::fromLocalFile(b.absoluteFilePath()).toEncoded());
+            } else primary = QString::compare(a.fileName(), b.fileName(), Qt::CaseInsensitive);
+            if (primary) return reversed ? primary > 0 : primary < 0;
+        }
+        return a.fileName() < b.fileName();
+    });
+}
 }
 
 RedesignFolderModel::RedesignFolderModel(QObject* parent)
@@ -37,6 +66,13 @@ RedesignFolderModel::RedesignFolderModel(QObject* parent)
                 replaceEntries(entries);
         });
     connect(m_results.get(), &RedesignFolderScanResult::infoReady, this, &RedesignFolderModel::infoReady);
+    connect(m_results.get(), &RedesignFolderScanResult::watchSorted, this,
+        [this](quint64 serial, const QFileInfoList& entries) {
+            m_watchSortRunning = false;
+            if (serial == m_watchSortSerial && m_sortCriteria == "played" && !m_watchStatesPending)
+                applyWatchOrder(entries);
+            if (m_watchSortNeeded) QTimer::singleShot(0, this, &RedesignFolderModel::startWatchSort);
+        });
     connect(&m_watcher, &QFileSystemWatcher::directoryChanged, this,
         &RedesignFolderModel::scheduleRefresh);
 }
@@ -50,6 +86,8 @@ void RedesignFolderModel::setFolder(const QUrl& folder)
     ++m_folderSerial;
     m_artwork.clear();
     m_progress.clear();
+    m_played.clear();
+    m_watchRequested.clear();
     m_artworkRequested.clear();
     const auto watched = m_watcher.directories();
     if (!watched.isEmpty())
@@ -66,6 +104,8 @@ void RedesignFolderModel::refresh()
     ++m_folderSerial;
     m_artwork.clear();
     m_progress.clear();
+    m_played.clear();
+    m_watchRequested.clear();
     m_artworkRequested.clear();
     scheduleRefresh();
 }
@@ -121,17 +161,19 @@ void RedesignFolderModel::setSortReversed(bool reversed)
     if (m_sortReversed == reversed)
         return;
     m_sortReversed = reversed;
-    scheduleRefresh();
+    if (m_sortCriteria == "played") scheduleWatchSort();
+    else scheduleRefresh();
     emit sortReversedChanged();
 }
 
 void RedesignFolderModel::setSortCriteria(const QString& criteria)
 {
-    if (criteria != "title" && criteria != "insertion" && criteria != "uri")
+    if (criteria != "title" && criteria != "insertion" && criteria != "uri" && criteria != "played")
         return;
     if (m_sortCriteria == criteria) return;
     m_sortCriteria = criteria;
-    scheduleRefresh();
+    if (criteria == "played") requestWatchStates();
+    else scheduleRefresh();
     emit sortCriteriaChanged();
 }
 
@@ -213,6 +255,89 @@ void RedesignFolderModel::setProgress(const QUrl& url, qreal progress)
         emit dataChanged(index(row), index(row), {Progress});
 }
 
+void RedesignFolderModel::setPlayed(const QUrl& url, bool played)
+{
+    if (!m_watchRequested.contains(url) && !m_artworkRequested.contains(url)) return;
+    const bool previous = m_played.value(url, false);
+    m_played.insert(url, played);
+    if (previous != played && m_rowsByUrl.contains(url) && m_sortCriteria == "played" && !m_watchStatesPending)
+        scheduleWatchSort();
+}
+
+void RedesignFolderModel::setWatchStatesPending(bool pending)
+{
+    if (m_watchStatesPending == pending) return;
+    m_watchStatesPending = pending;
+    emit watchStatesPendingChanged();
+}
+
+void RedesignFolderModel::requestWatchStates()
+{
+    ++m_watchSortSerial;
+    const auto serial = ++m_watchRequestSerial;
+    QList<QUrl> urls;
+    for (const auto& file : std::as_const(m_entries)) {
+        if (file.isDir()) continue;
+        const auto url = QUrl::fromLocalFile(file.absoluteFilePath());
+        urls.append(url);
+        m_watchRequested.insert(url);
+    }
+    setWatchStatesPending(!urls.isEmpty());
+    if (urls.isEmpty()) scheduleWatchSort();
+    else emit watchStatesRequested(urls, serial);
+}
+
+void RedesignFolderModel::finishWatchStates(quint64 serial)
+{
+    if (serial != m_watchRequestSerial || m_sortCriteria != "played" || !m_watchStatesPending) return;
+    setWatchStatesPending(false);
+    scheduleWatchSort();
+}
+
+void RedesignFolderModel::scheduleWatchSort()
+{
+    ++m_watchSortSerial;
+    if (m_watchSortNeeded) return;
+    m_watchSortNeeded = true;
+    QTimer::singleShot(0, this, &RedesignFolderModel::startWatchSort);
+}
+
+void RedesignFolderModel::startWatchSort()
+{
+    if (m_watchSortRunning || !m_watchSortNeeded || m_watchStatesPending || m_sortCriteria != "played") return;
+    m_watchSortNeeded = false;
+    m_watchSortRunning = true;
+    const auto results = m_results;
+    const auto serial = m_watchSortSerial;
+    const auto played = m_played;
+    const auto reversed = m_sortReversed;
+    auto entries = m_entries;
+    QThreadPool::globalInstance()->start([results, serial, played, reversed, entries = std::move(entries)]() mutable {
+        sortEntries(entries, QStringLiteral("played"), reversed, played);
+        emit results->watchSorted(serial, entries);
+    });
+}
+
+void RedesignFolderModel::applyWatchOrder(const QFileInfoList& entries)
+{
+    if (entries.size() != m_entries.size()) return;
+    bool changed = false;
+    for (qsizetype row = 0; row < entries.size(); ++row)
+        changed |= entries[row].absoluteFilePath() != m_entries[row].absoluteFilePath();
+    if (!changed) return;
+    emit layoutAboutToBeChanged({}, QAbstractItemModel::VerticalSortHint);
+    const auto persistent = persistentIndexList();
+    QList<QUrl> urls;
+    for (const auto& index : persistent)
+        urls.append(QUrl::fromLocalFile(m_entries[index.row()].absoluteFilePath()));
+    m_entries = entries;
+    rebuildRows();
+    QModelIndexList updated;
+    for (const auto& url : urls) updated.append(index(m_rowsByUrl.value(url, -1)));
+    changePersistentIndexList(persistent, updated);
+    emit layoutChanged({}, QAbstractItemModel::VerticalSortHint);
+}
+
 QVariant RedesignFolderModel::get(int row, const QString& role) const
 {
     const auto roles = roleNames();
@@ -225,6 +350,11 @@ QVariant RedesignFolderModel::get(int row, const QString& role) const
 void RedesignFolderModel::scheduleRefresh()
 {
     ++m_serial;
+    ++m_watchRequestSerial;
+    ++m_watchSortSerial;
+    m_watchSortNeeded = false;
+    setWatchStatesPending(false);
+    emit watchStatesCancelled();
     if (m_refreshPending)
         return;
     m_refreshPending = true;
@@ -243,7 +373,8 @@ void RedesignFolderModel::scan()
     const auto reversed = m_sortReversed;
     const auto sort = m_sortCriteria;
     const auto search = m_searchPattern;
-    QThreadPool::globalInstance()->start([results, folder, filters, serial, reversed, sort, search] {
+    const auto played = m_played;
+    QThreadPool::globalInstance()->start([results, folder, filters, serial, reversed, sort, search, played] {
         QFileInfoList entries;
         if (folder.isLocalFile()) {
             QDir directory(folder.toLocalFile());
@@ -255,20 +386,7 @@ void RedesignFolderModel::scan()
             entries.erase(std::remove_if(entries.begin(), entries.end(), [&search](const QFileInfo& file) {
                 return !file.fileName().contains(search, Qt::CaseInsensitive);
             }), entries.end());
-        std::sort(entries.begin(), entries.end(), [&sort, reversed](const QFileInfo& a, const QFileInfo& b) {
-            if (a.isDir() != b.isDir()) return a.isDir();
-            int primary;
-            if (sort == "insertion") {
-                const auto av = a.lastModified();
-                const auto bv = b.lastModified();
-                primary = av < bv ? -1 : av > bv ? 1 : 0;
-            } else if (sort == "uri") {
-                primary = QUrl::fromLocalFile(a.absoluteFilePath()).toEncoded().compare(
-                    QUrl::fromLocalFile(b.absoluteFilePath()).toEncoded());
-            } else primary = QString::compare(a.fileName(), b.fileName(), Qt::CaseInsensitive);
-            if (primary) return reversed ? primary > 0 : primary < 0;
-            return a.fileName() < b.fileName();
-        });
+        sortEntries(entries, sort, reversed, played);
         emit results->ready(serial, entries);
     });
 }
@@ -279,11 +397,16 @@ void RedesignFolderModel::replaceEntries(const QFileInfoList& entries)
     const int oldDirectoryCount = directoryCount();
     beginResetModel();
     m_entries = entries;
-    m_rowsByUrl.clear();
-    for (int row = 0; row < m_entries.size(); ++row)
-        if (!m_entries[row].isDir())
-            m_rowsByUrl.insert(QUrl::fromLocalFile(m_entries[row].absoluteFilePath()), row);
+    rebuildRows();
     endResetModel();
     if (oldCount != count() || oldDirectoryCount != directoryCount())
         emit countChanged();
+    if (m_sortCriteria == "played") requestWatchStates();
+}
+
+void RedesignFolderModel::rebuildRows()
+{
+    m_rowsByUrl.clear();
+    for (int row = 0; row < m_entries.size(); ++row)
+        m_rowsByUrl.insert(QUrl::fromLocalFile(m_entries[row].absoluteFilePath()), row);
 }

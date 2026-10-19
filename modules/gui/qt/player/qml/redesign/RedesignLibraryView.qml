@@ -12,6 +12,7 @@ Item {
     property var mediaModel
     readonly property int libraryMediaCount: mediaView.count
     property int itemCount: libraryMediaCount
+    property bool loading: false
     property bool homeSectionsVisible: category === 0
     property var homeSections: []
     property int category: 1
@@ -298,7 +299,7 @@ Item {
         onClicked: viewMenu.toggleFrom(button)
     }
     component ItemCount: Text {
-        text: qsTr("%n item", "%n items", root.itemCount)
+        text: root.loading ? qsTr("Loading…") : qsTr("%n item", "%n items", root.itemCount)
         color: root.wideToolbar ? root.theme.foreground : root.theme.playerLabel
         font.pixelSize: root.theme.dp(14)
     }

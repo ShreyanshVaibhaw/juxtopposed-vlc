@@ -15,6 +15,98 @@ class TestRedesignFolderModel : public QObject
         QVERIFY(file.open(QIODevice::WriteOnly));
     }
 private slots:
+    void watchSortingKeepsDirectoriesFirstAndPreservesFileIdentity() {
+        QTemporaryDir directory;
+        QDir dir(directory.path());
+        QVERIFY(dir.mkdir("folder"));
+        for (const auto* name : {"a.mp4", "b.mp4", "c.mp4", "d.mp4"}) touch(dir.filePath(name));
+        RedesignFolderModel model;
+        QSignalSpy requested(&model, &RedesignFolderModel::watchStatesRequested);
+        QSignalSpy artwork(&model, &RedesignFolderModel::artworkRequested);
+        QSignalSpy reset(&model, &RedesignFolderModel::modelReset);
+        model.setFolder(QUrl::fromLocalFile(directory.path()));
+        QTRY_COMPARE(model.count(), 5);
+        const auto a = model.get(1, "fileUrl").toUrl();
+        const auto c = model.get(3, "fileUrl").toUrl();
+        QPersistentModelIndex selected(model.index(1));
+        reset.clear();
+        model.setSortCriteria("played");
+        QCOMPARE(requested.count(), 1);
+        QCOMPARE(requested[0][0].value<QList<QUrl>>().size(), 4);
+        QVERIFY(model.watchStatesPending());
+        model.setPlayed(a, true); model.setPlayed(c, true);
+        model.finishWatchStates(requested[0][1].toULongLong());
+        QTRY_COMPARE(model.get(1, "fileName").toString(), "b.mp4");
+        QCOMPARE(model.get(2, "fileName").toString(), "d.mp4"); // No library record means unwatched.
+        QCOMPARE(model.get(3, "fileName").toString(), "a.mp4");
+        QCOMPARE(model.get(4, "fileName").toString(), "c.mp4");
+        QCOMPARE(model.get(0, "fileName").toString(), "folder");
+        QCOMPARE(selected.row(), 3);
+        QCOMPARE(selected.data(RedesignFolderModel::FileUrl).toUrl(), a);
+        QCOMPARE(artwork.count(), 0); // Sorting does not request or decode thumbnails.
+        model.setSortReversed(true);
+        QTRY_COMPARE(model.get(1, "fileName").toString(), "a.mp4");
+        QCOMPARE(model.get(2, "fileName").toString(), "c.mp4");
+        QCOMPARE(model.get(3, "fileName").toString(), "b.mp4");
+        QCOMPARE(selected.row(), 1);
+        QCOMPARE(requested.count(), 1); // Reversing groups reuses the metadata.
+        model.setPlayed(a, false);
+        QTRY_COMPARE(model.get(1, "fileName").toString(), "c.mp4");
+        QCOMPARE(selected.row(), 2);
+        QCOMPARE(selected.data(RedesignFolderModel::FileUrl).toUrl(), a);
+        QCOMPARE(model.get(0, "fileName").toString(), "folder");
+        QCOMPARE(reset.count(), 0);
+    }
+    void delayedWatchStatesCannotFinishAnotherSearchOrFolder() {
+        QTemporaryDir first, second;
+        touch(QDir(first.path()).filePath("a.mp4"));
+        touch(QDir(first.path()).filePath("b.mp4"));
+        touch(QDir(second.path()).filePath("b.mp4"));
+        RedesignFolderModel model;
+        QSignalSpy requested(&model, &RedesignFolderModel::watchStatesRequested);
+        model.setFolder(QUrl::fromLocalFile(first.path()));
+        QTRY_COMPARE(model.count(), 2);
+        const auto oldUrl = model.get(1, "fileUrl").toUrl();
+        model.setSortCriteria("played");
+        QCOMPARE(requested.count(), 1);
+        const auto old = requested[0][1].toULongLong();
+        model.setSearchPattern("b");
+        QTRY_COMPARE(requested.count(), 2);
+        model.finishWatchStates(old);
+        QVERIFY(model.watchStatesPending());
+        QCOMPARE(requested[1][0].value<QList<QUrl>>(), QList<QUrl>{oldUrl});
+        const auto filtered = requested[1][1].toULongLong();
+        model.finishWatchStates(filtered);
+        QVERIFY(!model.watchStatesPending());
+        model.setFolder(QUrl::fromLocalFile(second.path()));
+        QTRY_COMPARE(requested.count(), 3);
+        model.finishWatchStates(filtered);
+        QVERIFY(model.watchStatesPending());
+        model.setPlayed(oldUrl, true);
+        model.finishWatchStates(requested[2][1].toULongLong());
+        QVERIFY(!model.watchStatesPending());
+        QCOMPARE(model.get(0, "fileUrl").toUrl(), QUrl::fromLocalFile(QDir(second.path()).filePath("b.mp4")));
+        model.setSortCriteria("title");
+        model.finishWatchStates(requested[2][1].toULongLong());
+        QCOMPARE(model.sortCriteria(), "title");
+        QVERIFY(!model.watchStatesPending());
+    }
+    void watchDirectionCanChangeBeforeMetadataArrives() {
+        QTemporaryDir directory;
+        touch(QDir(directory.path()).filePath("a.mp4"));
+        touch(QDir(directory.path()).filePath("z.mp4"));
+        RedesignFolderModel model;
+        QSignalSpy requested(&model, &RedesignFolderModel::watchStatesRequested);
+        model.setFolder(QUrl::fromLocalFile(directory.path()));
+        QTRY_COMPARE(model.count(), 2);
+        const auto z = model.get(1, "fileUrl").toUrl();
+        model.setSortCriteria("played");
+        model.setSortReversed(true);
+        model.setPlayed(z, true);
+        model.finishWatchStates(requested[0][1].toULongLong());
+        QTRY_COMPARE(model.get(0, "fileName").toString(), "z.mp4");
+        QCOMPARE(requested.count(), 1);
+    }
     void progressSharesTheLazyArtworkRequestAndUpdatesOnlyItsRole() {
         QTemporaryDir directory;
         QDir dir(directory.path());

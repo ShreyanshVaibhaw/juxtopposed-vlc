@@ -25,8 +25,12 @@
 #include <QHash>
 #include <QSet>
 #include <QString>
+#include <QStringList>
+#include <QVector>
 
 #include <memory>
+#include <atomic>
+#include <functional>
 
 #include "mlmedia.hpp"
 
@@ -43,6 +47,9 @@ public:
     ~MLMediaStore();
 
     void insert(const QString &mrl, bool createMissing = false);
+    // Read existing metadata in bounded batches, without importing or parsing files.
+    void insertMany(const QStringList &mrls, std::function<void()> completed);
+    void cancelBatch();
     void remove(const MLItemId &id);
     void clear();
 
@@ -59,6 +66,17 @@ private:
     void update(const MLItemId &id);
 
     void setMedia(const QString &mrl, MLMedia media);
+    struct Batch {
+        struct Entry { QString mrl; quint64 revision; };
+        QVector<Entry> entries;
+        qsizetype offset = 0;
+        quint64 generation;
+        std::atomic_bool cancelled {false};
+        std::function<void()> completed;
+    };
+    void readNextBatch();
+    std::shared_ptr<Batch> m_batch;
+    bool m_batchRunning = false;
 
     MediaLib *m_ml;
 

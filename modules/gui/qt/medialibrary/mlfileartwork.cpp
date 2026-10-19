@@ -50,6 +50,7 @@ void MLFileArtwork::clear()
     }
     m_pending.clear();
     m_requested.clear();
+    m_stateRequested.clear();
     m_attempted.clear();
     if (m_store) m_store->clear();
 }
@@ -67,6 +68,8 @@ void MLFileArtwork::request(const QUrl& url, bool generateVideo)
 
 void MLFileArtwork::mediaUpdated(const QString& mrl, const MLMedia& media)
 {
+    if (!m_requested.contains(mrl) && !m_stateRequested.contains(mrl)) return;
+    emit mediaPlayedChanged(QUrl::fromEncoded(mrl.toUtf8()), media.valid() && media.playCount() > 0);
     if (!m_requested.contains(mrl)) return;
     emit mediaProgressChanged(QUrl::fromEncoded(mrl.toUtf8()), media.valid() ? media.progress() : 0.0);
     const QString artwork = media.valid() ? media.smallCover() : QString {};
@@ -92,6 +95,31 @@ void MLFileArtwork::mediaUpdated(const QString& mrl, const MLMedia& media)
         m_pending.push_back(work);
         startNext();
     });
+}
+
+void MLFileArtwork::requestWatchStates(const QList<QUrl>& urls, quint64 serial)
+{
+    if (!m_store) {
+        QTimer::singleShot(0, this, [this, serial] { emit watchStatesReady(serial); });
+        return;
+    }
+    QStringList mrls;
+    mrls.reserve(urls.size());
+    for (const auto& url : urls) {
+        if (!url.isLocalFile()) continue;
+        const auto mrl = url.toString(QUrl::FullyEncoded);
+        m_stateRequested.insert(mrl);
+        mrls.append(mrl);
+    }
+    m_store->insertMany(mrls, [this, serial, generation = m_generation.load()] {
+        if (generation == m_generation) emit watchStatesReady(serial);
+    });
+}
+
+void MLFileArtwork::cancelWatchStates()
+{
+    m_stateRequested.clear();
+    if (m_store) m_store->cancelBatch();
 }
 
 void MLFileArtwork::startNext()

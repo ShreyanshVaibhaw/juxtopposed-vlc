@@ -147,7 +147,7 @@ RedesignLibraryView {
         : category === 2 ? "music/" + musicSection : "category/" + category
     sortFields: {
         if (homeSectionsVisible || category === 2 && !musicSection && !currentFolder) return []
-        if (currentFolder) return ["title", "insertion", "uri"]
+        if (currentFolder) return category === 1 ? ["played", "title", "insertion", "uri"] : ["title", "insertion", "uri"]
         if (homeSection === "folders" || category === 1) return ["title", "uri"]
         if (homeSection === "playlists" || homeSection === "artists") return ["title"]
         if (homeSection === "watching") return ["played", "insertion", "title", "uri"]
@@ -161,6 +161,7 @@ RedesignLibraryView {
         ? [{id: "frequency", field: "frequency", descending: true, label: homeSection === "artists" ? qsTr("Most played first") : qsTr("Most visited first")}]
         : selectedPlaylist ? [{id: "original", field: "", descending: false, label: qsTr("Playlist order")}] : []
     defaultSortChoice: extraSortOptions.length ? extraSortOptions[0].id
+        : currentFolder && category === 1 ? "unwatched"
         : ["watching", "listening"].includes(homeSection) || category === 3 || category === 5 ? "newest" : "title-asc"
     readonly property string mediaSortField: sortField === "frequency" ? ""
         : sortField === "insertion" && (["watching", "listening"].includes(homeSection) || category === 3 || category === 5) ? ""
@@ -177,6 +178,7 @@ RedesignLibraryView {
         {key: "artists", title: homeTitles.artists, model: playedArtists, icon: "artist", emptyText: qsTr("Play music to see artists here.")}
     ]
     itemCount: homeSectionsVisible ? recentVideo.maximumCount + recentAudio.maximumCount + frequentFolders.count + frequentPlaylists.count + playedArtists.maximumCount : currentFolder ? (folderLoader.item ? folderLoader.item.count : 0) : activeModel && activeModel.count !== undefined ? activeModel.count : libraryMediaCount
+    loading: !!currentFolder && !!folderLoader.item && folderLoader.item.watchStatesPending
     readonly property var activeModel: homeSection ? homeModels[homeSection] : currentFolder ? folderLoader.item : selectedPlaylist ? playlistMedia : selectedCollection ? collectionTracks : category === 4 ? playlists : category === 2 ? (musicSection === "" ? musicCategories : musicSection === "Albums" ? albums : musicSection === "Artists" ? artists : musicSection === "Genres" ? genres : music) : category === 3 ? streams : category === 0 || category === 5 ? recent : folderEntries
     mediaModel: activeModel
     breadcrumbs: {
@@ -464,6 +466,12 @@ RedesignLibraryView {
         onMediaProgressChanged: (url, progress) => {
             if (folderLoader.item) folderLoader.item.setProgress(url, progress)
         }
+        onMediaPlayedChanged: (url, played) => {
+            if (folderLoader.item) folderLoader.item.setPlayed(url, played)
+        }
+        onWatchStatesReady: serial => {
+            if (folderLoader.item) folderLoader.item.finishWatchStates(serial)
+        }
         onArtworkChanged: (url, artwork) => {
             if (folderLoader.item) folderLoader.item.setArtwork(url, artwork)
             if (!artwork) return
@@ -482,6 +490,8 @@ RedesignLibraryView {
             sortCriteria: root.sortField
             searchPattern: root.searchText
             onArtworkRequested: url => folderArtwork.request(url, root.category !== 2)
+            onWatchStatesRequested: (urls, serial) => folderArtwork.requestWatchStates(urls, serial)
+            onWatchStatesCancelled: folderArtwork.cancelWatchStates()
         }
     }
     ListModel {
