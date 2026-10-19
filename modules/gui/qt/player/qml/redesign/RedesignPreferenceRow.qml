@@ -18,6 +18,10 @@ ColumnLayout {
     signal actionRequested(string action)
     signal editorResetRequested()
     readonly property var description: {
+        // C++ descriptions do not register the translations they read as QML
+        // dependencies. Refresh them on language changes, without reloading
+        // static choice lists on each ordinary value edit.
+        if ("translationRevision" in backend) backend.translationRevision
         const data = backend.describe(optionName)
         if (presentation.dynamicChoices || optionName.endsWith("-language")
             || data.restartRequired !== undefined || data.supported !== undefined) backend.revision

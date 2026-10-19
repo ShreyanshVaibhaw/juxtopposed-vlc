@@ -22,6 +22,7 @@ class RedesignPreferences : public QObject
     Q_PROPERTY(bool autoSave READ autoSave WRITE setAutoSave NOTIFY autoSaveChanged FINAL)
     Q_PROPERTY(bool dirty READ dirty NOTIFY changed FINAL)
     Q_PROPERTY(int revision READ revision NOTIFY changed FINAL)
+    Q_PROPERTY(int translationRevision READ translationRevision NOTIFY translationRevisionChanged FINAL)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY changed FINAL)
     Q_PROPERTY(bool editPlayerPreset MEMBER m_editPlayerPreset)
     Q_PROPERTY(QVariantList playerPresets READ playerPresets NOTIFY changed FINAL)
@@ -40,6 +41,7 @@ public:
     void setAutoSave(bool enabled);
     bool dirty() const { return !m_edits.isEmpty() || !m_invalid.isEmpty(); }
     int revision() const { return m_revision; }
+    int translationRevision() const { return m_translationRevision; }
     QString errorMessage() const { return m_error; }
     Q_INVOKABLE void refresh();
     bool stereoTestRunning() const { return m_stereoTest != nullptr; }
@@ -84,6 +86,7 @@ signals:
     void ctxChanged();
     void autoSaveChanged();
     void changed();
+    void translationRevisionChanged();
     void stereoTestChanged();
     void pluginScanChanged();
 private:
@@ -109,6 +112,7 @@ private:
     QList<Entry> m_catalog;
     QString m_error;
     int m_revision = 0;
+    int m_translationRevision = 0;
     bool m_autoSave = false;
     bool m_editPlayerPreset = false;
     bool m_presetTransaction = false;

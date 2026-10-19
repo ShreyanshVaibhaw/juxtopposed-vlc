@@ -592,6 +592,8 @@ RedesignPreferences::RedesignPreferences(QObject* parent) : QObject(parent)
             std::sort(m_catalog.begin(), m_catalog.end(), [](const Entry& a, const Entry& b) {
                 return QString::localeAwareCompare(a.title, b.title) < 0;
             });
+            ++m_translationRevision;
+            emit translationRevisionChanged();
             ++m_revision;
             emit changed();
         }, Qt::QueuedConnection);
