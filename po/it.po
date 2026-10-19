@@ -53655,3 +53655,33 @@ msgstr "Messaggi del registro non mostrati: %1"
 #, qt-format
 msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
 msgstr "Questa finestra può mostrare solo una parte dei messaggi lunghi del registro. Per conservare un registro completo, attiva Salva un registro nelle Impostazioni. Riavvia VLC dopo questa modifica."
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:416
+#, qt-format
+msgid "Playlist tree"
+msgstr "Albero della scaletta"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Playlist ID"
+msgstr "ID della scaletta"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Item ID"
+msgstr "ID dell’elemento"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Playlist flags"
+msgstr "Flag della scaletta"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Item flags"
+msgstr "Flag dell’elemento"
