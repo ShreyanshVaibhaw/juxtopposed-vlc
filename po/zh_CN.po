@@ -47599,3 +47599,21 @@ msgstr "增大或减小输出文件的音量。\n0 = 不变。100% = 原始音�
 #, qt-format
 msgid "No change"
 msgstr "不变"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:255
+#, qt-format
+msgid "This window shows up to %1 log lines."
+msgstr "此窗口最多显示 %1 行日志。"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:257
+#, qt-format
+msgid "Log messages not shown: %1"
+msgstr "未显示的日志消息：%1"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:259
+#, qt-format
+msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
+msgstr "此窗口可能只显示较长日志消息的一部分。若要保留完整日志，请在设置中启用“保存日志”。更改后请重启 VLC。"
