@@ -32,6 +32,11 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #include <QApplication>
+#include <QLineEdit>
+#include <QSignalBlocker>
+#include <QStyleOptionSpinBox>
+
+#include <algorithm>
 
 #define SPINNER_SIZE 32
 
@@ -46,6 +51,19 @@ void QFramelessButton::paintEvent( QPaintEvent * )
     QPainter painter( this );
     icon().paint(&painter, QRect( 0, 0, width(), height()));
 
+}
+
+void QVLCDebugLevelSpinBox::retranslate()
+{
+    const QSignalBlocker blocker(lineEdit());
+    lineEdit()->setText(textFromValue(value()));
+    QStyleOptionSpinBox option;
+    initStyleOption(&option);
+    int width = 0;
+    for (int level = 0; level <= 2; ++level)
+        width = std::max(width, fontMetrics().horizontalAdvance(textFromValue(level)));
+    const QSize content(width + fontMetrics().horizontalAdvance(QLatin1Char(' ')), fontMetrics().height());
+    setMinimumWidth(style()->sizeFromContents(QStyle::CT_SpinBox, &option, content, this).width());
 }
 
 QString QVLCDebugLevelSpinBox::textFromValue( int v ) const

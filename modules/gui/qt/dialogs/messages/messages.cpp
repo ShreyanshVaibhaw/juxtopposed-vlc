@@ -47,6 +47,7 @@
 
 #include "dialogs/messages/messages.hpp"
 #include "dialogs/dialogs/dialogmodel.hpp"
+#include "util/interface_translator.hpp"
 
 enum {
     MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
@@ -83,8 +84,8 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     setWindowRole( "vlc-messages" );
     /* Build Ui */
     ui.setupUi( this );
-    ui.bottomButtonsBox->addButton( new QPushButton( qtr("&Close"), this ),
-                                         QDialogButtonBox::RejectRole );
+    auto* closeButton = new QPushButton(qtr("&Close"), this);
+    ui.bottomButtonsBox->addButton(closeButton, QDialogButtonBox::RejectRole);
 
     /* Error messages */
     DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
@@ -113,6 +114,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     int i_verbosity = var_InheritInteger( p_intf, "verbose" );
     changeVerbosity( i_verbosity );
     ui.verbosityBox->setValue( qMin( i_verbosity, 2 ) );
+    ui.verbosityBox->retranslate();
 
     ui.filterEdit->setText( getSettings()->value( "Messages/messages-filter" ).toString() );
 
@@ -147,6 +149,16 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
              this, &MessagesDialog::changeVerbosity );
 
     connect( ui.mainTab, &QTabWidget::currentChanged, this, &MessagesDialog::tabChanged );
+
+    if (auto* translator = InterfaceTranslator::instance())
+        connect(translator, &InterfaceTranslator::languageChanged, this, [this, closeButton] {
+            ui.retranslateUi(this);
+            ui.mainTab->setTabText(1, qtr("Errors and warnings"));
+            ui.saveLogButton->setToolTip(qtr("Saves all the displayed logs to a file"));
+            closeButton->setText(qtr("&Close"));
+            ui.verbosityBox->retranslate();
+            tabChanged(ui.mainTab->currentIndex());
+        });
 
     /* General action */
     restoreWidgetPosition( "Messages", QSize( 600, 450 ) );
