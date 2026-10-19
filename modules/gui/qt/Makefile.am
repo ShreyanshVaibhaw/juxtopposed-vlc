@@ -376,6 +376,7 @@ libqt_plugin_la_SOURCES = \
 	util/vlchotkeyconverter.cpp util/vlchotkeyconverter.hpp \
 	util/postprocessing_preferences.hpp \
 	util/file_log_preferences.hpp \
+	util/message_log.hpp \
 	util/video_window_geometry.hpp \
 	util/vlctick.cpp \
 	util/vlctick.hpp \
@@ -2253,6 +2254,19 @@ test_file_log_preferences_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_file_log_preferences_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_file_log_preferences
 TESTS += test_file_log_preferences
+
+# test_message_log
+
+test_message_log_SOURCES = tests/test_message_log.cpp util/message_log.hpp
+nodist_test_message_log_SOURCES = tests/test_message_log.moc
+BUILT_SOURCES += tests/test_message_log.moc
+CLEANFILES += tests/test_message_log.moc
+test_message_log_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_message_log_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_message_log_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_message_log_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_message_log
+TESTS += test_message_log
 
 # test_warning_log_buffer
 

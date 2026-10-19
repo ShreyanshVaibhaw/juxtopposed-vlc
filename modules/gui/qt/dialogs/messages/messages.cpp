@@ -48,6 +48,7 @@
 #include "dialogs/messages/messages.hpp"
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "util/interface_translator.hpp"
+#include "util/message_log.hpp"
 
 enum {
     MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
@@ -231,7 +232,7 @@ void MessagesDialog::filterMessages()
 
     while( block.isValid() )
     {
-        block.setVisible( matchFilter( block.text().toLower() ) );
+        block.setVisible( matchFilter( block.text() ) );
         block = block.next();
     }
 
@@ -247,78 +248,15 @@ void MessagesDialog::filterMessages()
 
 bool MessagesDialog::matchFilter( const QString& text )
 {
-    const QString& filter = ui.filterEdit->text();
-
-    if( filter.isEmpty() || text.contains( filter.toLower() ) )
-        return true;
-    return false;
+    return messageLogMatches(text, ui.filterEdit->text());
 }
 
 void MessagesDialog::sinkMessage( const MsgEvent *msg )
 {
     QMutexLocker locker( &messageLocker );
 
-    QPlainTextEdit *messages = ui.messages;
-    /* Only scroll if the viewport is at the end.
-       Don't bug user by auto-changing/losing viewport on insert(). */
-    bool b_autoscroll = ( messages->verticalScrollBar()->value()
-                          + messages->verticalScrollBar()->pageStep()
-                          >= messages->verticalScrollBar()->maximum() );
-
-    /* Copy selected text to the clipboard */
-    if( messages->textCursor().hasSelection() )
-        messages->copy();
-
-    /* Fix selected text bug */
-    if( !messages->textCursor().atEnd() ||
-         messages->textCursor().anchor() != messages->textCursor().position() )
-         messages->moveCursor( QTextCursor::End );
-
-    /* Start a new logic block */
-    if( !messages->document()->isEmpty() )
-        messages->textCursor().insertBlock();
-
-    /* Insert the prefix */
-    const bool dark = messages->palette().color(QPalette::Base).lightness() < 128;
     const QColor accent = p_intf->p_mi ? p_intf->p_mi->redesignAccent() : palette().color(QPalette::Link);
-    const QColor sourceColor = dark ? accent : accent.darker(200);
-    QTextCharFormat format;
-    format.setProperty( QTextFormat::FontItalic, true );
-    format.setForeground(sourceColor);
-
-    messages->textCursor().insertText( msg->module, format );
-
-    switch ( msg->priority )
-    {
-        case VLC_MSG_INFO:
-            format.setForeground(sourceColor);
-            messages->textCursor().insertText( " info: ", format );
-            break;
-        case VLC_MSG_ERR:
-            format.setForeground(QColor(dark ? "#ff7373" : "#a31b1b"));
-            messages->textCursor().insertText( " error: ", format );
-            break;
-        case VLC_MSG_WARN:
-            format.setForeground(QColor(dark ? "#d69c38" : "#775100"));
-            messages->textCursor().insertText( " warning: ", format );
-            break;
-        case VLC_MSG_DBG:
-        default:
-            format.setForeground(messages->palette().color(QPalette::WindowText));
-            messages->textCursor().insertText( " debug: ", format );
-            break;
-    }
-
-    /* Insert the message */
-    format.setProperty( QTextFormat::FontItalic, false );
-    format.setForeground(messages->palette().color(QPalette::Text));
-    messages->textCursor().insertText( msg->text, format );
-
-    /* Pass the new message thru the filter */
-    QTextBlock b = messages->document()->lastBlock();
-    b.setVisible( matchFilter( b.text() ) );
-
-    if ( b_autoscroll ) messages->ensureCursorVisible();
+    appendMessageLog(ui.messages, {{msg->priority, msg->module, msg->text}}, ui.filterEdit->text(), accent);
 }
 
 void MessagesDialog::customEvent( QEvent *event )

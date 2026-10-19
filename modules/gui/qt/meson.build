@@ -544,6 +544,7 @@ qt_plugin_sources = files(
     'util/vlchotkeyconverter.hpp',
     'util/postprocessing_preferences.hpp',
     'util/file_log_preferences.hpp',
+    'util/message_log.hpp',
     'util/video_window_geometry.hpp',
     'util/shared_input_item.hpp',
     'util/fast_gaussian_blur_template.h',
@@ -1885,6 +1886,16 @@ if qt6_dep.found()
             'name': 'test_qt_warning_log_buffer',
             'sources': files('tests/test_warning_log_buffer.cpp'),
             'moc_sources': files('tests/test_warning_log_buffer.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_message_log',
+            'sources': files('tests/test_message_log.cpp'),
+            'moc_sources': files('tests/test_message_log.cpp'),
             'suite': ['qt'],
             'include_directories': qt_include_dir,
             'link_args': qt_link_args,
