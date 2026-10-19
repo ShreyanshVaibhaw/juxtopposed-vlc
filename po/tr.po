@@ -49725,3 +49725,33 @@ msgstr "Gösterilmeyen günlük iletileri: %1"
 #, qt-format
 msgid "This window can show only part of a long log message. To keep a full log, turn on Save a log in Settings. Restart VLC after this change."
 msgstr "Bu pencere uzun günlük iletilerinin yalnızca bir bölümünü gösterebilir. Günlüğün tamamını saklamak için Ayarlar'da Günlük kaydet seçeneğini açın. Bu değişiklikten sonra VLC'yi yeniden başlatın."
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:416
+#, qt-format
+msgid "Playlist tree"
+msgstr "Oynatma listesi ağacı"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Playlist ID"
+msgstr "Liste kimliği"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:417
+#, qt-format
+msgid "Item ID"
+msgstr "Öge kimliği"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Playlist flags"
+msgstr "Liste bayrakları"
+
+#. First-pass interface translation; fluent-speaker review is welcome.
+#: modules/gui/qt/dialogs/messages/messages.cpp:418
+#, qt-format
+msgid "Item flags"
+msgstr "Öge bayrakları"
