@@ -342,6 +342,7 @@ libqt_plugin_la_SOURCES = \
 	util/playlist_cover_store.hpp \
 	util/track_matching.hpp \
 	util/local_file_url.hpp \
+	util/gettext_translator.cpp util/gettext_translator.hpp \
 	util/ui_notifier.cpp util/ui_notifier.hpp \
 	util/color_svg_image_provider.cpp util/color_svg_image_provider.hpp \
 	util/vlcaccess_image_provider.cpp util/vlcaccess_image_provider.hpp \
@@ -2159,6 +2160,19 @@ test_vlcqtmessagehandler_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlcqtmessagehandler_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlcqtmessagehandler
 TESTS += test_vlcqtmessagehandler
+
+# test_gettext_translator
+
+test_gettext_translator_SOURCES = tests/test_gettext_translator.cpp util/gettext_translator.hpp util/gettext_translator.cpp
+nodist_test_gettext_translator_SOURCES = tests/test_gettext_translator.moc
+BUILT_SOURCES += tests/test_gettext_translator.moc
+CLEANFILES += tests/test_gettext_translator.moc
+test_gettext_translator_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_gettext_translator_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_gettext_translator_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_gettext_translator_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_gettext_translator
+TESTS += test_gettext_translator
 
 # test_embedded_file_browser
 

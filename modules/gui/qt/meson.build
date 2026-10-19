@@ -488,6 +488,8 @@ qt_plugin_sources = files(
     'util/playlist_cover_store.hpp',
     'util/track_matching.hpp',
     'util/local_file_url.hpp',
+    'util/gettext_translator.cpp',
+    'util/gettext_translator.hpp',
     'util/ui_notifier.cpp',
     'util/ui_notifier.hpp',
     'util/color_svg_image_provider.cpp',
@@ -1800,6 +1802,16 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'link_args': qt_link_args,
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_gettext_translator',
+            'sources': files('tests/test_gettext_translator.cpp', 'util/gettext_translator.cpp'),
+            'moc_sources': files('tests/test_gettext_translator.cpp'),
+            'suite': ['qt'],
+            'include_directories': qt_include_dir,
+            'link_args': qt_link_args,
+            'dependencies': [qt6_dep, qtest_qt6_dep],
         }
 
         vlc_tests += {
