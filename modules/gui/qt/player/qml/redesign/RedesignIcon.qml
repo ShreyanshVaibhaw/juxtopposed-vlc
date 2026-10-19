@@ -8,15 +8,20 @@
 // This file's implementation code is GPL-2.0-or-later.
 import QtQuick
 
-RedesignSvg {
+Item {
     id: root
     property string name
     property color color: "#8f8f8f"
     property color detailColor: color
     property real sidebarReveal: 0
     readonly property bool hasDetail: name === "sort-active" || (paths[name] || "").includes("DETAIL")
-    sourceSize: Qt.size(width * Screen.devicePixelRatio, height * Screen.devicePixelRatio)
-    fillMode: Image.PreserveAspectFit
+    // Raster requests follow the display size; layout hints use the SVG frame.
+    implicitWidth: 24
+    implicitHeight: 24
+    property alias sourceSize: glyph.sourceSize
+    readonly property alias status: glyph.status
+    property alias fillMode: glyph.fillMode
+    property alias svg: glyph.svg
     readonly property var paths: {
     "playback-settings": "\n<g id=\"name=playback settings, direction=default, state=default, value=default, EQ=default, two-tone=no\">\n<g id=\"Frame 1\">\n<path id=\"Vector 75\" d=\"M12.4027 3H11.4962C10.6057 3 9.8838 3.72188 9.8838 4.61236C9.8838 5.18346 9.58169 5.71195 9.08957 6.00173L8.12104 6.57205C7.6141 6.87056 6.98638 6.87579 6.47453 6.58579C5.69274 6.14283 4.70017 6.40876 4.24456 7.18324L3.83425 7.8807C3.37572 8.66014 3.64468 9.66408 4.43146 10.1099C4.93008 10.3924 5.24215 10.9175 5.25197 11.4905L5.27052 12.5725C5.28053 13.1568 4.97024 13.6999 4.46172 13.9881C3.68617 14.4275 3.42105 15.4171 3.87302 16.1854L4.28351 16.8831C4.74564 17.6687 5.75241 17.9384 6.54538 17.4891C7.04729 17.2047 7.66046 17.1996 8.16704 17.4756L9.15602 18.0144C9.66709 18.2929 9.98514 18.8283 9.98512 19.4103C9.98509 20.2883 10.6968 21 11.5747 21H12.504C13.3945 21 14.1163 20.2781 14.1163 19.3876C14.1163 18.8165 14.4184 18.2881 14.9106 17.9983L15.8791 17.4279C16.386 17.1294 17.0137 17.1242 17.5256 17.4142C18.3073 17.8572 19.2998 17.5913 19.7554 16.8169L20.1658 16.1193C20.6243 15.3399 20.3553 14.336 19.5685 13.8901C19.0699 13.6076 18.7579 13.0825 18.748 12.5095L18.7295 11.4277C18.7195 10.8432 19.0298 10.3001 19.5384 10.012C20.314 9.57268 20.5792 8.58305 20.1272 7.81473L19.732 7.14287C19.264 6.34734 18.2389 6.08302 17.4446 6.55304C16.9218 6.8624 16.2721 6.86309 15.7486 6.55483L14.8093 6.00173C14.3172 5.71195 14.0151 5.18346 14.0151 4.61236C14.0151 3.72188 13.2932 3 12.4027 3Z\" stroke=\"COLOR\" stroke-width=\"1.5\"/>\n<path id=\"Vector 16\" d=\"M10.5 14.625V9.625L14.5 12.125L10.5 14.625Z\" fill=\"COLOR\" stroke=\"COLOR\" stroke-width=\"0.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</g>\n</g>\n",
     "videos-active": "<g xmlns=\"http://www.w3.org/2000/svg\" id=\"name=videos, direction=default, state=active, value=default, EQ=default, two-tone=no\">\n<g id=\"Frame\">\n<path id=\"Subtract\" d=\"M5.49609 2.25C3.70333 2.25 2.25 3.70333 2.25 5.49609V18C2.25 20.0711 3.92893 21.75 6 21.75H18C20.0711 21.75 21.75 20.0711 21.75 18V8.80273C21.7498 7.04781 20.3272 5.62521 18.5723 5.625H13.9619C13.0109 5.625 12.1303 5.12284 11.6455 4.30469C10.8905 3.03086 9.51884 2.25 8.03809 2.25H5.49609ZM9.63086 9.34766C9.86586 9.21467 10.1541 9.21763 10.3857 9.35645L15.3857 12.3564C15.6116 12.492 15.75 12.7366 15.75 13C15.75 13.2634 15.6116 13.508 15.3857 13.6436L10.3857 16.6436C10.1541 16.7824 9.86586 16.7853 9.63086 16.6523C9.39573 16.5192 9.25 16.2702 9.25 16V10C9.25 9.7298 9.39573 9.48079 9.63086 9.34766Z\" fill=\"COLOR\" />\n</g>\n</g>\n",
@@ -158,9 +163,13 @@ RedesignSvg {
     "shuffle": "<g id=\"name=shuffle, direction=right, state=default, value=default, EQ=default, two-tone=yes\">\n<g id=\"Frame\">\n<g id=\"Frame 259\">\n<path id=\"Vector 27\" d=\"M17.5 10.5L20 8.00015L17.5 5.5M20 8.00015H15.366C12.8079 8.00015 10.5859 9.75999 10 12.2501C9.41409 14.7402 7.1921 16.5 4.63401 16.5H3\" stroke=\"COLOR\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path id=\"Vector 28\" d=\"M17.5 13.5L20 16.0001L17.5 18.5M20 16.0001L13.3006 16.0001C12.485 16.0001 11.7203 15.6039 11.25 14.9376M3 8.00008L6.58579 8.00008C7.49129 8.00008 8.35971 8.35979 9 9.00008\" stroke=\"DETAIL\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</g>\n</g>\n</g>\n"
 }
 
-    svg:
+    RedesignSvg {
+        id: glyph
+        anchors.fill: parent
+        svg:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">'
-        + (paths[name] || "").split("COLOR").join(color.toString()).split("DETAIL").join(detailColor.toString()) + "</svg>"
+        + (root.paths[root.name] || "").split("COLOR").join(root.color.toString()).split("DETAIL").join(root.detailColor.toString()) + "</svg>"
+    }
     // The active dot extends outside the standard icon frame in the mockup.
     // Keep its SVG frame aligned with the base icon at fractional scales.
     RedesignSvg {

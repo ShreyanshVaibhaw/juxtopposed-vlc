@@ -1116,6 +1116,7 @@ qml_tests = {
     'tst_RedesignCompactMenus': files('tests/tst_RedesignCompactMenus.qml'),
     'tst_RedesignLibrary': files('tests/tst_RedesignLibrary.qml'),
     'tst_RedesignQueue': files('tests/tst_RedesignQueue.qml'),
+    'tst_RedesignIconSizing': files('tests/tst_RedesignIconSizing.qml'),
     'tst_RedesignBookmarks': files('tests/tst_RedesignBookmarks.qml'),
     'tst_RedesignChapters': files('tests/tst_RedesignChapters.qml'),
     'tst_RedesignNetwork': files('tests/tst_RedesignNetwork.qml'),
