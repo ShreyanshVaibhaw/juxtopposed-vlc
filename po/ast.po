@@ -20417,11 +20417,13 @@ msgstr "Ficheros de testu y rexistros (*.log *.txt);; Too (*.*)"
 msgid "Application"
 msgstr "Aplicación"
 
+#. Qt placeholder correction by Codex (first pass; review welcome).
+#, qt-format
 #: modules/gui/qt/dialogs/messages.cpp:268
 msgid ""
 "Cannot write to file %1:\n"
 "%2."
-msgstr "Nun pue escribise'l ficheru %1"
+msgstr "Nun pue escribise'l ficheru %1:\n%2."
 
 #: modules/gui/qt/dialogs/messages.cpp:334
 msgid "Update the tree"
@@ -33942,7 +33944,6 @@ msgstr "Llista del alministrador multimedia"
 #, fuzzy
 #~ msgid "Color fun"
 #~ msgstr "Color"
-
 
 #. Redesign translation by Codex (first pass; review welcome).
 msgid "System language"
