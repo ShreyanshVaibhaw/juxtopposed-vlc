@@ -747,7 +747,9 @@ FocusScope {
                 objectName: "muteButton"
                 scaleFactor: root.scaleFactor; lightTheme: root.lightTheme; accentColor: root.accentColor
                 implicitWidth: theme.dp(28)
-                iconName: root.muted ? "muted" : "volume"
+                iconName: root.muted || root.volume <= 0 ? "muted"
+                    : root.volume < 0.33 ? "volume-low"
+                    : root.volume <= 0.66 ? "volume-medium" : "volume"
                 text: root.muted ? qsTr("Unmute") : qsTr("Mute")
                 onClicked: root.muteRequested()
                 MouseArea {
