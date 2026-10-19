@@ -49,6 +49,8 @@ include/vlc_vlm.h
 include/vlc_vout.h
 include/vlc_xml.h
 modules/gui/qt/dialogs/dialogs/dialogmodel.cpp
+modules/gui/qt/dialogs/help/aboutmodel.hpp
+modules/gui/qt/util/subtitle_source_service.cpp
 modules/gui/qt/dialogs/preferences/redesign_preferences.cpp
 modules/gui/qt/dialogs/systray/systray.cpp
 modules/gui/qt/maininterface/navigationmodel.cpp
